@@ -1,0 +1,3 @@
+[submodule "bin/cooc"]
+	path = bin/cooc
+	url = https://github.com/CommunityGeneticsAnalyses/cooc.git
