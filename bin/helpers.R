@@ -10,7 +10,7 @@ zeroCol <- function(x, n = 10){
     x
 }
 
-freqNets <- function(x, zero.diag = FALSE){
+freqNet <- function(x, zero.diag = FALSE){
     if (class(x) == "data.frame"){x <- as.matrix(x)}
     x <- sign(x)
     x <- t(x) %*% x
@@ -47,7 +47,8 @@ netDist <- function(x, zero.na = TRUE){
     }
     for (i in 1:length(x)){
         for (j in 1:length(x)){
-            out[i, j] <- sum((x[[i]] - x[[j]])^2)^(1/2)
+            out[i, j] <- sum((x[[i]][lower.tri(x[[i]])] - 
+                                  x[[j]][lower.tri(x[[j]])])^2)^(1/2)
         }
     }
     if (zero.na){out[is.na(out)] <- 0}

@@ -1,6 +1,6 @@
 ###LCN: ONC Garden Analyses
 ###MKLau
-###24Aug2018
+###06Sep2018
 
 rm(list=ls())
 source('lcn_load_onc.R')
@@ -23,6 +23,54 @@ source('lcn_load_wild.R')
 ### Data notes:
 ## No physciods
 ## Lecanoras merged
+
+
+### We know from Lamit's dissertation work that lichen communities are heritable, largely driven by bark roughness
+
+### First test for lichen species and community heritability
+
+oneway.test(os ~ og) # Welch ANOVA
+oneway.test(os ~ og, var.equal = TRUE) # Welch ANOVA
+
+plot(os ~ prb.onc)
+
+osgmu.d <- dist(osgmu[match(colnames(as.matrix(rflp.d)), names(osgmu))])
+os.d <- dist(os)
+prb.onc.d <- dist(prb.onc)
+
+
+ecodist::mantel(osgmu.d ~ rflp.d, nperm = 10000)
+ecodist::mantel(cn.mu.d.onc ~ rflp.d, nperm = 10000)
+
+ecodist::mantel(cn.d.onc ~ os.d, nperm = 10000)
+ecodist::mantel(cn.d.onc ~ prb.onc.d, nperm = 10000)
+
+ecodist::mantel(os.d ~ prb.onc.d, nperm = 10000)
+
+adonis(os.d ~ prb.onc)
+
+summary(aov(prb.onc ~ og))
+summary(aov(os ~ og))
+
+w.lm <- lm(wses ~ prb.wild, 
+             data = data.frame(ws, prb.wild))
+summary(w.lm)
+
+summary(w.lm)
+
+## The SES indicated generally increased co-occurrences
+## linked with bark roughness. Given that the lichen
+## are functioning in a largely 2D environment and given
+## that the scale at which we measured the lichen was close
+## to the size of individual thalli, the lichen are likely
+## interacting if they occur in the same cell, either through
+## mutualism or competition.
+## Because of this we chose to use each co-occurrence in a cell
+## as an interaction. We do not assign a "sign" to the
+## interaction as we cannot distinguish between positive or
+## negative interactions (e.g., a mutualism and a parasitism
+## could look identical in terms of the spatial pattern).
+
 
 
 ## Tree Genotype Influences Ecological Network Structure
