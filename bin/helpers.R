@@ -1,3 +1,9 @@
+test.checks <- function(x = "fitted model object"){
+    print(shapiro.test(residuals(x)))
+    print(car::leveneTest(x))
+}
+
+
 ord <- function(x){
     diag(x) <- 0
     sum(sign(x))/2
