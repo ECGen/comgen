@@ -5,7 +5,9 @@
 library(vegan)
 library(bipartite)
 library(ComGenR)
+source('../bin/helpers.R')
 source('../bin/cooc/src/cooc.R')
+
 ## source('~/projects/packages/ComGenR/R/CoCo.R')
 cs <- function(x){nestedchecker(x)[[1]][1]}
 mm <- function(x){slot(computeModules(x),'likelihood')}
@@ -71,17 +73,23 @@ rflp.d <- rflp.d[rownames(rflp.d)%in%unique(onc.geno),colnames(rflp.d)%in%unique
 rflp.d <- rflp.d[match(unique(onc.geno),rownames(rflp.d)),match(unique(onc.geno),rownames(rflp.d))]
 if (all(rownames(rflp.d)==unique(onc.geno))){print('Good to go!')}else{print('Holy crap, rflp.d names match error')}
 rflp.d <- as.dist(rflp.d)
+
                                         # Lichen Network Models
-cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
-cn.d.onc <- netDist(cn.onc)
-onc.tree <- do.call(rbind, strsplit(names(og), " "))[, 1]
+cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95)
+cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
+cn.d.onc <- netDist(cn.onc, method = "bc")
+fn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
+fn.d.onc <- netDist(fn.onc, method = "bc")
+
+onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
 cn.mu.onc <- list()
-cn.mu.d.onc <- netDist(cn.mu.onc)
-for (i in 1:length(unique(og))){cn.mu.onc[[i]] <- netMean(cn.onc[og == unique(og)[i]])}
-names(cn.mu.onc) <- unique(og)
+for (i in 1:length(unique(onc.geno))){cn.mu.onc[[i]] <- netMean(cn.onc[onc.geno == unique(onc.geno)[i]])}
+cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
+names(cn.mu.onc) <- unique(onc.geno)
 if (all(onc.tree == names(cn.onc))){print("Good to go!")}else{
     print("Danger Will Robinson!")
 }
+
                                         #community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
 onc.R <- apply(sign(onc.com),1,sum)
@@ -108,6 +116,8 @@ oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)),names(oprbmu))]
                                         #co-occurrence patterns
 oco <- do.call(rbind,lapply(onc.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='pos'))
 och <- do.call(rbind,lapply(onc.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='neg'))
+oco <- oco[order(apply(oco, 1, sum), decreasing = TRUE), order(apply(oco, 2, sum), decreasing = TRUE)]
+och <- och[order(apply(och, 1, sum), decreasing = TRUE), order(apply(och, 2, sum), decreasing = TRUE)]
                                         #get araujo coordinates
 coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
 rownames(coord) <- coord[,1]
@@ -120,3 +130,5 @@ og <- onc.geno
 osgmu <- tapply(os ,og,mean)
 osgse <- tapply(os ,og,function(x)sd(x)/sqrt(length(x)))
 prb.onc <- onc.rough
+prb.mu.onc <- tapply(prb.onc, og, mean)
+prb.mu.d.onc <- dist(prb.mu.onc)

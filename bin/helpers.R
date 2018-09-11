@@ -18,45 +18,60 @@ freqNet <- function(x, zero.diag = FALSE){
     x
 }
 
-coNets <- function(x, zero.diag = FALSE, prob = TRUE, zero.na = TRUE, ci.p = 95){
+coNets <- function(x, ci.p = 95, scale = FALSE, return.signs = FALSE){
     Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
     Z <- Z.tab[as.character(floor(ci.p))]
     if (class(x) == "data.frame"){x <- as.matrix(x)}
     x <- sign(x)
     N <- apply(x, 2, sum)
-    A <- sum(N)
+    A <- nrow(x)
     P <- as.matrix(N / A)
     Pab <- P %*% t(P)
-    A <- array(sum(N), dim = dim(Pab))
+    diag(Pab) <- P
+    A <- array(nrow(x), dim = dim(Pab))
     Vab <- A * Pab * (1 - Pab)
     ci.u <- A * Pab + Z * Vab^(1/2)
     ci.l <- A * Pab - Z * Vab^(1/2)
     ab <- t(x) %*% x    
     net <- ab
-    net[ab < ci.u & ab > ci.l] <- 0
-    if (zero.diag){diag(net) <- 0}
-    if (prob){net <- Pab * sign(net)}
-    if (zero.na){net[is.na(net)] <- 0}
-    net
+    net[ab <= ci.u & ab >= ci.l] <- 0
+    if (scale){net <- net / nrow(x)}
+    if (return.signs){
+        net[ab > ci.u] <- net[ab > ci.u] * 1
+        net[ab < ci.l] <- net[ab < ci.l] * -1
+    }
+    return(net)
 }
 
-netDist <- function(x, zero.na = TRUE){
+netDist <- function(x, zero.na = TRUE, method = "euclidean"){
     out <- array(0, dim = rep(length(x), 2))
     if (!is.null(names(x))){
         rownames(out) <- colnames(out) <- names(x)
     }
-    for (i in 1:length(x)){
-        for (j in 1:length(x)){
-            out[i, j] <- sum((x[[i]][lower.tri(x[[i]])] - 
-                                  x[[j]][lower.tri(x[[j]])])^2)^(1/2)
+    if (grepl("bray", tolower(method)) | tolower(method) == "bc"){
+        for (i in 1:length(x)){
+            for (j in 1:length(x)){
+                y <- data.frame(x[[i]][lower.tri(x[[i]])], x[[j]][lower.tri(x[[j]])])
+                if (all(y == 0)){y[y == 0] <- 1}
+                out[i, j] <- ecodist::bcdist(t(y))
+            }
+        }
+    }else{
+        for (i in 1:length(x)){
+            for (j in 1:length(x)){
+                out[i, j] <- sum((x[[i]][lower.tri(x[[i]])] - 
+                                      x[[j]][lower.tri(x[[j]])])^2)^(1/2)
+            }
         }
     }
     if (zero.na){out[is.na(out)] <- 0}
     dist(out)
 }
 
-netMean <- function(x){
-    Reduce("+", x) / sum(unlist(x))
+netMean <- function(x, zero.na = TRUE){
+    x <- Reduce("+", x) / sum(unlist(x))
+    if (zero.na){x[is.na(x)] <- 0}
+    x
 }
 
 rmZeros <- function(x, zero.diag = TRUE){

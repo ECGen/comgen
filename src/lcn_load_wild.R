@@ -81,6 +81,10 @@ tree.age <- age[match(names(prb.wild),age[,1]),2]
 tree.age[is.na(tree.age)] <- gnu19.age
 names(tree.age) <- age[match(names(prb.wild),age[,1]),1]
 age <- tree.age
+                                        # networks
+cn.wild <- lapply(wild.q, coNets, return.signs = TRUE)
+cn.mu.wild <- meanNet(cn.wild)
+cn.d.wild <- netDist(cn.wild, method = 'bc')
                                         #co-occurrence patterns
 wco <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='pos'))
 wch <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='neg'))
