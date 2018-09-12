@@ -59,11 +59,6 @@ if (!(all(names(onc.ses)==names(onc.q)))){print('Holy crap!')}
 ses.tree <- as.character(sapply(names(onc.ses),function(x) unlist(strsplit(x,split=' '))[1]))
 onc.rough <- avg.rough[match(ses.tree, r.tree)]
 if (!(all(ses.tree==names(onc.rough)))){print('Holy Crap!')}
-
-                                        #Microsat data from Nash
-## gen.d <- read.csv(file='../../lcn/data/ONC_MSAT_datafromnash.csv')[,-1]
-## gen.d[is.na(gen.d)] <- 0
-## gen.d <- as.dist((gen.d))
                                         #RFLP distance values from Zink from Martinsen
 rflp.d <- readLines('../data/acn/rflp_queller_goodnight.txt')
 rflp.d <- lapply(rflp.d,strsplit,split='\t')
@@ -99,20 +94,52 @@ ns.onc <- lapply(cn.onc, pack)
 ns.onc <- lapply(ns.onc, enaStructure)
 ns.onc <- do.call(rbind, lapply(ns.onc, function(x) x[[2]]))
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
-
-                                        #community data
+                                        # Community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
 onc.R <- apply(sign(onc.com),1,sum)
 onc.H <- vegan::diversity(onc.com)
 onc.com.rel <- apply(onc.com, 2, function(x) x/max(x))
 onc.com.rel <- cbind(onc.com.rel, ds = rep(min(onc.com.rel[onc.com.rel != 0]) / 1000, nrow(onc.com.rel)))
 onc.com <- cbind(onc.com, ds = rep(min(onc.com[onc.com != 0]) / 1000, nrow(onc.com)))
-                                        # nmds and procrustes rotation
-## onc.nms <- nmds.min(nmds(vegdist(onc.com.rel),2,2))
-## onc.rot <- procrustes(dist(onc.rough),onc.nms,scale=TRUE)
-## onc.rot <- t(onc.rot$rotation)
-## onc.rot.sem <- onc.rot
-## onc.rot <- onc.rot[,(1:2)[abs(cor(cbind(onc.rough,onc.rot))[1,2:3])==max(abs(cor(cbind(onc.rough,onc.rot))[1,2:3]))]]
+                                        # Lichen community metrics
+                                        # Percent Total Cover
+ptc.onc <- unlist(lapply(onc.q, function(x) sum(apply(x, 1, function(x) sign(sum(x))))))
+                                        # Species richness
+spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
+                                        # Bipartite analysis
+nperm <- 999
+if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
+    nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"], n.nulls = 999)
+    dput(nest.onc, "../data/lichen_networks/nest_rel_onc.rda")
+}
+if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
+    obs.mod.onc <- computeModules(onc.com.rel[, colnames(onc.com.rel) != "ds"])
+    mods.onc <- tail(apply(slot(obs.mod.onc, "modules"), 2, 
+                           function(x) sum(sign(x[2:length(x)]) *
+                                               (1:(length(x) - 1)))),
+                     sum(dim(onc.com[, colnames(onc.com) != "ds"])))
+    mods.onc <- list(sp = tail(mods.onc, ncol(onc.com[, colnames(onc.com) != "ds"])), 
+                     tree = head(mods.onc, nrow(onc.com)))
+    sim.onc <- lapply(1:nperm, sim.com, x = onc.q)
+    sim.onc <- lapply(sim.onc, function(x) x / max(x))
+    nul.mod.onc <- lapply(sim.onc, function(x) computeModules(x))
+    nul.mod.onc <- unlist(lapply(nul.mod.onc, slot, "likelihood"))
+    dput(mods.onc, "../data/lichen_networks/mod_list_onc.rda")
+    write.csv(slot(obs.mod.onc, "likelihood"), 
+              "../data/lichen_networks/obs_mod_onc.csv", 
+              row.names = FALSE)
+    write.csv(nul.mod.onc, 
+              "../data/lichen_networks/null_mod_onc.csv", 
+              row.names = FALSE)
+}else{
+    obs.mod.onc <- read.csv("../data/lichen_networks/obs_mod_onc.csv")[1]
+    nul.mod.onc <- read.csv("../data/lichen_networks/null_mod_onc.csv")[,1]
+    mods.onc <- dget("../data/lichen_networks/mod_list_onc.rda")
+}
+pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) / length(nul.mod.onc)
+if (pval.mod.onc == 0){pval.mod.onc <- 1/nperm}
+z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
+bp.mod.onc <- c(nperm = nperm, obs = obs.mod.onc, z = z.mod.onc, pval = pval.mod.onc)
                                         # NMDS ordinations
                                         # community ordination
 if (!file.exists("../data/lichen_networks/onc_nmds.csv")){
@@ -122,21 +149,21 @@ if (!file.exists("../data/lichen_networks/onc_nmds.csv")){
     write.table(nms.info.onc, 
                 "../data/lichen_networks/onc_nmds_info.txt", 
                 col.names = FALSE, row.names = FALSE)
-}else{nmds.onc <- read.csv("../data/lichen_networks/onc_nmds.csv")}
+}else{nms.onc <- read.csv("../data/lichen_networks/onc_nmds.csv")}
                                         # Network ordination
 if (!(file.exists("../data/lichen_networks/conet_nmds.csv"))){
     cn.nmds.stats.onc <- capture.output(cn.nms.onc <- nmds.min(nmds(cn.d.onc, 2, 2)))
     write.csv(cn.nms.onc, "../data/lichen_networks/conet_nmds.csv", row.names = FALSE)
     write.table(cn.nmds.stats.onc, 
                 "../data/lichen_networks/conet_nmds_info.txt", 
-                col.names = FALSE, row.names = FALSE)v
+                col.names = FALSE, row.names = FALSE)
 }else{cn.nms.onc <- read.csv("../data/lichen_networks/conet_nmds.csv")}
                                         # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
                                         C = ns.onc[, c("C")]))
 cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
-                                        R = prb.onc, 
+                                        R = onc.rough, 
                                         C = ns.onc[, c("C")]))
                                         #genotype means
 omu <- apply(onc.com[,colnames(onc.com) != 'ds'], 2, 
@@ -150,14 +177,21 @@ oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)),names(oprbmu))]
 coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
 rownames(coord) <- coord[,1]
 coord <- coord[,-1]
-
-### Renaming
-oq <- onc.q
-oc <- onc.com[,colnames(onc.com) != 'ds']
-os <- onc.ses
-og <- onc.geno
-osgmu <- tapply(os ,og,mean)
-osgse <- tapply(os ,og,function(x)sd(x)/sqrt(length(x)))
-prb.onc <- onc.rough
-prb.mu.onc <- tapply(prb.onc, og, mean)
+                                        # packing into a dataframe
+tree <- onc.geno
+for (i in 1:length(unique(onc.geno))){
+    tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
+}
+tree <- factor(tree)
+onc.dat <- data.frame(ptc.onc, spr.onc, geno = factor(onc.geno), tree = tree, onc.rough)
+                                        # mean bark roughness calculations
+prb.mu.onc <- tapply(onc.rough, onc.geno, mean)
 prb.mu.d.onc <- dist(prb.mu.onc)
+
+                                        # Plot calculations
+pw.onc <- onc.com.rel[, colnames(onc.com.rel) != "ds"]
+pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE), 
+                 order(apply(pw.onc, 2, sum), decreasing = TRUE)]
+rownames(pw.onc) <- onc.geno
+col.pal <- brewer.pal((max(unlist(mods.onc))), "Paired")
+

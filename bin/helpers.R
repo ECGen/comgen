@@ -1,3 +1,25 @@
+sim.com <- function(x = "list of named quadrat observations", burn = 5, relative = FALSE){
+    r.names <- names(x)
+    for (i in 1:burn){r.names <- sample(r.names)}
+    out <- do.call(rbind, x)
+    out <- split(out, f = r.names)
+    out <- lapply(out, function(x) apply(x, 2, sum))
+    out <- do.call(rbind, out)
+    if (relative){
+        out <- apply(out, 2, function(x) x / max(x))
+        out <- cbind(out, rep(min(out[out != 0]) / 1000, nrow(out)))
+    }
+    return(out)
+}
+
+h2.reml <- function(x = "lmerTest fitted model", digits = 5){
+    var.comp <- as.data.frame(VarCorr(x))[, "vcov"]
+    out <- c(var.comp[1] / sum(var.comp), 
+             tail(coef(summary(x))[1, ], n = 1))
+    names(out) <- c("H2", "pvalue")
+    return(round(out, digits))
+}
+
 test.checks <- function(x = "fitted model object"){
     print(shapiro.test(residuals(x)))
     print(car::leveneTest(x))

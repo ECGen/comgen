@@ -3,9 +3,6 @@
 ###06Sep2018
 
 source('lcn_load_onc.R')
-source('lcn_load_wild.R')
-
-### Stats from previous lichen comgen work
 
 ### Data objects:
 ## oc = "community" occurrences summed across all cells for each tree
@@ -21,62 +18,140 @@ source('lcn_load_wild.R')
 ## No physciods
 ## Lecanoras merged
 
-
-## Total cover ~ genotype
-
-
-
-## Species richness ~ genotype
-
-## Composition ~ Genotype
-
-## Structural equation composition ~ prb <- composite(genotype)
-
-
-
+### REML
 
 ### We know from Lamit's dissertation work that lichen communities are
 ### heritable, largely driven by bark roughness
+## Do we find similar patterns?
 
-### First test for lichen species and community heritability
+## Total cover ~ genotype
+ptc.reml <- lmerTest::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+shapiro.test(residuals(ptc.reml))
+hist(residuals(ptc.reml))
+summary(ptc.reml)
+h2.reml(ptc.reml, 10)
 
-adonis(cn.d.onc ~  og, mrank = FALSE, perm = 10000)
-adonis(cn.d.onc ~  prb.onc, mrank = FALSE, perm = 10000)
-adonis(prb.onc.d ~ og, mrank = FALSE, perm = 10000)
+## Species richness ~ genotype
+spr.reml <- lmerTest::lmer(I(spr.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+shapiro.test(residuals(spr.reml))
+hist(residuals(spr.reml))
+summary(spr.reml)
+h2.reml(spr.reml, 10)
 
+## Bark roughness REML
+prb.reml <- lmerTest::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+shapiro.test(residuals(prb.reml))
+hist(residuals(prb.reml))
+summary(prb.reml)
+h2.reml(prb.reml, 10)
 
-### Networks are correlated with community structure, once relativized
-rel.com <- apply(cbind(onc.com, 
-                       ds = rep(1, nrow(onc.com))), 
-                 2, function(x) x / max(x))
-com.d.onc <- vegdist(rel.com)
-ecodist::mantel(cn.d.onc ~ com.d.onc)
+## Is species richness correlated with percent cover?
+summary(lm(ptc.onc ~ spr.onc))
 
+## Were these correlated with bark roughness?
+ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ onc.rough)
+shapiro.test(residuals(ptc.prb.lm))
+hist(residuals(ptc.prb.lm))
+summary(ptc.prb.lm)
+
+## Was composition determined by genotype?
+adonis(vegdist(onc.com.rel^(1/4)) ~ geno, perm = 5000, data = onc.dat, mrank = TRUE)
+
+## Was lichen network similarity determined by genotype?
+cn.perm <- adonis(cn.d.onc ~  onc.geno, mrank = FALSE, perm = 10000)
+
+## Is network similarity correlated with community composition?
+ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
+
+## What aspects of networks were determined by genotype?
+colnames(ns.onc)
+
+ns.C.reml <- lmerTest::lmer(I(C^(1/2)) ~ (1 | geno), data = data.frame(onc.dat, C = ns.onc[, "C"]), REML = TRUE)
+shapiro.test(residuals(ns.C.reml))
+hist(residuals(ns.C.reml))
+summary(ns.C.reml)
+h2.reml(ns.C.reml, 10)
+
+ns.L.reml <- lmerTest::lmer(I(L^(1/2)) ~ (1 | geno), data = data.frame(onc.dat, L = ns.onc[, "L"]), REML = TRUE)
+shapiro.test(residuals(ns.L.reml))
+hist(residuals(ns.L.reml))
+summary(ns.L.reml)
+h2.reml(ns.L.reml, 10)
+
+ns.LD.reml <- lmerTest::lmer(I(LD^(1/2)) ~ (1 | geno), data = data.frame(onc.dat, LD = ns.onc[, "LD"]), REML = TRUE)
+shapiro.test(residuals(ns.LD.reml))
+hist(residuals(ns.LD.reml))
+summary(ns.LD.reml)
+h2.reml(ns.LD.reml, 10)
 
 
 ## n = number of nodes, L = number of edges, C = connectivity,
 ## LD = link density, ppr = pathway proliferation rate,
-
-### Who are the players? Describe the networks.
-
-## text(chp.coord, labels = rownames(chp.coord), bg = "white")
+colnames(ns.onc)
 
 
-par(mfrow = c(1, 2))
-ch.plot(nms.onc, og)
-plot(cv.onc, col = "darkgrey")
+hist(unlist(nul.mod.onc), xlim = c(0.025, 0.12))
+abline(v = obs.mod.onc)
+bp.mod.onc
+
+
+## Tables
+perm.tab <- xtable::xtable(cn.perm$aov.tab, 
+                           caption = "Pseudo-F Table for the perMANOVA test of genotype effect on lichen network similarity.", digits = 5, label = "tab:cn_perm")
+print(perm.tab,
+      type = "latex",
+      file = "../results/cn_perm_onc.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+
+
+## Plots
+
+### Network diagram for explanation figure.
+
+pdf("../docs/lcn_araujo_method_net.pdf")
+rg10 <- sna::rgraph(n = 10, m=1, tprob=0.25, mode="graph", diag=FALSE, replace=FALSE,
+         tielist=NULL, return.as.edgelist=FALSE)
+gplot(rg15, gmode = "graph", vertex.col = "black")
+dev.off()
+
+### Figure 2
+pdf("../results/cn_chplot_onc.pdf", height = 5, width = 12)
+par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1) / 2)
+gplot(netMean(cn.mu.onc), gmode = "graph", 
+      displaylabels = TRUE, 
+      edge.lwd = netMean(cn.mu.onc) * 20, 
+      vertex.col = "darkgrey")
+legend("topleft", legend = "A", bty = "none")
 chp.coord <- ch.plot(cn.nms.onc, og, cex = 1.5)
 plot(nv.onc, col = "darkgrey")
+legend("topleft", legend = "B")
+dev.off()
 
-cn.array.onc <- array(NA, dim = c(length(cn.onc), dim(cn.onc[[1]])))
-for (i in 1:length(cn.onc)){cn.array.onc[i, , ] <- cn.onc[[i]]}
-n.cent.onc <- sna::centralization(cn.array.onc, FUN = "degree")
-sna::centralization(cn.array.onc, g=3,degree, cmode="indegree")
+pdf("../results/bp_net_onc.pdf")
+bipartite::plotweb(pw.onc, method = "normal", 
+                   text.rot = 90, 
+                   col.low = col.pal[mods.onc$tree], 
+                   col.high = col.pal[mods.onc$sp],
+                   bor.col.low = col.pal[mods.onc$tree], 
+                   bor.col.high = col.pal[mods.onc$sp],
+                   col.interaction = "grey70",
+                   bor.col.interaction = "grey70", 
+                   labsize = 1.5)
+dev.off()
 
-plot(ns.onc[, "C"] ~ factor(og))
+pdf("../results/chp_com_onc.pdf")
+ch.plot(nms.onc, onc.geno)
+plot(cv.onc, col = "grey30")
+dev.off()
 
-mod.och.onc <- metaComputeModules(och, N=1)
-plotModuleWeb(mod.onc)
+## legend("topleft", legend = "A")
+
+
+
+
+plot(ns.onc[, "C"] ~ factor(onc.geno))
 
 
 ### Wild Stands
