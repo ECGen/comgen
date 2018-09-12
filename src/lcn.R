@@ -123,12 +123,13 @@ gplot(netMean(cn.mu.onc), gmode = "graph",
       displaylabels = TRUE, 
       edge.lwd = netMean(cn.mu.onc) * 20, 
       vertex.col = "darkgrey")
-legend("topleft", legend = "A", bty = "none")
-chp.coord <- ch.plot(cn.nms.onc, og, cex = 1.5)
+legend("topleft", legend = "A", bty = "n", cex = 1.5)
+chp.coord <- ch.plot(cn.nms.onc, onc.geno, cex = 1.5)
 plot(nv.onc, col = "darkgrey")
-legend("topleft", legend = "B")
+legend("topleft", legend = "B", bty = "n", cex = 1.5)
 dev.off()
 
+par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 pdf("../results/bp_net_onc.pdf")
 bipartite::plotweb(pw.onc, method = "normal", 
                    text.rot = 90, 
@@ -143,16 +144,21 @@ dev.off()
 
 pdf("../results/chp_com_onc.pdf")
 ch.plot(nms.onc, onc.geno)
-plot(cv.onc, col = "grey30")
+##plot(cv.onc, col = "grey30")
 dev.off()
 
 ## legend("topleft", legend = "A")
 
+## Update figures
 
 
 
-plot(ns.onc[, "C"] ~ factor(onc.geno))
-
+pdf("../results/connect_geno.pdf", width = 12, height = 7)
+g.order <- tapply(ns.onc[, "C"], onc.geno, mean)
+g.order <- names(g.order)[order(g.order, decreasing = TRUE)]
+onc.g <- factor(onc.geno, levels = g.order)
+plot(ns.onc[, "C"] ~ onc.g, xlab = "Tree Genotype", ylab = "Lichen Network Connectance (C)")
+dev.off()
 
 ### Wild Stands
 
