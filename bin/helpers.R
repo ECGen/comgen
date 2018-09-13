@@ -1,3 +1,29 @@
+cgH2c <- function(x = "adonis object", g = "genotype vector", sib = 1){
+    ## These calculations follow Shuster et al. 2006
+aov.tab <- as.matrix(x$aov.tab)
+S <- length(unique(g))
+n. <- length(g)
+ni <- table(g)
+if (all(duplicated(g))){
+    k <- table(g)
+}else{
+    k <- (1/(S - 1)) * (n. - (sum(ni^2) / n.))
+}
+                                        # Heritability
+MSs <- as.matrix(x$aov.tab)[1, "MeanSqs"]
+MSw <- as.matrix(x$aov.tab)[2, "MeanSqs"]
+sigma2.s <- (MSs - MSw) / k
+sigma2.w <- MSw
+sigma2.t <- sigma2.s + sigma2.w
+h2c <- sigma2.s / sigma2.t
+                                        # 95% Confidence Interval
+t <- h2c * sib^(-1)
+SE <- ((2 * (n. - 1) * (1 - t)^2 * (1 + (k - 1) * t)^2) / (k^2 * (n. - S) * (S - 1)))^(1/2)
+CI <- 1.96 * SE
+                                        # Output
+return(c(H2c = h2c, ci.l = h2c - CI, ci.u = h2c + CI))
+}
+
 sim.com <- function(x = "list of named quadrat observations", burn = 5, relative = FALSE){
     r.names <- names(x)
     for (i in 1:burn){r.names <- sample(r.names)}

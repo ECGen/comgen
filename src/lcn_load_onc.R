@@ -8,7 +8,7 @@
 ## och = checker counts
 
 library(vegan)
-library(bipartite)
+## library(bipartite)
 library(enaR)
 library(ComGenR)
 source('../bin/helpers.R')
@@ -16,7 +16,7 @@ source('../bin/cooc/src/cooc.R')
 
 ## source('~/projects/packages/ComGenR/R/CoCo.R')
 cs <- function(x){nestedchecker(x)[[1]][1]}
-mm <- function(x){slot(computeModules(x),'likelihood')}
+mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
                                         #remove genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]
@@ -91,7 +91,7 @@ cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
 names(cn.mu.onc) <- unique(onc.geno)
                                         # network statistics
 ns.onc <- lapply(cn.onc, pack)
-ns.onc <- lapply(ns.onc, enaStructure)
+ns.onc <- lapply(ns.onc, enaR::enaStructure)
 ns.onc <- do.call(rbind, lapply(ns.onc, function(x) x[[2]]))
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
                                         # Community data
@@ -113,7 +113,7 @@ if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
     dput(nest.onc, "../data/lichen_networks/nest_rel_onc.rda")
 }
 if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
-    obs.mod.onc <- computeModules(onc.com.rel[, colnames(onc.com.rel) != "ds"])
+    obs.mod.onc <- bipartite::computeModules(onc.com.rel[, colnames(onc.com.rel) != "ds"])
     mods.onc <- tail(apply(slot(obs.mod.onc, "modules"), 2, 
                            function(x) sum(sign(x[2:length(x)]) *
                                                (1:(length(x) - 1)))),
@@ -122,7 +122,7 @@ if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
                      tree = head(mods.onc, nrow(onc.com)))
     sim.onc <- lapply(1:nperm, sim.com, x = onc.q)
     sim.onc <- lapply(sim.onc, function(x) x / max(x))
-    nul.mod.onc <- lapply(sim.onc, function(x) computeModules(x))
+    nul.mod.onc <- lapply(sim.onc, function(x) bipartite::computeModules(x))
     nul.mod.onc <- unlist(lapply(nul.mod.onc, slot, "likelihood"))
     dput(mods.onc, "../data/lichen_networks/mod_list_onc.rda")
     write.csv(slot(obs.mod.onc, "likelihood"), 
@@ -193,5 +193,5 @@ pw.onc <- onc.com.rel[, colnames(onc.com.rel) != "ds"]
 pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE), 
                  order(apply(pw.onc, 2, sum), decreasing = TRUE)]
 rownames(pw.onc) <- onc.geno
-col.pal <- brewer.pal((max(unlist(mods.onc))), "Paired")
+col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
 
