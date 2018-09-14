@@ -9,7 +9,8 @@
 
 pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "ComGenR")
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
-    pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))]
+    sapply(pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))], 
+           install.packages)
 }
 sapply(pkg.list, library, quietly = TRUE, character.only = TRUE)
 
