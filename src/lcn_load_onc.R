@@ -2,11 +2,6 @@
 ###MKLau
 ###21Mar2014
 
-## osgmu = ses genotype means
-## osgse = ses genotype SE
-## os = onc ses values
-## och = checker counts
-
 pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
                                         # Install packages that are not installed
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
@@ -14,17 +9,16 @@ if (any(!(pkg.list %in% installed.packages()[, 1]))){
            install.packages, repos='http://cran.us.r-project.org')
 }
                                         # Check for ComGenR
-if (!("ComGenR" %in% installed.packages[, 1])){
+if (!("ComGenR" %in% installed.packages()[, 1])){
     devtools::install_github("CommunityGeneticsAnalyses/ComGenR")
 }
                                         # Library packages
-sapply(pkg.list, library, quietly = TRUE, character.only = TRUE)
+sapply(c(pkg.list, "ComGenR"), library, quietly = TRUE, character.only = TRUE)
                                         # Loading some misc helper functions
 source('../bin/helpers.R')
-
-                                        # 
+                                        # Loading data
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
-                                        #remove genotype RL6 and N1.31
+                                        # remove genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]
 garden.data <- garden.data[garden.data$Tree!='N1.31',]
                                         #separate onc
@@ -35,16 +29,15 @@ onc <- garden.data[g1=='onc',]
 					#tree overlap between years
 unique(onc$Tree[onc$Year=='2010']) %in% unique(onc$Tree[onc$Year=='2011'])
 unique(onc$Tree[onc$Year=='2011']) %in% unique(onc$Tree[onc$Year=='2010'])
-                                        #
+                                        # Checking the data
 if (!(all(table(onc[,1])==100))){for (i in 1:1000){print('Warning: check input data!!!')}}
-                                        #separate trees
+                                        # Separate trees
 colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)],1,2)
 onc.q <- split(onc,paste(onc[,1],onc[,2]))
 onc.q <- lapply(onc.q,function(x) x[,7:ncol(x)])
-
-                                        #get genotype
+                                        # Get genotype
 onc.geno <- unlist(sapply(names(onc.q),function(x) strsplit(x,split=' ')[[1]][2]))
-                                        #Roughness in the Garden
+                                        # Roughness in the Garden
 rough <- read.csv('../data/lichen_networks/ONC_raw_roughness.csv')
                                         # Isolate roughness
 rough <- rough[, 1:5]
@@ -80,7 +73,6 @@ rflp.d <- rflp.d[rownames(rflp.d)%in%unique(onc.geno),colnames(rflp.d)%in%unique
 rflp.d <- rflp.d[match(unique(onc.geno),rownames(rflp.d)),match(unique(onc.geno),rownames(rflp.d))]
 if (!(all(rownames(rflp.d)==unique(onc.geno)))){print('Holy crap, rflp.d names match error')}
 rflp.d <- as.dist(rflp.d)
-
                                         # Lichen Network Models
 cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95)
 cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
@@ -195,7 +187,6 @@ onc.dat <- data.frame(ptc.onc, spr.onc, geno = factor(onc.geno), tree = tree, on
                                         # mean bark roughness calculations
 prb.mu.onc <- tapply(onc.rough, onc.geno, mean)
 prb.mu.d.onc <- dist(prb.mu.onc)
-
                                         # Plot calculations
 pw.onc <- onc.com.rel[, colnames(onc.com.rel) != "ds"]
 pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE), 

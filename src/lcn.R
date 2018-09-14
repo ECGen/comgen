@@ -5,16 +5,13 @@
 source('lcn_load_onc.R')
 
 ### Data objects:
-## oc = "community" occurrences summed across all cells for each tree
-## oq = occurrence matrices separated out for each tree
-## og = genotypes
-
+## onc.com = "community" occurrences summed across all cells for each tree
+## onc.q = occurrence matrices separated out for each tree
+## onc.geno = genotypes
 ## prb.onc = percent rough bark (averaged between the upper and lower)
-## prb.wild = percent rough bark (averaged between the upper and lower)
-## ws = wild ses values
-## wc = wild community
 
 ### Data notes:
+## Trees were removed from the analysis genotype RL6 and N1.31
 ## No physciods
 ## Lecanoras merged
 
@@ -22,7 +19,7 @@ source('lcn_load_onc.R')
 
 ### We know from Lamit's dissertation work that lichen communities are
 ### heritable, largely driven by bark roughness
-## Do we find similar patterns?
+### Do we find similar patterns?
 
 ## Total cover ~ genotype
 ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
