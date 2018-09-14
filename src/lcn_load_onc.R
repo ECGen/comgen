@@ -7,18 +7,22 @@
 ## os = onc ses values
 ## och = checker counts
 
-pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "ComGenR")
+pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
+                                        # Install packages that are not installed
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
     sapply(pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))], 
            install.packages, repos='http://cran.us.r-project.org')
 }
+                                        # Check for ComGenR
+if (!("ComGenR" %in% installed.packages[, 1])){
+    devtools::install_github("CommunityGeneticsAnalyses/ComGenR")
+}
+                                        # Library packages
 sapply(pkg.list, library, quietly = TRUE, character.only = TRUE)
-
+                                        # Loading some misc helper functions
 source('../bin/helpers.R')
 
-## source('~/projects/packages/ComGenR/R/CoCo.R')
-cs <- function(x){nestedchecker(x)[[1]][1]}
-mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
+                                        # 
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
                                         #remove genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]

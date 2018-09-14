@@ -1,3 +1,6 @@
+cs <- function(x){nestedchecker(x)[[1]][1]}
+mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
+                                        # Community Heritability function
 cgH2c <- function(x = "adonis object", g = "genotype vector", sib = 1){
     ## These calculations follow Shuster et al. 2006
 aov.tab <- as.matrix(x$aov.tab)
@@ -37,7 +40,8 @@ sim.com <- function(x = "list of named quadrat observations", burn = 5, relative
     }
     return(out)
 }
-
+                                        # Model Fitter for 
+                                        # REML from lmerTest
 h2.reml <- function(x = "lmerTest fitted model", digits = 5){
     var.comp <- as.data.frame(VarCorr(x))[, "vcov"]
     out <- c(var.comp[1] / sum(var.comp), 
