@@ -6,7 +6,7 @@ pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools
                                         # Install packages that are not installed
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
     sapply(pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))], 
-           install.packages, repos='http://cran.us.r-project.org')
+           install.packages, dependencies = TRUE, repos='http://cran.us.r-project.org')
 }
                                         # Check for ComGenR
 if (!("ComGenR" %in% installed.packages()[, 1])){
