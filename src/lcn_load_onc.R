@@ -161,10 +161,12 @@ if (!(file.exists("../data/lichen_networks/conet_nmds.csv"))){
                                         # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
-                                        C = ns.onc[, c("C")]))
+                                        C = ns.onc[, c("C")], 
+                                        A = ptc.onc))
 cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
-                                        C = ns.onc[, c("C")]))
+                                        C = ns.onc[, c("C")], 
+                                     A = ptc.onc))
                                         #genotype means
 omu <- apply(onc.com[,colnames(onc.com) != 'ds'], 2, 
              function(x,g) tapply(x,g,mean),g=onc.geno)

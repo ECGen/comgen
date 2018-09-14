@@ -23,15 +23,13 @@ source('lcn_load_onc.R')
 ### We know from Lamit's dissertation work that lichen communities are
 ### heritable, largely driven by bark roughness
 ## Do we find similar patterns?
-RLRsim
+
 ## Total cover ~ genotype
 ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
 ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
 ptc.reml.pval
 shapiro.test(residuals(ptc.reml))
 hist(residuals(ptc.reml))
-summary(ptc.reml)
-h2.reml(ptc.reml, 10)
 
 ## Species richness ~ genotype
 spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
@@ -39,8 +37,6 @@ spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
 spr.reml.pval
 shapiro.test(residuals(spr.reml))
 hist(residuals(spr.reml))
-summary(spr.reml)
-h2.reml(spr.reml, 10)
 
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
@@ -48,8 +44,6 @@ prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
 prb.reml.pval
 shapiro.test(residuals(prb.reml))
 hist(residuals(prb.reml))
-summary(prb.reml)
-h2.reml(prb.reml, 10)
 
 ## Is species richness correlated with percent cover?
 summary(lm(ptc.onc ~ spr.onc))
@@ -58,10 +52,6 @@ summary(lm(ptc.onc ~ spr.onc))
 ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ onc.rough)
 shapiro.test(residuals(ptc.prb.lm))
 hist(residuals(ptc.prb.lm))
-summary(ptc.prb.lm)
-
-## Was composition determined by genotype?
-adonis(vegdist(onc.com.rel^(1/4)) ~ geno, perm = 5000, data = onc.dat, mrank = TRUE)
 
 ## Was lichen network similarity determined by genotype?
 cn.perm <- adonis(cn.d.onc ~  onc.geno, mrank = FALSE, perm = 10000)
@@ -71,24 +61,17 @@ cgH2c(cn.perm, g = onc.geno)
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
 
 ## What aspects of networks were determined by genotype?
-colnames(ns.onc)
-
 ns.C.reml <- lme4::lmer(I(C^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, C = ns.onc[, "C"]), REML = TRUE)
 ns.C.reml.pval <- RLRsim::exactRLRT(ns.C.reml)
 ns.C.reml.pval
 shapiro.test(residuals(ns.C.reml))
 hist(residuals(ns.C.reml))
-summary(ns.C.reml)
-h2.reml(ns.C.reml, 10)
-
+                                        # 
 ns.L.reml <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, L = ns.onc[, "L"]), REML = TRUE)
 ns.L.reml.pval <- RLRsim::exactRLRT(ns.L.reml)
 ns.L.reml.pval
 shapiro.test(residuals(ns.L.reml))
-hist(residuals(ns.L.reml))
-summary(ns.L.reml)
-h2.reml(ns.L.reml, 10)
-
+                                        # 
 ns.LD.reml <- lme4::lmer(I(LD^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, LD = ns.onc[, "LD"]), REML = TRUE)
 ns.LD.reml.pval <- RLRsim::exactRLRT(ns.LD.reml)
 ns.LD.reml.pval
@@ -101,7 +84,6 @@ h2.reml(ns.LD.reml, 10)
 ## n = number of nodes, L = number of edges, C = connectivity,
 ## LD = link density, ppr = pathway proliferation rate,
 colnames(ns.onc)
-
 
 hist(unlist(nul.mod.onc), xlim = c(0.025, 0.12))
 abline(v = obs.mod.onc)
