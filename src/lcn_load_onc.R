@@ -7,12 +7,13 @@
 ## os = onc ses values
 ## och = checker counts
 
-library(vegan)
-## library(bipartite)
-library(enaR)
-library(ComGenR)
+pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "ComGenR")
+if (any(!(pkg.list %in% installed.packages()[, 1]))){
+    pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))]
+}
+sapply(pkg.list, library, quietly = TRUE, character.only = TRUE)
+
 source('../bin/helpers.R')
-source('../bin/cooc/src/cooc.R')
 
 ## source('~/projects/packages/ComGenR/R/CoCo.R')
 cs <- function(x){nestedchecker(x)[[1]][1]}
