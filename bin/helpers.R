@@ -1,7 +1,39 @@
 cs <- function(x){nestedchecker(x)[[1]][1]}
 mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
+                                        # dbrda community heritability
+dbr.cgH2c <- function(x = "dbrda object", 
+                      g = "genotype vector", 
+                      sib = 1, 
+                      ci.p = 95){
+    Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
+    Z <- Z.tab[as.character(floor(ci.p))]
+    ## These calculations follow Shuster et al. 2006
+aov.tab <- unlist(anova(x))
+S <- length(unique(g))
+n. <- length(g)
+ni <- table(g)
+if (all(duplicated(g))){
+    k <- table(g)
+}else{
+    k <- (1/(S - 1)) * (n. - (sum(ni^2) / n.))
+}
+                                        # Heritability
+sigma2.s <- aov.tab["Variance1"] 
+sigma2.w <- aov.tab["Variance2"]
+sigma2.t <- sigma2.s + sigma2.w
+h2c <- sigma2.s / sigma2.t
+                                        # 95% Confidence Interval
+t <- h2c * sib^(-1)
+SE <- ((2 * (n. - 1) * (1 - t)^2 * (1 + (k - 1) * t)^2) / (k^2 * (n. - S) * (S - 1)))^(1/2)
+CI <- Z * SE
+                                        # Output
+return(c(H2c = h2c, ci.l = h2c - CI, ci.u = h2c + CI))
+}
+
                                         # Community Heritability function
-cgH2c <- function(x = "adonis object", g = "genotype vector", sib = 1){
+cgH2c <- function(x = "adonis object", g = "genotype vector", sib = 1, ci.p = 95){
+    Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
+    Z <- Z.tab[as.character(floor(ci.p))]
     ## These calculations follow Shuster et al. 2006
 aov.tab <- as.matrix(x$aov.tab)
 S <- length(unique(g))
@@ -22,7 +54,7 @@ h2c <- sigma2.s / sigma2.t
                                         # 95% Confidence Interval
 t <- h2c * sib^(-1)
 SE <- ((2 * (n. - 1) * (1 - t)^2 * (1 + (k - 1) * t)^2) / (k^2 * (n. - S) * (S - 1)))^(1/2)
-CI <- 1.96 * SE
+CI <- Z * SE
                                         # Output
 return(c(H2c = h2c, ci.l = h2c - CI, ci.u = h2c + CI))
 }

@@ -4,6 +4,15 @@
 
 source('lcn_load_onc.R')
 
+### How do the unipartite networks based on the bipartite network compare to the unipartite networks from genotypes?
+sp.up <- t(onc.com[, -ncol(onc.com)]) %*% onc.com[, -ncol(onc.com)]
+sp.up <- (sp.up )^(1/5)
+sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+
+### What are the heritabilities for all REML analyses?
+
+sp.up <- onc.com[, -"ds"]
+
 ### Data objects:
 ## onc.com = "community" occurrences summed across all cells for each tree
 ## onc.q = occurrence matrices separated out for each tree
@@ -43,48 +52,32 @@ shapiro.test(residuals(prb.reml))
 hist(residuals(prb.reml))
 
 ## Is species richness correlated with percent cover?
-summary(lm(ptc.onc ~ spr.onc))
+summary(lm(spr.onc ~ ptc.onc))
 
 ## Were these correlated with bark roughness?
 ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ onc.rough)
+summary(ptc.prb.lm)
 shapiro.test(residuals(ptc.prb.lm))
 hist(residuals(ptc.prb.lm))
 
-## Was lichen network similarity determined by genotype?
-cn.perm <- adonis(cn.d.onc ~  onc.geno, mrank = FALSE, perm = 10000)
-cgH2c(cn.perm, g = onc.geno)
+## Is network similarity correlated with community richness?
+vegan::adonis(cn.d.onc ~ spr.onc)
+vegan::adonis(cn.d.onc ~ onc.rough)
 
 ## Is network similarity correlated with community composition?
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
 
-## What aspects of networks were determined by genotype?
-ns.C.reml <- lme4::lmer(I(C^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, C = ns.onc[, "C"]), REML = TRUE)
-ns.C.reml.pval <- RLRsim::exactRLRT(ns.C.reml)
-ns.C.reml.pval
-shapiro.test(residuals(ns.C.reml))
-hist(residuals(ns.C.reml))
-                                        # 
-ns.L.reml <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, L = ns.onc[, "L"]), REML = TRUE)
-ns.L.reml.pval <- RLRsim::exactRLRT(ns.L.reml)
-ns.L.reml.pval
-shapiro.test(residuals(ns.L.reml))
-                                        # 
-ns.LD.reml <- lme4::lmer(I(LD^(1/4)) ~ (1 | geno), data = data.frame(onc.dat, LD = ns.onc[, "LD"]), REML = TRUE)
-ns.LD.reml.pval <- RLRsim::exactRLRT(ns.LD.reml)
-ns.LD.reml.pval
-shapiro.test(residuals(ns.LD.reml))
-hist(residuals(ns.LD.reml))
-summary(ns.LD.reml)
-h2.reml(ns.LD.reml, 10)
+## Was lichen network similarity determined by genotype?
+summary(dbr.cn.geno)
+anova(dbr.cn.geno, permutations = 5000)
+dbr.cgH2c(dbr.cn.geno, g = onc.geno, ci.p = 95)
 
-
-## n = number of nodes, L = number of edges, C = connectivity,
-## LD = link density, ppr = pathway proliferation rate,
-colnames(ns.onc)
-
-hist(unlist(nul.mod.onc), xlim = c(0.025, 0.12))
-abline(v = obs.mod.onc)
-bp.mod.onc
+## What aspects of networks explained the similiarity?
+## L = number of edges, LD = link density, C = connectivity,
+## dcen = degree centrality
+ch.plot(ord, onc.geno)
+plot(ns.vec.onc)
+ns.vec.onc
 
 
 ## Tables

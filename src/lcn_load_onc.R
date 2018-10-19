@@ -87,10 +87,17 @@ for (i in 1:length(unique(onc.geno))){
 }
 cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
 names(cn.mu.onc) <- unique(onc.geno)
+                                        # db rda for network similarity
+dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ onc.geno, distance = "bray")
                                         # network statistics
+ord <- vegan:::scores.cca(dbr.cn.geno)$"sites"
 ns.onc <- lapply(cn.onc, pack)
 ns.onc <- lapply(ns.onc, enaR::enaStructure)
 ns.onc <- do.call(rbind, lapply(ns.onc, function(x) x[[2]]))
+                                        # graph level centralization 
+dcen.onc <- unlist(lapply(cn.onc, function(x) 
+    sna::centralization(x, FUN = sna::degree)))
+ns.onc <- cbind(ns.onc, Cen = dcen.onc)
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
                                         # Community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
@@ -104,6 +111,8 @@ onc.com <- cbind(onc.com, ds = rep(min(onc.com[onc.com != 0]) / 1000, nrow(onc.c
 ptc.onc <- unlist(lapply(onc.q, function(x) sum(apply(x, 1, function(x) sign(sum(x))))))
                                         # Species richness
 spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
+                                        # Vectors for network similarity
+ns.vec.onc <- envfit(ord, cbind(ns.onc[, c("L", "Cen")], R = onc.rough, Cov = ptc.onc))
                                         # Bipartite analysis
 nperm <- 999
 if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
