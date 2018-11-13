@@ -31,7 +31,7 @@ sp.up <- onc.com[, -"ds"]
 ### Do we find similar patterns?
 
 ## Create a list to generate a results table
-h2.tab <- matrix("", 9, 4)
+h2.tab <- matrix("", 6, 4)
 colnames(h2.tab) <- c("Response", "Predictor", "p-value", "H2")
 
 ## Total cover ~ genotype
