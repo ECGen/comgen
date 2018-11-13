@@ -1,10 +1,10 @@
 ###LCN: ONC Garden Analyses
 ###MKLau
 ###06Sep2018
-
 source('lcn_load_onc.R')
 
-### How do the unipartite networks based on the bipartite network compare to the unipartite networks from genotypes?
+### How do the unipartite networks based on the bipartite network
+### compare to the unipartite networks from genotypes?
 sp.up <- t(onc.com[, -ncol(onc.com)]) %*% onc.com[, -ncol(onc.com)]
 sp.up <- (sp.up )^(1/5)
 sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
@@ -30,26 +30,38 @@ sp.up <- onc.com[, -"ds"]
 ### heritable, largely driven by bark roughness
 ### Do we find similar patterns?
 
+## Create a list to generate a results table
+results <- list()
+
 ## Total cover ~ genotype
-ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ptc.reml
 ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
 ptc.reml.pval
+fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$geno)
 shapiro.test(residuals(ptc.reml))
 hist(residuals(ptc.reml))
+H2(ptc.reml)
 
 ## Species richness ~ genotype
-spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
 spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
 spr.reml.pval
 shapiro.test(residuals(spr.reml))
+fligner.test(onc.dat$spr.onc^(1/2), onc.dat$geno)
 hist(residuals(spr.reml))
+H2c(spr.reml)
 
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
 prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
 prb.reml.pval
+fligner.test(onc.dat$onc.rough^(1/2), onc.dat$geno)
 shapiro.test(residuals(prb.reml))
 hist(residuals(prb.reml))
+H2c(prb.reml)
 
 ## Is species richness correlated with percent cover?
 summary(lm(spr.onc ~ ptc.onc))
@@ -57,27 +69,59 @@ summary(lm(spr.onc ~ ptc.onc))
 ## Were these correlated with bark roughness?
 ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ onc.rough)
 summary(ptc.prb.lm)
+fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$onc.rough)
 shapiro.test(residuals(ptc.prb.lm))
 hist(residuals(ptc.prb.lm))
 
 ## Is network similarity correlated with community richness?
 vegan::adonis(cn.d.onc ~ spr.onc)
 vegan::adonis(cn.d.onc ~ onc.rough)
+vegan::adonis(cn.d.onc ~ onc.geno + onc.rough)
 
 ## Is network similarity correlated with community composition?
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
 
 ## Was lichen network similarity determined by genotype?
 summary(dbr.cn.geno)
+vegan::adonis2(cn.d.onc ~ onc.geno)
+vegan::adonis2(cn.d.onc ~ 1 | onc.geno)
 anova(dbr.cn.geno, permutations = 5000)
-dbr.cgH2c(dbr.cn.geno, g = onc.geno, ci.p = 95)
+                                        # db rda for network similarity
+dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ geno, data = onc.dat, distance = "bray")
+ord <- vegan:::scores.cca(dbr.cn.geno)$"sites"
+H2c(dbr.cn.geno)
 
 ## What aspects of networks explained the similiarity?
 ## L = number of edges, LD = link density, C = connectivity,
 ## dcen = degree centrality
-ch.plot(ord, onc.geno)
-plot(ns.vec.onc)
-ns.vec.onc
+pairs(cbind(R =onc.dat$spr.onc, onc.ns[,c("L", "C", "Cen")]))
+
+link.reml <- lme4::lmer(I(L^(1/2)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+link.reml.pval <- RLRsim::exactRLRT(link.reml)
+link.reml.pval
+fligner.test(onc.dat$L^(1/2), onc.dat$geno)
+shapiro.test(residuals(link.reml))
+hist(residuals(link.reml))
+
+
+cen.reml <- lme4::lmer(I(log(Cen + 0.0001)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+cen.reml.pval <- RLRsim::exactRLRT(cen.reml)
+cen.reml.pval
+fligner.test(onc.dat$L^(1/1), onc.dat$geno)
+shapiro.test(residuals(cen.reml))
+hist(residuals(cen.reml))
+
+
+summary(lm(Cen ~ spr.onc, data = onc.dat))
+summary(lm(L ~ spr.onc, data = onc.dat))
+
+summary(lm(Cen ~ ptc.onc, data = onc.dat))
+summary(lm(L ~ ptc.onc, data = onc.dat))
+
+plot(Cen ~ spr.onc, data = onc.dat)
+plot(Cen ~ ptc.onc, data = onc.dat)
 
 
 ## Tables
@@ -95,12 +139,6 @@ print(perm.tab,
 
 ### Network diagram for explanation figure.
 
-pdf("../docs/lcn_araujo_method_net.pdf")
-rg10 <- sna::rgraph(n = 10, m=1, tprob=0.25, mode="graph", diag=FALSE, replace=FALSE,
-         tielist=NULL, return.as.edgelist=FALSE)
-gplot(rg15, gmode = "graph", vertex.col = "black")
-dev.off()
-
 ### Figure 2
 pdf("../results/cn_chplot_onc.pdf", height = 5, width = 12)
 par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1) / 2)
@@ -117,7 +155,7 @@ dev.off()
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 pdf("../results/bp_net_onc.pdf")
 bipartite::plotweb(pw.onc, method = "normal", 
-                   text.rot = 90, 
+                   text.rot = 45, 
                    col.low = col.pal[mods.onc$tree], 
                    col.high = col.pal[mods.onc$sp],
                    bor.col.low = col.pal[mods.onc$tree], 

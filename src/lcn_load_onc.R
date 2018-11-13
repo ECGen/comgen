@@ -87,17 +87,14 @@ for (i in 1:length(unique(onc.geno))){
 }
 cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
 names(cn.mu.onc) <- unique(onc.geno)
-                                        # db rda for network similarity
-dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ onc.geno, distance = "bray")
                                         # network statistics
-ord <- vegan:::scores.cca(dbr.cn.geno)$"sites"
 ns.onc <- lapply(cn.onc, pack)
 ns.onc <- lapply(ns.onc, enaR::enaStructure)
 ns.onc <- do.call(rbind, lapply(ns.onc, function(x) x[[2]]))
                                         # graph level centralization 
 dcen.onc <- unlist(lapply(cn.onc, function(x) 
-    sna::centralization(x, FUN = sna::degree)))
-ns.onc <- cbind(ns.onc, Cen = dcen.onc)
+    sna::centralization(x, FUN = sna::degree, normalize = TRUE)))
+onc.ns <- cbind(ns.onc, Cen = dcen.onc)
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
                                         # Community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
@@ -112,12 +109,14 @@ ptc.onc <- unlist(lapply(onc.q, function(x) sum(apply(x, 1, function(x) sign(sum
                                         # Species richness
 spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
                                         # Vectors for network similarity
-ns.vec.onc <- envfit(ord, cbind(ns.onc[, c("L", "Cen")], R = onc.rough, Cov = ptc.onc))
+## ns.vec.onc <- envfit(ord, data.frame(onc.ns[, c("L", "Cen")], R = onc.rough, Cov = ptc.onc))
                                         # Bipartite analysis
 nperm <- 999
 if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
     nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"], n.nulls = 999)
     dput(nest.onc, "../data/lichen_networks/nest_rel_onc.rda")
+}else{
+    nest.onc <- dget("../data/lichen_networks/nest_rel_onc.rda")
 }
 if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
     obs.mod.onc <- bipartite::computeModules(onc.com.rel[, colnames(onc.com.rel) != "ds"])
@@ -141,6 +140,7 @@ if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
 }else{
     obs.mod.onc <- read.csv("../data/lichen_networks/obs_mod_onc.csv")[1]
     nul.mod.onc <- read.csv("../data/lichen_networks/null_mod_onc.csv")[,1]
+    z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
     mods.onc <- dget("../data/lichen_networks/mod_list_onc.rda")
 }
 pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) / length(nul.mod.onc)
@@ -168,11 +168,11 @@ if (!(file.exists("../data/lichen_networks/conet_nmds.csv"))){
                                         # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
-                                        C = ns.onc[, c("C")], 
+                                        C = onc.ns[, c("C")], 
                                         A = ptc.onc))
 cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
-                                        C = ns.onc[, c("C")], 
+                                        C = onc.ns[, c("C")], 
                                      A = ptc.onc))
                                         #genotype means
 omu <- apply(onc.com[,colnames(onc.com) != 'ds'], 2, 
@@ -192,7 +192,9 @@ for (i in 1:length(unique(onc.geno))){
     tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
 }
 tree <- factor(tree)
-onc.dat <- data.frame(ptc.onc, spr.onc, geno = factor(onc.geno), tree = tree, onc.rough)
+onc.dat <- data.frame(ptc.onc, spr.onc, 
+                      geno = factor(onc.geno), tree = tree, 
+                      onc.rough, onc.ns[, c("L", "Cen")])
                                         # mean bark roughness calculations
 prb.mu.onc <- tapply(onc.rough, onc.geno, mean)
 prb.mu.d.onc <- dist(prb.mu.onc)

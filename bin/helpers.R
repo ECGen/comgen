@@ -1,64 +1,53 @@
-cs <- function(x){nestedchecker(x)[[1]][1]}
-mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
-                                        # dbrda community heritability
-dbr.cgH2c <- function(x = "dbrda object", 
-                      g = "genotype vector", 
-                      sib = 1, 
-                      ci.p = 95){
-    Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
-    Z <- Z.tab[as.character(floor(ci.p))]
-    ## These calculations follow Shuster et al. 2006
-aov.tab <- unlist(anova(x))
-S <- length(unique(g))
-n. <- length(g)
-ni <- table(g)
-if (all(duplicated(g))){
-    k <- table(g)
-}else{
-    k <- (1/(S - 1)) * (n. - (sum(ni^2) / n.))
-}
+                                        # heritability
+H2 <- function(x = "aov, reml, adonis2 or dbrda object", g = "genotype vector", perm = 10000){
+    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
+        warning("Unknown object.")
+        stop()
+    }
+    if (class(x)[1] == "anova.cca"){
+        if (any(g == "genotype vector")){
+            warning("Please supply a genotype vector.")
+            stop()
+        }
+        tab <- as.matrix(x)
+        MSa <- tab[1, "SumOfSqs"] / tab[1, "Df"]
+        MSw <- tab[2, "SumOfSqs"] / tab[2, "Df"]
+    }else if (class(x)[1] == "aov"){
+        if (any(g == "genotype vector")){
+            warning("Please supply a genotype vector.")
+            stop()
+        }
+        g <- x$model[,2]
+        tab <- as.matrix(anova(x))
+        MSa <- tab[1, "Mean Sq"]
+        MSw <- tab[2, "Mean Sq"]
+    }
+                                        # Adjust MS for sample size
+    if (class(x)[1] == "anova.cca" | class(x)[1] == "aov"){
+        if (all(duplicated(table(g)))){
+            k <- table(g)[1]
+        }else{
+            S <- length(unique(g))
+            n. <- length(g)
+            ni <- table(g)
+            k <- (1/(S-1)) * (n. - (sum(ni^2) / n.))
+        }
+        s2.a <- (MSa - MSw) / k
+        s2.w <- MSw
+    }
+    if (class(x)[1] == "dbrda"){
+        aov.tab <- as.matrix(anova(x, permutations = perm), all = TRUE)
+        s2.a <- aov.tab[1, "Variance"]
+        s2.w <- aov.tab[2, "Variance"] 
+    }else if (class(x)[1] == "lmerMod"){
+        s2.a <- as.data.frame((summary(x)[["varcor"]]))[1, "sdcor"]^2
+        s2.w <- as.data.frame((summary(x)[["varcor"]]))[2, "sdcor"]^2
+    }
                                         # Heritability
-sigma2.s <- aov.tab["Variance1"] 
-sigma2.w <- aov.tab["Variance2"]
-sigma2.t <- sigma2.s + sigma2.w
-h2c <- sigma2.s / sigma2.t
-                                        # 95% Confidence Interval
-t <- h2c * sib^(-1)
-SE <- ((2 * (n. - 1) * (1 - t)^2 * (1 + (k - 1) * t)^2) / (k^2 * (n. - S) * (S - 1)))^(1/2)
-CI <- Z * SE
-                                        # Output
-return(c(H2c = h2c, ci.l = h2c - CI, ci.u = h2c + CI))
+    s2.a /  (s2.a + s2.w)
 }
 
-                                        # Community Heritability function
-cgH2c <- function(x = "adonis object", g = "genotype vector", sib = 1, ci.p = 95){
-    Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
-    Z <- Z.tab[as.character(floor(ci.p))]
-    ## These calculations follow Shuster et al. 2006
-aov.tab <- as.matrix(x$aov.tab)
-S <- length(unique(g))
-n. <- length(g)
-ni <- table(g)
-if (all(duplicated(g))){
-    k <- table(g)
-}else{
-    k <- (1/(S - 1)) * (n. - (sum(ni^2) / n.))
-}
-                                        # Heritability
-MSs <- as.matrix(x$aov.tab)[1, "MeanSqs"]
-MSw <- as.matrix(x$aov.tab)[2, "MeanSqs"]
-sigma2.s <- (MSs - MSw) / k
-sigma2.w <- MSw
-sigma2.t <- sigma2.s + sigma2.w
-h2c <- sigma2.s / sigma2.t
-                                        # 95% Confidence Interval
-t <- h2c * sib^(-1)
-SE <- ((2 * (n. - 1) * (1 - t)^2 * (1 + (k - 1) * t)^2) / (k^2 * (n. - S) * (S - 1)))^(1/2)
-CI <- Z * SE
-                                        # Output
-return(c(H2c = h2c, ci.l = h2c - CI, ci.u = h2c + CI))
-}
-
+                                        # Simulating Communities
 sim.com <- function(x = "list of named quadrat observations", burn = 5, relative = FALSE){
     r.names <- names(x)
     for (i in 1:burn){r.names <- sample(r.names)}
@@ -235,3 +224,7 @@ ch.plot <- function(x = 'ordination matrix', g = 'groupings', cex = 1, plot.lege
     }
     mu
 }
+
+cs <- function(x){nestedchecker(x)[[1]][1]}
+mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
+
