@@ -96,6 +96,10 @@ dcen.onc <- unlist(lapply(cn.onc, function(x)
     sna::centralization(x, FUN = sna::degree, normalize = TRUE)))
 onc.ns <- cbind(ns.onc, Cen = dcen.onc)
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
+                                        # species centralities
+cen.spp <- lapply(cn.onc, sna::degree, rescale = FALSE)
+cen.spp <- do.call(rbind, cen.spp)
+colnames(cen.spp) <- colnames(cn.onc[[1]])
                                         # Community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
 onc.R <- apply(sign(onc.com),1,sum)
