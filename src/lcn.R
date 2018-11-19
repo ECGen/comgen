@@ -3,27 +3,6 @@
 ###06Sep2018
 source('lcn_load_onc.R')
 
-### How do the unipartite networks based on the bipartite network
-### compare to the unipartite networks from genotypes?
-sp.up <- t(onc.com[, -ncol(onc.com)]) %*% onc.com[, -ncol(onc.com)]
-sp.up <- (sp.up )^(1/5)
-sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
-
-### What are the heritabilities for all REML analyses?
-
-sp.up <- onc.com[, -"ds"]
-
-### Data objects:
-## onc.com = "community" occurrences summed across all cells for each tree
-## onc.q = occurrence matrices separated out for each tree
-## onc.geno = genotypes
-## prb.onc = percent rough bark (averaged between the upper and lower)
-
-### Data notes:
-## Trees were removed from the analysis genotype RL6 and N1.31
-## No physciods
-## Lecanoras merged
-
 ### REML
 
 ### We know from Lamit's dissertation work that lichen communities are
@@ -31,8 +10,8 @@ sp.up <- onc.com[, -"ds"]
 ### Do we find similar patterns?
 
 ## Create a list to generate a results table
-h2.tab <- matrix("", 6, 4)
-colnames(h2.tab) <- c("Response", "Predictor", "p-value", "H2")
+h2.tab <- matrix("", 6, 5)
+colnames(h2.tab) <- c("Response", "Predictor", "p-value", "H2", "R2")
 
 ## Total cover ~ genotype
 ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), 
@@ -148,6 +127,13 @@ h2.tab[6, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[6, "H2"] <- H2(cen.reml)
 h2.tab[6, "Response"] <- "Network Centrality"
 h2.tab[6, "Predictor"] <- "Genotype"
+
+### How do the unipartite networks based on the bipartite network
+### compare to the unipartite networks from genotypes?
+sp.up <- t(onc.com[, -ncol(onc.com)]) %*% onc.com[, -ncol(onc.com)]
+sp.up <- (sp.up )^(1/5)
+## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+
 
 ## Tables
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 2)

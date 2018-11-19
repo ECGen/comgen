@@ -2,6 +2,18 @@
 ###MKLau
 ###21Mar2014
 
+### Data objects:
+## onc.com = "community" occurrences summed across all cells for each tree
+## onc.q = occurrence matrices separated out for each tree
+## onc.geno = genotypes
+## prb.onc = percent rough bark (averaged between the upper and lower)
+
+### Data notes:
+## Trees were removed from the analysis genotype RL6 and N1.31
+## No physciods
+## Lecanoras merged
+
+
 pkg.list <- c("vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
                                         # Install packages that are not installed
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
