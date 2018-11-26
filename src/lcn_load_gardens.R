@@ -37,18 +37,25 @@ garden.data <- garden.data[garden.data$Tree!='N1.31',]
 garden.data[,1] <- as.character(garden.data[,1])
 g1 <- substr(garden.data[,1],2,2)
 g1[g1!='P'] <- 'onc'
-onc <- garden.data[g1=='onc',]
+onc <- garden.data[g1 == 'onc',]
+pit <- garden.data[g1 == 'P',]
 					#tree overlap between years
 unique(onc$Tree[onc$Year=='2010']) %in% unique(onc$Tree[onc$Year=='2011'])
 unique(onc$Tree[onc$Year=='2011']) %in% unique(onc$Tree[onc$Year=='2010'])
                                         # Checking the data
 if (!(all(table(onc[,1])==100))){for (i in 1:1000){print('Warning: check input data!!!')}}
                                         # Separate trees
+                                        # onc
 colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)],1,2)
 onc.q <- split(onc,paste(onc[,1],onc[,2]))
 onc.q <- lapply(onc.q,function(x) x[,7:ncol(x)])
+                                        # pit
+colnames(pit)[7:ncol(pit)] <- substr(colnames(pit)[7:ncol(pit)],1,2)
+pit.q <- split(pit,paste(pit[,1],pit[,2]))
+pit.q <- lapply(pit.q,function(x) x[,7:ncol(x)])
                                         # Get genotype
 onc.geno <- unlist(sapply(names(onc.q),function(x) strsplit(x,split=' ')[[1]][2]))
+pit.geno <- unlist(sapply(names(pit.q),function(x) strsplit(x,split=' ')[[1]][2]))
                                         # Roughness in the Garden
 rough <- read.csv('../data/lichen_networks/ONC_raw_roughness.csv')
                                         # Isolate roughness
@@ -86,11 +93,18 @@ rflp.d <- rflp.d[match(unique(onc.geno),rownames(rflp.d)),match(unique(onc.geno)
 if (!(all(rownames(rflp.d)==unique(onc.geno)))){print('Holy crap, rflp.d names match error')}
 rflp.d <- as.dist(rflp.d)
                                         # Lichen Network Models
+                                        # onc
 cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95)
 cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
 cn.d.onc <- netDist(cn.onc, method = "bc")
 fn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
 fn.d.onc <- netDist(fn.onc, method = "bc")
+                                        # pit
+cn.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNets, ci.p = 95)
+cn.sign.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
+cn.d.pit <- netDist(cn.pit, method = "bc")
+fn.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), freqNet, zero.diag = TRUE)
+fn.d.pit <- netDist(fn.pit, method = "bc")
                                         # genotype means and mean distances
 onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
 cn.mu.onc <- list()
@@ -116,9 +130,16 @@ colnames(cen.spp) <- colnames(cn.onc[[1]])
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
 onc.R <- apply(sign(onc.com),1,sum)
 onc.H <- vegan::diversity(onc.com)
+onc.com.gm <- apply(onc.com, 2, function(x, g) tapply(x, g, mean), g = onc.geno)
+onc.com.gm.rel <- apply(onc.com.gm, 2, function(x) x/max(x))
 onc.com.rel <- apply(onc.com, 2, function(x) x/max(x))
 onc.com.rel <- cbind(onc.com.rel, ds = rep(min(onc.com.rel[onc.com.rel != 0]) / 1000, nrow(onc.com.rel)))
 onc.com <- cbind(onc.com, ds = rep(min(onc.com[onc.com != 0]) / 1000, nrow(onc.com)))
+                                        # pit genotype mean community
+pit.com <- do.call(rbind,lapply(pit.q,function(x) apply(x,2,sum)))
+pit.com.gm <- apply(pit.com, 2, function(x, g) tapply(x, g, mean), g = pit.geno)
+pit.com.gm.rel <- apply(pit.com.gm, 2, function(x) x/max(x))
+pit.com.gm.rel[is.na(pit.com.gm.rel)] <- 0
                                         # Lichen community metrics
                                         # Percent Total Cover
 ptc.onc <- unlist(lapply(onc.q, function(x) sum(apply(x, 1, function(x) sign(sum(x))))))

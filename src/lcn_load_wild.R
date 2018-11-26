@@ -34,6 +34,8 @@ x <- x[colnames(x)!='fgb']
 x.q <- split(x,quads)
 wild.com <- split(x,x$tree)
 wild.com <- do.call(rbind,lapply(wild.com,function(x) apply(x[,-1:-4],2,sum)))
+wild.com.rel <- apply(wild.com, 2, function(x) x/max(x))
+wild.com.rel[is.na(wild.com.rel)] <- 0
 wild.q <- lapply(split(x,x$tree),function(x) x[,-1:-4])
                                         #data from lamit
 env <- read.csv('../data/lichen_networks/Uinta2012_all_data_from_Lamit.csv')
@@ -106,5 +108,4 @@ coord <- coord[,-1]
 
 ###Rename data objects for simplicity
 ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')
-wc <- wild.com
-wq <- wild.q
+

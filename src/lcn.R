@@ -1,7 +1,8 @@
 ###LCN: ONC Garden Analyses
 ###MKLau
 ###06Sep2018
-source('lcn_load_onc.R')
+source('lcn_load_gardens.R')
+source('lcn_load_wild.R')
 
 ### REML
 
@@ -58,6 +59,9 @@ shapiro.test(residuals(ptc.prb.lm))
 vegan::adonis(cn.d.onc ~ spr.onc)
 vegan::adonis(cn.d.onc ~ onc.rough)
 vegan::adonis(cn.d.onc ~ onc.geno + onc.rough)
+                                        # Not enough genotypes
+vegan::adonis2(cn.d.pit ~ pit.geno)
+vegan::adonis2(cn.d.pit ~ pit.geno, sqrt.dist = TRUE)
 
 ## Is network similarity correlated with community composition?
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
@@ -128,12 +132,19 @@ h2.tab[6, "H2"] <- H2(cen.reml)
 h2.tab[6, "Response"] <- "Network Centrality"
 h2.tab[6, "Predictor"] <- "Genotype"
 
-### How do the unipartite networks based on the bipartite network
-### compare to the unipartite networks from genotypes?
-sp.up <- t(onc.com[, -ncol(onc.com)]) %*% onc.com[, -ncol(onc.com)]
-sp.up <- (sp.up )^(1/5)
-## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+### What is the structure of the bipartite networks?
+                                        # test for modularity and nestedness
+                                        # wild
+mods.wild <- bipartite::computeModules(wild.com.rel)
+# nest.wild <- bipartite::nestedness(wild.com.rel)
+                                        # onc
+mods.onc <- bipartite::computeModules(onc.com.gm.rel)
+# nest.onc <- bipartite::nestedness(onc.com.gm.rel)
+                                        # pit
+mods.pit <- bipartite::computeModules(pit.com.gm.rel)
+# nest.pit <- bipartite::nestedness(pit.com.gm.rel)
 
+## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
 
 ## Tables
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 2)
