@@ -22,6 +22,7 @@ fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$geno)
 shapiro.test(residuals(ptc.reml))
 h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
 h2.tab[1, "H2"] <- H2(ptc.reml)
+h2.tab[1, "R2"] <- R2(ptc.reml)
 h2.tab[1, "Response"] <- "Percent Lichen Cover"
 h2.tab[1, "Predictor"] <- "Tree Genotype"
 
@@ -33,6 +34,7 @@ shapiro.test(residuals(spr.reml))
 fligner.test(onc.dat$spr.onc^(1/2), onc.dat$geno)
 h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
 h2.tab[2, "H2"] <- H2(spr.reml)
+h2.tab[2, "R2"] <- R2(spr.reml)
 h2.tab[2, "Response"] <- "Lichen Species Richness"
 h2.tab[2, "Predictor"] <- "Tree Genotype"
 
@@ -43,8 +45,9 @@ fligner.test(onc.dat$onc.rough^(1/2), onc.dat$geno)
 shapiro.test(residuals(prb.reml))
 h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
 h2.tab[3, "H2"] <- H2(prb.reml)
+h2.tab[3, "R2"] <- R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
-h2.tab[3, "Predictor"] <- "Tree Genotype"
+
 
 ## Is species richness correlated with percent cover?
 summary(lm(spr.onc ~ ptc.onc))
@@ -64,11 +67,11 @@ vegan::adonis2(cn.d.pit ~ pit.geno)
 vegan::adonis2(cn.d.pit ~ pit.geno, sqrt.dist = TRUE)
 
 ## Is network similarity correlated with community composition?
+cen.d <- vegdist(cbind(cen.spp, ds = rep(1, nrow(cen.spp))))
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
 vegan::adonis2(cen.d ~ geno, data = onc.dat)
 
 ## So, are there patterns in the centrlity of individual lichen species?
-cen.d <- vegdist(cbind(cen.spp, ds = rep(1, nrow(cen.spp))))
 ecodist::mantel(cen.d ~ vegdist(onc.com.rel^(1/4)))
 
 RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xg"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
@@ -84,20 +87,11 @@ RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pu"] + 0.00001)) ~ (1 | geno), dat
 RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Rs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
 
 
-xg.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
-prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
-fligner.test(onc.dat$onc.rough^(1/2), onc.dat$geno)
-shapiro.test(residuals(prb.reml))
-h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
-h2.tab[3, "H2"] <- H2(prb.reml)
-h2.tab[3, "Response"] <- "Percent Rough Bark"
-h2.tab[3, "Predictor"] <- "Tree Genotype"
-
-
 ## Was lichen network similarity determined by genotype?
 cn.perm <- vegan::adonis2(cn.d.onc ~ geno, data = onc.dat, permutations = 10000)
 h2.tab[4, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[4, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
+h2.tab[4, "R2"] <- R2(cn.perm)
 h2.tab[4, "Response"] <- "Lichen Network"
 h2.tab[4, "Predictor"] <- "Genotype"
 
@@ -109,8 +103,6 @@ H2(dbr.cn.geno)
 ## What aspects of networks explained the similiarity?
 ## L = number of edges, LD = link density, C = connectivity,
 ## dcen = degree centrality
-pairs(cbind(R =onc.dat$spr.onc, onc.ns[,c("L", "C", "Cen")]))
-
 link.reml <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 link.reml.pval <- RLRsim::exactRLRT(link.reml)
@@ -118,6 +110,7 @@ fligner.test(onc.dat$L^(1/2), onc.dat$geno)
 shapiro.test(residuals(link.reml))
 h2.tab[5, "p-value"] <- link.reml.pval$"p.value"
 h2.tab[5, "H2"] <- H2(link.reml)
+h2.tab[5, "R2"] <- R2(link.reml)
 h2.tab[5, "Response"] <- "Number of Network Links"
 h2.tab[5, "Predictor"] <- "Genotype"
 
@@ -129,25 +122,64 @@ fligner.test(onc.dat$L^(1/1), onc.dat$geno)
 shapiro.test(residuals(cen.reml))
 h2.tab[6, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[6, "H2"] <- H2(cen.reml)
+h2.tab[6, "R2"] <- R2(cen.reml)
 h2.tab[6, "Response"] <- "Network Centrality"
 h2.tab[6, "Predictor"] <- "Genotype"
 
+## Lichen size distribution
+## X. gallericulata thalli are about 0.22 +/- 0.003 cm^2 on average
+## with an average median size of 0.12 +/- 0.001 cm^2
+## and, size does not vary significantly with genotype.
+xgs.reml <- lme4::lmer(I(mean.thallus) ~ (1 | geno), 
+                       data = xgs.data[xgs.data$geno %in% names(which(table(xgs.data$geno) > 2)), ],
+                       REML = TRUE)
+xgs.median.reml <- lme4::lmer(median.thallus ~ (1 | geno), 
+                       data = xgs.data[xgs.data$geno %in% names(which(table(xgs.data$geno) > 2)), ],
+                       REML = TRUE)
+RLRsim::exactRLRT(xgs.reml)
+RLRsim::exactRLRT(xgs.median.reml)
+fligner.test(xgs.data$mean.thallus, xgs.data$geno)
+fligner.test(xgs.data$median.thallus, xgs.data$geno)
+mean(xgs.data$mean.thallus)
+sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
+mean(xgs.data$median.thallus)
+sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
+
+
 ### What is the structure of the bipartite networks?
-                                        # test for modularity and nestedness
+                                        # test for modularity 
                                         # wild
-mods.wild <- bipartite::computeModules(wild.com.rel)
+mod.wild <- slot(bipartite::computeModules(wild.com.rel), "likelihood")
+# wild.sweb <- lapply(shuffle.web(wild.com, 99, legacy = FALSE), rel)
+wild.sweb <- lapply(r2dtable(99, apply(wild.com, 1, sum), apply(wild.com, 2, sum)), rel)
+wild.sweb <- lapply(wild.sweb, bipartite::computeModules)
+mods.wild.sweb <- unlist(lapply(wild.sweb, slot, name = "likelihood"))
 # nest.wild <- bipartite::nestedness(wild.com.rel)
                                         # onc
-mods.onc <- bipartite::computeModules(onc.com.gm.rel)
+mod.onc <- slot(bipartite::computeModules(onc.com.gm.rel), "likelihood")
+# onc.sweb <- lapply(shuffle.web(onc.com, 99, legacy = FALSE), rel)
+onc.sweb <- lapply(r2dtable(99, apply(onc.com, 1, sum), apply(onc.com, 2, sum)), rel)
+onc.sweb <- lapply(onc.sweb, bipartite::computeModules)
+mods.onc.sweb <- unlist(lapply(onc.sweb, slot, name = "likelihood"))
 # nest.onc <- bipartite::nestedness(onc.com.gm.rel)
                                         # pit
-mods.pit <- bipartite::computeModules(pit.com.gm.rel)
+mod.pit <- slot(bipartite::computeModules(pit.com.gm.rel), "likelihood")
+pit.sweb <- lapply(bp.sim(pit.com, 99, constant = "c"), rel)
+pit.sweb <- lapply(pit.sweb, bipartite::computeModules)
+mods.pit.sweb <- unlist(lapply(pit.sweb, slot, name = "likelihood"))
+                                        # modularity p-values
+p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb >= mod.wild]) / length(mods.wild.sweb),
+           onc = length(mods.onc.sweb[mods.onc.sweb >= mod.onc]) / length(mods.onc.sweb), 
+           pit = length(mods.pit.sweb[mods.pit.sweb >= mod.pit]) / length(mods.pit.sweb))
+                                        # ses modularity
+ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
+             onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
+             pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb))
 # nest.pit <- bipartite::nestedness(pit.com.gm.rel)
-
 ## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
-
 ## Tables
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 2)
+h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 2)
 h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
 h2.xtab <- xtable::xtable(h2.tab, 
                            caption = "Genotypic effects of cottonwood trees on the associated lichen community.", 
@@ -159,13 +191,31 @@ print(h2.xtab,
       include.colnames = TRUE
 )
 
-
 ## Plots
-
 ### Network diagram for explanation figure.
 
+## Lichen size distribution
+
+pdf("../results/xg_size.pdf", height = 5, width = 5)
+plot(density(xgs.data$mean.thallus),
+     xlab = "Mean Lichen Area (cm^2)", 
+     main = "")
+abline(v = c(mean(xgs.data$mean.thallus, na.rm = TRUE), 
+           median(xgs.data$median.thallus, na.rm = TRUE)), lty = c(1, 2))
+dev.off()
+
+pdf("../results/xg_median.pdf", height = 5, width = 5)
+plot(density(xgs.data$median.thallus),
+     xlab = "Median Lichen Area (cm^2)", 
+     main = "")
+abline(v = c(mean(xgs.data$mean.thallus, na.rm = TRUE), 
+           median(xgs.data$median.thallus, na.rm = TRUE)), lty = c(1, 2))
+dev.off()
+
+
+
 ### Figure 2
-pdf("../results/cn_chplot_onc.pdf", height = 5, width = 12)
+zpdf("../results/cn_chplot_onc.pdf", height = 5, width = 12)
 par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1) / 2)
 gplot(netMean(cn.mu.onc), gmode = "graph", 
       displaylabels = TRUE, 

@@ -29,6 +29,7 @@ sapply(c(pkg.list, "ComGenR"), library, quietly = TRUE, character.only = TRUE)
                                         # Loading some misc helper functions
 source('../bin/helpers.R')
                                         # Loading data
+xgal.size <- gdata::read.xls("../data/lichen_networks/ONC_Xgal_SizeData_May2011.xlsx")
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
                                         # remove genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]
@@ -56,6 +57,37 @@ pit.q <- lapply(pit.q,function(x) x[,7:ncol(x)])
                                         # Get genotype
 onc.geno <- unlist(sapply(names(onc.q),function(x) strsplit(x,split=' ')[[1]][2]))
 pit.geno <- unlist(sapply(names(pit.q),function(x) strsplit(x,split=' ')[[1]][2]))
+
+                                        # Xgal size data
+xgs <- xgal.size[-1:-4, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+xgs.cols <- xgal.size[4, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+colnames(xgs) <- gsub("\\#", "", as.character(unlist(xgs.cols)))
+xgs <- xgs[, 1:13]
+xgs <- apply(xgs, 2, gsub, pattern = "\\,", replacement = "") 
+xgs.dim <- xgs[, "Measurement"]
+xgs.geno <- xgs[, "Genotype"]
+xgs.tree <- xgs[, "Tree"]
+xgs <- xgs[, grep("Thallus", colnames(xgs))] 
+                                        # Coercing to numeric
+xgs <- apply(xgs, 2, as.numeric) 
+                                        # Dealing with NA values
+xgs.geno <- xgs.geno[grep("Dimension", xgs.dim)]
+xgs.tree <- xgs.tree[grep("Dimension", xgs.dim)]
+xgs <- xgs[grep("Dimension", xgs.dim), ]
+xgs.dim <- xgs.dim[grep("Dimension", xgs.dim)]
+                                        # Convert to cm
+xgs <- xgs * 0.1
+xgs.ellipse <- pi * xgs[xgs.dim == "Dimension 1", ] * xgs[xgs.dim == "Dimension 2", ] 
+xgs.geno <- xgs.geno[xgs.dim == "Dimension 1"]
+xgs.tree <- xgs.tree[xgs.dim == "Dimension 1"]
+                                        # package all xgs related data
+xgs.data <- data.frame(tree = xgs.tree, geno = xgs.geno, 
+                       mean.thallus = apply(xgs.ellipse, 1, mean, na.rm = TRUE),
+                       median.thallus = apply(xgs.ellipse, 1, median, na.rm = TRUE),
+                       xgs.ellipse)
+                                        # remove trees not done (i.e. all NA)
+xgs.data <- xgs.data[apply(xgs.data[, grep("Thallus", colnames(xgs.data))], 1, function(x) !(all(is.na(x)))),]
+
                                         # Roughness in the Garden
 rough <- read.csv('../data/lichen_networks/ONC_raw_roughness.csv')
                                         # Isolate roughness
