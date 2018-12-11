@@ -47,6 +47,79 @@ H2 <- function(x = "aov, reml, adonis2 or dbrda object", g = "genotype vector", 
     s2.a /  (s2.a + s2.w)
 }
 
+                                        # r-square
+R2 <- function(x = "aov, reml, adonis2 or dbrda object"){
+    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
+        warning("Unknown object.")
+        stop()
+    }
+    if (class(x)[1] == "anova.cca"){
+        tab <- as.matrix(x)
+        r2 <- tab[1, "SumOfSqs"] / (tab[1, "SumOfSqs"] + tab[2, "SumOfSqs"])
+    }else if (class(x)[1] == "aov"){
+        tab <- as.matrix(anova(x))
+        r2 <- tab[1, "Sum Sq"] / (tab[1, "Sum Sq"] + tab[2, "Sum Sq"])
+    }
+    if (class(x)[1] == "dbrda"){
+        r2 <- vegan::RsquareAdj(x)$r.squared
+    }else if (class(x)[1] == "lmerMod"){
+        r2 <- MuMIn::r.squaredGLMM(x)[, "R2c"]
+    }
+    return(r2)
+}
+
+                                        #
+rel <- function(x, rel.type = "max"){
+    if (rel.type == "max"){
+        apply(x , 2, function(x) x / max(x))
+    }else if (rel.type == "sum"){
+        apply(x , 2, function(x) x / sum(x))
+    }else{
+        warning("Unknown relativization type.")
+    }
+}
+
+                                        # shuf.vec
+shuf.vec <- function(x){
+    y <- x * 0
+    y[1] <- sample(0:sum(x), 1)
+    for (i in 2:length(y)){
+        y[i] <- sample(0:(sum(x) - sum(y)), 1)
+    }
+    if (abs(sum(x) - sum(y)) != 0){
+        r.add <- sample(1:length(y), 1)
+        y[r.add] <- sum(x) - sum(y)
+    }
+    y <- sample(y)
+return(y)
+}
+                                        # bp.null
+bp.null <- function(x = "bipartite network counts", constant = "c"){
+    if (constant == "r"){
+        out <- t(apply(x, 1, shuf.vec))
+    }else if (constant == "c"){
+        out <- apply(x, 2, shuf.vec)
+    }else if (constant == "rc"){
+        out <- r2dtable(1, apply(x, 1, sum), apply(x, 2, sum))[[1]]
+        
+    }else if (constant == "n"){
+        out <- bipartite::shuffle.web(x, 1, legacy = FALSE)[[1]]
+    }else{
+        warning("Unknown constant method")
+    }
+    colnames(out) <- colnames(x)
+    rownames(out) <- rownames(x)
+    return(out)
+}
+                                        # bp simulator
+bp.sim <- function(x = "bipartite network counts", n = "n simulations", constant = "c"){
+    out <- list()
+    for (i in 1:n){
+        out[[i]] <- bp.null(x = x, constant = "c")
+    }
+return(out)
+}
+
                                         # Simulating Communities
 sim.com <- function(x = "list of named quadrat observations", burn = 5, relative = FALSE){
     r.names <- names(x)
