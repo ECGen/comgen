@@ -68,6 +68,10 @@ xgs.dim <- xgs[, "Measurement"]
 xgs.geno <- xgs[, "Genotype"]
 xgs.tree <- xgs[, "Tree"]
 xgs <- xgs[, grep("Thallus", colnames(xgs))] 
+                                        # fix genotypes
+                                        # t6
+xgs.geno[grep("T6", xgs.geno)] <- "T6"
+xgs.geno[grep("H10", xgs.geno)] <- "H-10"
                                         # Coercing to numeric
 xgs <- apply(xgs, 2, as.numeric) 
                                         # Dealing with NA values
@@ -151,7 +155,7 @@ ns.onc <- lapply(ns.onc, enaR::enaStructure)
 ns.onc <- do.call(rbind, lapply(ns.onc, function(x) x[[2]]))
                                         # graph level centralization 
 dcen.onc <- unlist(lapply(cn.onc, function(x) 
-    sna::centralization(x, FUN = sna::degree, normalize = TRUE)))
+    sna::centralization(x, FUN = sna::degree, normalize = FALSE)))
 onc.ns <- cbind(ns.onc, Cen = dcen.onc)
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
                                         # species centralities

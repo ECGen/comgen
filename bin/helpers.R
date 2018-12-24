@@ -81,16 +81,10 @@ rel <- function(x, rel.type = "max"){
 
                                         # shuf.vec
 shuf.vec <- function(x){
-    y <- x * 0
-    y[1] <- sample(0:sum(x), 1)
-    for (i in 2:length(y)){
-        y[i] <- sample(0:(sum(x) - sum(y)), 1)
-    }
-    if (abs(sum(x) - sum(y)) != 0){
-        r.add <- sample(1:length(y), 1)
-        y[r.add] <- sum(x) - sum(y)
-    }
-    y <- sample(y)
+    x <- matrix(c(x, rep(0, length(x))), ncol = 2)
+    
+    r2dtable(matrix(x, ncol = 1), r = apply(x, 1, sum), c = apply(x, 2, sum))
+
 return(y)
 }
                                         # bp.null
