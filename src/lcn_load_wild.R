@@ -105,6 +105,24 @@ coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
 rownames(coord) <- coord[,1]
 coord <- coord[,-1]
 
+                                        # wild
+if (!("mod_obsval_wild.csv" %in% dir("../data/lichen_networks"))){
+        mod.wild <- slot(bipartite::computeModules(rel(wild.com), deep = FALSE), 
+                         "likelihood")
+        write.csv(mod.wild, file = "../data/lichen_networks/mod_obsval_wild.csv", row.names = FALSE)
+}else{
+    mod.wild <- read.csv(file = "../data/lichen_networks/mod_obsval_wild.csv")[, 1]
+}
+if (!("mod_simvals_wild.csv" %in% dir("../data/lichen_networks"))){
+        wild.sweb <- simulate(vegan::nullmodel(wild.com, method = "swsh_samp_c"), 99)
+for (i in 1:dim(wild.sweb)[3]){wild.sweb[,, i] <- rel(wild.sweb[,, i])}
+        wild.smod <- apply(wild.sweb, 3, bipartite::computeModules)
+        mods.wild.sweb <- unlist(lapply(wild.smod, slot, name = "likelihood"))
+        write.csv(mods.wild.sweb, file = "../data/lichen_networks/mod_simvals_wild.csv", row.names = FALSE)
+# nest.wild <- bipartite::nestedness(wild.com.rel)
+}else{
+    mods.wild.sweb <- read.csv(file = "../data/lichen_networks/mod_simvals_wild.csv")[, 1]
+}
 
 ###Rename data objects for simplicity
 ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')

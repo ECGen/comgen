@@ -71,12 +71,30 @@ h2.tab[4, "Response"] <- "Lichen Community Composition"
 h2.tab[4, "Predictor"] <- "Genotype"
 
 ## Is network similarity correlated with community richness?
-vegan::adonis(cn.d.onc ~ spr.onc)
-vegan::adonis(cn.d.onc ~ onc.rough)
-vegan::adonis(cn.d.onc ~ onc.geno + onc.rough)
-                                        # Not enough genotypes
-vegan::adonis2(cn.d.pit ~ pit.geno)
-vegan::adonis2(cn.d.pit ~ pit.geno, sqrt.dist = TRUE)
+summary(lm(spr.onc ~ ptc.onc, data = onc.dat))
+summary(lm(ptc.onc ~ onc.rough, data = onc.dat))
+vegan::adonis2(cn.d.onc ~ geno + onc.rough + ptc.onc + spr.onc, 
+               data = onc.dat, sqrt = TRUE)
+
+
+## Partial Mantels 
+## Using RFLP as genetic distance
+## cn.d.onc <- ptc.onc
+## cn.d.onc <- rel(onc.com)
+## rel(onc.com)_<- spr.onc
+## spr.onc <- onc.rough
+## ptc.onc <- onc.rough
+## onc.rough <- geno
+
+ecodist::mantel(cn.mu.d.onc ~ rflp.d)
+ecodist::mantel(onc.com.mu.d ~ rflp.d)
+ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
+
+vegan::adonis2(onc.com.rel ~ onc.rough * geno, data = onc.dat, perm = 5000)
+ecodist::mantel(cn.d.onc ~ onc.rough * rflp.d)
+cn.mu.d.onc
+
+
 
 ## Is network similarity correlated with community composition?
 vegan::adonis2(cen.d ~ geno, data = onc.dat, sqrt.dist = TRUE)
@@ -164,29 +182,10 @@ sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
 
 ### What is the structure of the bipartite networks?
                                         # test for modularity 
-                                        # wild
-mod.wild <- slot(bipartite::computeModules(wild.com.rel), "likelihood")
-# wild.sweb <- lapply(shuffle.web(wild.com, 99, legacy = FALSE), rel)
-wild.sweb <- lapply(r2dtable(99, apply(wild.com, 1, sum), apply(wild.com, 2, sum)), rel)
-wild.sweb <- lapply(wild.sweb, bipartite::computeModules)
-mods.wild.sweb <- unlist(lapply(wild.sweb, slot, name = "likelihood"))
-# nest.wild <- bipartite::nestedness(wild.com.rel)
-                                        # onc
-mod.onc <- slot(bipartite::computeModules(onc.com.rel), "likelihood")
-onc.sweb <- bp.sim(onc.com, 99, constant = "c")
-onc.sweb <- lapply(onc.sweb, bipartite::computeModules)
-mods.onc.sweb <- unlist(lapply(onc.sweb, slot, name = "likelihood"))
-# nest.onc <- bipartite::nestedness(onc.com.gm.rel)
-                                        # pit
-mod.pit <- slot(bipartite::computeModules(pit.com.rel), "likelihood")
-# pit.sweb <- lapply(bp.sim(pit.com, 99, constant = "c"), rel)
-pit.sweb <- bp.sim(pit.com, 99, constant = "c")
-pit.sweb <- lapply(pit.sweb, bipartite::computeModules)
-mods.pit.sweb <- unlist(lapply(pit.sweb, slot, name = "likelihood"))
                                         # modularity p-values
-p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb >= mod.wild]) / length(mods.wild.sweb),
-           onc = length(mods.onc.sweb[mods.onc.sweb >= mod.onc]) / length(mods.onc.sweb), 
-           pit = length(mods.pit.sweb[mods.pit.sweb >= mod.pit]) / length(mods.pit.sweb))
+p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
+           onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb), 
+           pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb))
                                         # ses modularity
 ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
              onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),

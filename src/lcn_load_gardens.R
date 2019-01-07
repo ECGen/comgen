@@ -115,18 +115,22 @@ onc.rough <- avg.rough[match(ses.tree, r.tree)]
 if (!(all(ses.tree==names(onc.rough)))){print('Holy Crap!')}
                                         #RFLP distance values from Zink from Martinsen
 rflp.d <- readLines('../data/acn/rflp_queller_goodnight.txt')
-rflp.d <- lapply(rflp.d,strsplit,split='\t')
-rflp.d <- lapply(rflp.d,function(x) x[[1]])
-rflp.d[[61]] <- c(rflp.d[[61]],"")
-rflp.d <- do.call(rbind,rflp.d)
-rflp.n <- rflp.d[1,-1]
-rflp.d <- rflp.d[-1,-1]
+rflp.d <- lapply(rflp.d, strsplit,split='\t')
+rflp.d <- lapply(rflp.d, function(x) x[[1]])
+rflp.d[[61]] <- c(rflp.d[[61]], "")
+rflp.d <- do.call(rbind, rflp.d)
+rflp.n <- rflp.d[1, -1]
+rflp.d <- rflp.d[-1, -1]
 diag(rflp.d) <- 1
 rflp.d <- matrix(as.numeric(rflp.d),nrow=nrow(rflp.d))
 rownames(rflp.d) <- colnames(rflp.d) <- rflp.n
-rflp.d <- rflp.d[rownames(rflp.d)%in%unique(onc.geno),colnames(rflp.d)%in%unique(onc.geno)]
-rflp.d <- rflp.d[match(unique(onc.geno),rownames(rflp.d)),match(unique(onc.geno),rownames(rflp.d))]
-if (!(all(rownames(rflp.d)==unique(onc.geno)))){print('Holy crap, rflp.d names match error')}
+rflp.d <- rflp.d[rownames(rflp.d) %in% unique(onc.geno), 
+                 colnames(rflp.d) %in% unique(onc.geno)]
+rflp.d <- rflp.d[match(unique(onc.geno), rownames(rflp.d)), 
+                 match(unique(onc.geno),rownames(rflp.d))]
+if (!(all(rownames(rflp.d) == unique(onc.geno)))){
+    print('Holy crap, rflp.d names match error')
+}
 rflp.d <- as.dist(rflp.d)
                                         # Lichen Network Models
                                         # onc
@@ -147,8 +151,9 @@ cn.mu.onc <- list()
 for (i in 1:length(unique(onc.geno))){
     cn.mu.onc[[i]] <- netMean(cn.onc[onc.geno == unique(onc.geno)[i]])
 }
-cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
 names(cn.mu.onc) <- unique(onc.geno)
+cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
+
                                         # network statistics
 ns.onc <- lapply(cn.onc, pack)
 ns.onc <- lapply(ns.onc, enaR::enaStructure)
@@ -183,6 +188,26 @@ ptc.onc <- unlist(lapply(onc.q, function(x) sum(apply(x, 1, function(x) sign(sum
 spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
                                         # Vectors for network similarity
 ## ns.vec.onc <- envfit(ord, data.frame(onc.ns[, c("L", "Cen")], R = onc.rough, Cov = ptc.onc))
+
+## Creating distance matrices that match rflp
+## this is for the "mean" distance matrices
+cn.mu.d <- as.matrix(cn.mu.d.onc)
+prb.mu.d <- as.matrix(prb.mu.d.onc)
+prb.mu.d <- prb.mu.d[match(rownames(cn.mu.d), rownames(prb.mu.d)), 
+                     match(rownames(cn.mu.d), rownames(prb.mu.d))]
+prb.mu.d <- as.dist(prb.mu.d)
+onc.com.mu <- apply(onc.com[, -ncol(onc.com)], 2, 
+                    function(x, g) tapply(x, g, mean), g = onc.dat$geno)
+onc.com.mu <- onc.com.mu[match(rownames(cn.mu.d), rownames(onc.com.mu)), ]
+onc.com.mu.d <- vegdist(onc.com.mu)
+if (!(all(c(all(rownames(as.matrix(rflp.d)) == rownames(as.matrix(cn.mu.d.onc))),
+            all(rownames(as.matrix(rflp.d)) == rownames(as.matrix(prb.mu.d))),
+            all(rownames(as.matrix(rflp.d)) == rownames(as.matrix(onc.com.mu.d))))))){
+    warning("Warning: distance matrices are not aligned.")
+}else{
+    print("Distance matrices good to go!")
+}
+
                                         # Bipartite analysis
 nperm <- 999
 if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
@@ -278,3 +303,42 @@ pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE),
 rownames(pw.onc) <- onc.geno
 col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
 
+                                        # onc
+if (!("mod_obsval_onc.csv" %in% dir("../data/lichen_networks"))){
+        mod.onc <- slot(bipartite::computeModules(rel(onc.com[, -ncol(onc.com)]), 
+                                                  deep = FALSE), 
+                         "likelihood")
+        write.csv(mod.onc, file = "../data/mod_obsval_onc.csv", row.names = FALSE)
+}else{
+    mod.onc <- read.csv(file = "../data/lichen_networks/mod_obsval_onc.csv")[, 1]
+}
+if (!("mod_simvals_onc.csv" %in% dir("../data/lichen_networks"))){
+        onc.sweb <- simulate(vegan::nullmodel(onc.com[, -ncol(onc.com)], 
+                                              method = "swsh_samp_c"), 99)
+        for (i in 1:dim(onc.sweb)[3]){onc.sweb[,, i] <- rel(onc.sweb[,, i])}
+        onc.smod <- apply(onc.sweb, 3, bipartite::computeModules)
+        mods.onc.sweb <- unlist(lapply(onc.smod, slot, name = "likelihood"))
+        write.csv(mods.onc.sweb, file = "../data/lichen_networks/mod_simvals_onc.csv", row.names = FALSE)
+# nest.onc <- bipartite::nestedness(onc.com.rel)
+}else{
+    mods.onc.sweb <- read.csv(file = "../data/lichen_networks/mod_simvals_onc.csv")[, 1]
+}
+
+                                        # pit
+if (!("mod_obsval_pit.csv" %in% dir("../data/lichen_networks"))){
+        mod.pit <- slot(bipartite::computeModules(rel(pit.com), deep = FALSE), 
+                         "likelihood")
+        write.csv(mod.pit, file = "../data/lichen_networks/mod_obsval_pit.csv", row.names = FALSE)
+}else{
+    mod.pit <- read.csv(file = "../data/lichen_networks/mod_obsval_pit.csv")[, 1]
+}
+if (!("mod_simvals_pit.csv" %in% dir("../data/lichen_networks"))){
+        pit.sweb <- simulate(vegan::nullmodel(pit.com, method = "swsh_samp_c"), 99)
+for (i in 1:dim(pit.sweb)[3]){pit.sweb[,, i] <- rel(pit.sweb[,, i])}
+        pit.smod <- apply(pit.sweb, 3, bipartite::computeModules)
+        mods.pit.sweb <- unlist(lapply(pit.smod, slot, name = "likelihood"))
+        write.csv(mods.pit.sweb, file = "../data/lichen_networks/mod_simvals_pit.csv", row.names = FALSE)
+# nest.pit <- bipartite::nestedness(pit.com.rel)
+}else{
+    mods.pit.sweb <- read.csv(file = "../data/lichen_networks/mod_simvals_pit.csv")[, 1]
+}
