@@ -1,18 +1,38 @@
 ---
-title: Reproducible Science with R
-author: M.K. Lau
 title: "Rock Lichen data from Sunset Crater collected by Rikke Naesborg and Richard Michalet"
+author: Rikke, Matt, Cameron, Richard
 output: pdf_document
 
 ---
 
+# Analysis Summary
 
+- Dead trees and non-lichen species were removed from lichen community
+  analyses. 
+- Lichen communities were adequately sampled, based on species
+  accumulation curves, with moth resistant trees accumulating slightly
+  more lichen species.
+- Lichen communities (abundance, richness, diversity, composition)
+were significantly, generally negatively, affected by moth
+susceptibility.
+- Several tree variables, including light availability, leaf litter
+  abundance and rock abundance, were impacted by moth susceptibility.
+- Analysis of causal pathways supported an indirect link between moth
+  susceptibility and impacts on lichen communities via decreasing rock
+  (i.e. habitat) availability through increased leaf abscission and
+  accumulation on rocks under trees.
+- These results support a genetically based link between intraspecific
+  variation in susceptibility to an insect herbivore and community
+  dynamics in an arid ecosystem.
+- Given the possible impacts of cliimate change on this system, this
+  study supports the conclusion that community and ecosystem impacts
+  need to be considered in an evolutionary context.
 
-```{r, echo = FALSE, results = "hide", eval = TRUE}
+```{r, echo = TRUE, results = "hide", eval = TRUE}
 # 0. Supporting functions and libraries
 ## Support functions
 
-dif=function(x){
+dif <- function(x){
     out=x[1]
     for (i in 2:length(x)){
         out=out-x[i]
@@ -21,14 +41,11 @@ dif=function(x){
 }
 
 ## Libraries
-
 my.libs <- c("vegan", "ecodist")
-
 if (any(!(my.libs %in% installed.packages()[, 1]))){
     sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
            install.packages)
 }else{}
-
 sapply(my.libs, require, character.only = TRUE)
 
 
@@ -88,7 +105,7 @@ rownames(l.dat) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 
 Are the communities on each tree type adequately sampled?
 
-```{r results = "hide"}
+```{r }
 
 spa.all <- specaccum(com)
 spa.res <- specaccum(com[l.dat[, "Moth"] == 0, ])
@@ -108,16 +125,23 @@ legend("bottomright",
 
 ```
 
-## 2. Community analyses using the differences (A, R, H, Comp)
+## Community Analyses 
 
 The following is an analysis of the univariate community metrics,
 abundance, richness and diversity (Shannon's index). These three
 metrics were strongly intercorrelated and all responded to the
-environmental effects of moth infection.
+environmental effects of moth infection. Litter cover, light and rock
+abundance were all also responsive to moth infection. Other variables,
+such as branches, grasses and mosses were not impacted by
+moth. Differences are analyzed with univariate t-tests in order to
+account for the paired structure of the data. Also presented here are
+Shapiro-Wilks tests for homogeneity of variance, which as assumption
+of the t-test. These effects should be shown using dotplots with mean
+differences as dots and confidence intervals as horizontal lines.
 
 
 
-```{r results = "hide"}
+```{r }
 
 ## Calculate metrics
 abun <- apply(com, 1, sum)
@@ -171,13 +195,35 @@ t.test(tapply(l.dat[, "Synrur"] , l.dat[, "Tree.pairs"], diff))
 t.test(tapply(l.dat[, "Cerpur.Bryarg"] , l.dat[, "Tree.pairs"], diff))
 
 
-
 ```
+
+<!-- Here are dotplots to visualize the differences. -->
+
+<!-- ```{r } -->
+
+<!-- ### Test for effect of moth -->
+
+
+<!-- t.test(tapply(abun, l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(rich, l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(shan, l.dat[, "Tree.pairs"], diff)) -->
+
+<!-- t.test(tapply(l.dat[, "Litter.."] , l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(l.dat[, "Light...average"] , l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(l.dat[, "Light...N"] , l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(l.dat[, "Light...S"] , l.dat[, "Tree.pairs"], diff)) -->
+<!-- t.test(tapply(l.dat[, "Big.rocks.."] , l.dat[, "Tree.pairs"], diff)) -->
+
+
+<!-- ``` -->
+
 
 Lichen communities as a whole responded to the effects of moth
 infection. Using PerMANOVA, a permutational analysis of variance, with
 the tree pairs as blocks in the model, we observed a significant
-effect of moth susceptibility on lichen community composition.
+effect of moth susceptibility on lichen community composition. This
+should be shown using an NMDS ordination plot.
+
 
 ```{r }
 ### Composition analysis
@@ -192,9 +238,10 @@ Although susceptibility to moth infection generally had a negative
 impact on lichen, several species showed significant responses. Here,
 because of the paired design, we analyze the response of the
 differences using a one-way t-test on the differences of each
-species. 
+species. I don't think we need to plot this, but perhaps the results
+could be shown as a table. 
 
-```{r results = "hide"}
+```{r }
 
 ind.spp <- list()
 ind.spp$p.value[1] <- t.test(tapply(com[, "Acacon"], l.dat[, "Tree.pairs"], diff))$p.value
@@ -239,9 +286,31 @@ do.call(cbind, ind.spp)
 ```
 
 
-## 4. Exploring causal pathways
+## Exploring causal pathways
 
-```{r results = "hide"}
+I suggest that we develop these into a structural equation
+model. Here, I've analyzed several "causal pathways" in parts using
+correlation tests of the differences (susceptible - resistant) for
+each variable. Here are two hypothesized causal pathways, where lichen
+refers to the lichen community abundance, richness, diversity and
+composition:
+
+- moth decreases light which decreases lichen
+- moth increases litter which covers/decreases rocks which
+  support/increase lichen
+
+Only the litter pathway is supported. Although light is impacted by
+moth susceptibility, it isn't correlated with lichen. Litter, however,
+is positively affected by the moth infection. In addition, litter is
+negatively correlated with rock abundance and rock abundance is
+positively correlated with lichen. This is also supported by the
+indirect pathway between moth and lichen, which are negatively
+correlated, as would be expected by the product of the signs along the
+pathway (i.e. positive * negative * positive = negative). 
+
+
+
+```{r }
 
 ### Test for correlations among effects
 cor.test(tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff), 

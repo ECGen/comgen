@@ -1,8 +1,10 @@
-apply(cbind(l.dat[l.dat[, "Moth"] == 0, "Litter.."], l.dat[l.dat[, "Moth"] == 1, "Litter.."], 
-      tapply(l.dat[, "Litter.."] , l.dat[, "Tree.pairs"], diff)), 2, mean)
-cbind(l.dat[l.dat[, "Moth"] == 0, "Light...average"], l.dat[l.dat[, "Moth"] == 1, "Light...average"], 
-      tapply(l.dat[, "Light...average"] , l.dat[, "Tree.pairs"], diff))
-cbind(abun[l.dat[, "Moth"] == 0], abun[l.dat[, "Moth"] == 1], 
-      tapply(abun , l.dat[, "Tree.pairs"], diff))
+dc.lcm <- data.frame(Response = c(rep("Abundance", length(abun) / 2),
+                         rep("Richness", length(abun) / 2),
+                         rep("Diversity", length(abun) / 2)), 
+                     Difference = c(tapply(abun, l.dat[, "Tree.pairs"], diff),
+                         tapply(rich, l.dat[, "Tree.pairs"], diff),
+                         tapply(shan, l.dat[, "Tree.pairs"], diff)))
 
-
+pdf("../results/rln_dotchart.pdf")
+dotplot(Response ~ Difference, data = dc.lcm)
+dev.off()
