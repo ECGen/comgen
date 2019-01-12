@@ -1,3 +1,14 @@
+---
+title: "LCN: Lichen interaction network study"
+author: MK Lau
+---
+
+
+
+## Load data
+
+```{r eval = TRUE, echo = FALSE, results = "hide"}
+
 ###LCN: loading the onc data
 ###MKLau
 ###21Mar2014
@@ -168,6 +179,7 @@ for (i in 1:length(cn.onc)){
     }else{cn.mod.onc[i] <- NA}
 }
 cn.mod.onc[is.na(cn.mod.onc)] <- 0
+cn.onc <- do.call(rbind, lapply(cn.onc, function(x) x[[2]]))
                                         # graph level centralization 
 dcen.onc <- unlist(lapply(cn.onc, function(x) 
     sna::centralization(x, FUN = sna::degree, normalize = FALSE)))
@@ -207,7 +219,7 @@ prb.mu.d <- prb.mu.d[match(rownames(cn.mu.d), rownames(prb.mu.d)),
                      match(rownames(cn.mu.d), rownames(prb.mu.d))]
 prb.mu.d <- as.dist(prb.mu.d)
 onc.com.mu <- apply(onc.com[, -ncol(onc.com)], 2, 
-                    function(x, g) tapply(x, g, mean), g = onc.geno)
+                    function(x, g) tapply(x, g, mean), g = onc.dat$geno)
 onc.com.mu <- onc.com.mu[match(rownames(cn.mu.d), rownames(onc.com.mu)), ]
 onc.com.mu.d <- vegdist(onc.com.mu)
 if (!(all(c(all(rownames(as.matrix(rflp.d)) == rownames(as.matrix(cn.mu.d.onc))),
@@ -219,7 +231,7 @@ if (!(all(c(all(rownames(as.matrix(rflp.d)) == rownames(as.matrix(cn.mu.d.onc)))
 }
 
                                         # Bipartite analysis
-nperm <- 20
+nperm <- 999
 if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
     nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"], n.nulls = 999)
     dput(nest.onc, "../data/lichen_networks/nest_rel_onc.rda")
@@ -245,7 +257,7 @@ if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
     write.csv(nul.mod.onc, 
               "../data/lichen_networks/null_mod_onc.csv", 
               row.names = FALSE)
-n}else{
+}else{
     obs.mod.onc <- read.csv("../data/lichen_networks/obs_mod_onc.csv")[1]
     nul.mod.onc <- read.csv("../data/lichen_networks/null_mod_onc.csv")[,1]
     z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
@@ -254,11 +266,52 @@ n}else{
 pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) / length(nul.mod.onc)
 if (pval.mod.onc == 0){pval.mod.onc <- 1/nperm}
 z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
-bp.mod.onc <- round(unlist(c(nperm = nperm, obs = obs.mod.onc, 
-                mu.sim = mean(nul.mod.onc), sd.sim = sd(nul.mod.onc), 
-                z = z.mod.onc, p.value = pval.mod.onc)), 5)
-
+bp.mod.onc <- c(nperm = nperm, obs = obs.mod.onc, z = z.mod.onc, pval = pval.mod.onc)
 ## NMDS ordinations
+
+                                        # variance explained
+nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
+nms.cn <- nmds(cn.d.onc, 1, 2)
+range(nms.com$r2)
+range(nms.cn$r2)
+ord.cn <- nmds.min(nms.cn, 2)
+ord.com <- nmds.min(nms.com, 3)
+
+ord1.cn.reml <- lme4::lmer(I(ord.cn[, 1]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord2.cn.reml <- lme4::lmer(I(ord.cn[, 2]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord1.cn.reml.pval <- RLRsim::exactRLRT(ord1.cn.reml)
+ord2.cn.reml.pval <- RLRsim::exactRLRT(ord2.cn.reml)
+ord1.cn.reml.pval
+ord2.cn.reml.pval
+fligner.test(ord.cn[, 1]^(1/1), onc.dat$geno)
+fligner.test(ord.cn[, 2]^(1/1), onc.dat$geno)
+
+ord1.com.reml <- lme4::lmer(I(ord.com[, 1]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord2.com.reml <- lme4::lmer(I(ord.com[, 2]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord3.com.reml <- lme4::lmer(I(ord.com[, 3]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord1.com.reml.pval <- RLRsim::exactRLRT(ord1.com.reml)
+ord2.com.reml.pval <- RLRsim::exactRLRT(ord2.com.reml)
+ord3.com.reml.pval <- RLRsim::exactRLRT(ord3.com.reml)
+ord1.com.reml.pval
+ord2.com.reml.pval
+ord3.com.reml.pval
+fligner.test(ord.com[, 1]^(1/1), onc.dat$geno)
+fligner.test(ord.com[, 2]^(1/1), onc.dat$geno)
+fligner.test(ord.com[, 3]^(1/1), onc.dat$geno)
+
+
+summary(lm(ord.cn[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.cn[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
+
+summary(lm(ord.com[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.com[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.com[, 3] ~ spr.onc + ptc.onc, data = onc.dat))
+
                                         # community ordination
 if (!file.exists("../data/lichen_networks/onc_nmds.csv")){
     nms.info.onc <- capture.output(nms.onc <- nmds.min(nmds(
@@ -352,3 +405,14 @@ for (i in 1:dim(pit.sweb)[3]){pit.sweb[,, i] <- rel(pit.sweb[,, i])}
 }else{
     mods.pit.sweb <- read.csv(file = "../data/lichen_networks/mod_simvals_pit.csv")[, 1]
 }
+
+
+```
+
+
+
+```{r }
+
+
+
+```

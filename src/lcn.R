@@ -21,6 +21,7 @@ colnames(h2.tab) <- c("Response", "Predictor", "p-value", "H2", "R2")
 ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
+ptc.reml.pval
 fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$geno)
 shapiro.test(residuals(ptc.reml))
 h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
@@ -30,9 +31,10 @@ h2.tab[1, "Response"] <- "Percent Lichen Cover"
 h2.tab[1, "Predictor"] <- "Tree Genotype"
 
 ## Species richness ~ genotype
-spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), 
+spr.reml <- lme4::lmer(I(spr.onc^(1/1)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
+spr.reml.pval
 shapiro.test(residuals(spr.reml))
 fligner.test(onc.dat$spr.onc^(1/2), onc.dat$geno)
 h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
@@ -44,6 +46,7 @@ h2.tab[2, "Predictor"] <- "Tree Genotype"
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
 prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
+prb.reml.pval
 fligner.test(onc.dat$onc.rough^(1/2), onc.dat$geno)
 shapiro.test(residuals(prb.reml))
 h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
@@ -52,68 +55,63 @@ h2.tab[3, "R2"] <- R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
 h2.tab[3, "Predictor"] <- "Genotype"
 
-
 ## Is species richness correlated with percent cover?
 summary(lm(spr.onc ~ ptc.onc))
 
 ## Were these correlated with bark roughness?
-ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ onc.rough)
+ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ I(onc.rough^(1/2)))
 summary(ptc.prb.lm)
-fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$onc.rough)
+fligner.test(onc.dat$ptc.onc, onc.dat$onc.rough)
 shapiro.test(residuals(ptc.prb.lm))
 
-## Bark roughness REML
-perm.com <- vegan::adonis2(onc.com.rel^(1/4) ~ geno, data = onc.dat, perm = 5000)
+spr.prb.lm <- lm(I(spr.onc^(1)) ~ I(onc.rough^(1/2)))
+summary(spr.prb.lm)
+fligner.test(onc.dat$spr.onc^(1), onc.dat$onc.rough)
+shapiro.test(residuals(spr.prb.lm))
+
+## COM ~ genotype + Bark roughness + PTC + SPR
+set.seed(2)
+rcom.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+set.seed(2)
+com.perm <- vegan::adonis2(onc.com^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+rcom.perm
+com.perm
+
+## Network ~ genotype and other varibles
+set.seed(12345)
+nd.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough + spr.onc + ptc.onc, 
+                          data = onc.dat, perm = 10000, mrank = TRUE)
+nd.perm
+
+## Genotype and community
+set.seed(2)
+rcom.g.perm <- vegan::adonis2(onc.com.rel^(1/4) ~ geno, data = onc.dat, perm = 10000, mrank = TRUE)
+set.seed(2)
+com.g.perm <- vegan::adonis2(onc.com^(1/4) ~ onc.geno, data = onc.dat, perm = 10000, mrank = TRUE)
+rcom.g.perm
+com.g.perm
+
 h2.tab[4, "p-value"] <- unlist(perm.com)["Pr(>F)1"]
 h2.tab[4, "H2"] <- H2(perm.com, g = onc.dat$geno)
 h2.tab[4, "R2"] <- R2(perm.com)
 h2.tab[4, "Response"] <- "Lichen Community Composition"
 h2.tab[4, "Predictor"] <- "Genotype"
 
-## Is network similarity correlated with community richness?
-summary(lm(spr.onc ~ ptc.onc, data = onc.dat))
-summary(lm(ptc.onc ~ onc.rough, data = onc.dat))
-vegan::adonis2(cn.d.onc ~ geno + onc.rough + ptc.onc + spr.onc, 
-               data = onc.dat, sqrt = TRUE)
+## Is network similarity correlated with community composition?
+ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel), mrank = TRUE)
+spr.d <- dist(onc.dat$spr.onc)
+ptc.d <- dist(onc.dat$ptc.onc)
+prb.d <- dist(onc.dat$onc.rough)
+### rough -> cover -> rich -> net
+ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel) + spr.d + ptc.d + prb.d, mrank = TRUE)
 
 
-## Partial Mantels 
-## Using RFLP as genetic distance
-## cn.d.onc <- ptc.onc
-## cn.d.onc <- rel(onc.com)
-## rel(onc.com)_<- spr.onc
-## spr.onc <- onc.rough
-## ptc.onc <- onc.rough
-## onc.rough <- geno
-
+## Partial Mantels using RFLP distance
 ecodist::mantel(cn.mu.d.onc ~ rflp.d)
 ecodist::mantel(onc.com.mu.d ~ rflp.d)
 ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
 vegan::adonis2(onc.com.rel ~ onc.rough * geno, data = onc.dat, perm = 5000)
-ecodist::mantel(cn.d.onc ~ onc.rough * rflp.d)
-cn.mu.d.onc
-
-
-
-## Is network similarity correlated with community composition?
-vegan::adonis2(cen.d ~ geno, data = onc.dat, sqrt.dist = TRUE)
-cen.d <- vegdist(cbind(cen.spp, ds = rep(1, nrow(cen.spp))))
-ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel^(1/4)))
-ecodist::mantel(cen.d ~ vegdist(onc.com.rel^(1/4)))
-
-## So, are there patterns in the centrlity of individual lichen species?
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xg"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Cs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ls"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-shapiro.test(residuals(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE)))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(cen.spp[, "Xm"]) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-## Pa has centrlity of zero 
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pu"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Rs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
 
 
 ## Was lichen network similarity determined by genotype?
@@ -135,6 +133,7 @@ H2(dbr.cn.geno)
 link.reml <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 link.reml.pval <- RLRsim::exactRLRT(link.reml)
+link.reml.pval
 fligner.test(onc.dat$L^(1/4), onc.dat$geno)
 shapiro.test(residuals(link.reml))
 h2.tab[6, "p-value"] <- link.reml.pval$"p.value"
@@ -143,10 +142,19 @@ h2.tab[6, "R2"] <- R2(link.reml)
 h2.tab[6, "Response"] <- "Number of Network Links"
 h2.tab[6, "Predictor"] <- "Genotype"
 
+                                        # network modularity
+mod.reml <- lme4::lmer(I(ns.mod.onc^(1/4)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
+mod.reml.pval
+fligner.test(ns.mod.onc^(1/4), onc.dat$geno)
+shapiro.test(residuals(mod.reml))
+
                                         # network centrality
 cen.reml <- lme4::lmer(I(log(Cen + 1)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 cen.reml.pval <- RLRsim::exactRLRT(cen.reml)
+cen.reml.pval
 fligner.test(onc.dat$L^(1/1), onc.dat$geno)
 shapiro.test(residuals(cen.reml))
 h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
@@ -154,6 +162,86 @@ h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
 h2.tab[7, "Predictor"] <- "Genotype"
+
+                                        # network stats in relation to other variables
+L.lm <- lm(L ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+summary(L.lm)
+shapiro.test(residuals(L.lm))
+cen.lm <- lm(I(log(Cen + 1)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+summary(cen.lm)
+shapiro.test(residuals(cen.lm))
+mod.lm <- lm(I(cn.mod.onc^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+summary(mod.lm)
+shapiro.test(residuals((mod.lm)))
+summary(lm(Cen ~ cn.mod.onc + L, data = onc.dat))
+summary(lm(cn.mod.onc ~ Cen + L, data = onc.dat))
+
+plot(L ~ spr.onc, data = onc.dat)
+plot(L ~ ptc.onc, data = onc.dat)
+
+                                        # are these metrics correlated with network similarity
+L.d <- dist(onc.dat$L)
+cen.d <- dist(onc.dat$Cen)
+mod.d <- dist(cn.mod.onc)
+
+adonis2(cn.d.onc ~ Cen + L + cn.mod.onc, data = onc.dat, mrank = TRUE)
+adonis2(cn.d.onc ~ Cen + cn.mod.onc + L, data = onc.dat, mrank = TRUE)
+adonis2(cn.d.onc ~ cn.mod.onc +  Cen + L, data = onc.dat, mrank = TRUE)
+adonis2(cn.d.onc ~ L + Cen + cn.mod.onc, data = onc.dat, mrank = TRUE)
+
+## So, are there patterns in the centrlity of individual lichen species?
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xg"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Cs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ls"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+shapiro.test(residuals(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE)))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(cen.spp[, "Xm"]) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+## Pa has centrlity of zero 
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pu"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Rs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+
+### Structural Modeling
+
+## checking variance explained by ordinations
+nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
+nms.cn <- nmds(cn.d.onc, 1, 2)
+range(nms.com$r2)
+range(nms.cn$r2)
+ord.cn <- nmds.min(nms.cn, 2)
+ord.com <- nmds.min(nms.com, 3)
+ord1.cn.reml <- lme4::lmer(I(ord.cn[, 1]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord2.cn.reml <- lme4::lmer(I(ord.cn[, 2]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord1.cn.reml.pval <- RLRsim::exactRLRT(ord1.cn.reml)
+ord2.cn.reml.pval <- RLRsim::exactRLRT(ord2.cn.reml)
+ord1.cn.reml.pval
+ord2.cn.reml.pval
+fligner.test(ord.cn[, 1]^(1/1), onc.dat$geno)
+fligner.test(ord.cn[, 2]^(1/1), onc.dat$geno)
+
+ord1.com.reml <- lme4::lmer(I(ord.com[, 1]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord2.com.reml <- lme4::lmer(I(ord.com[, 2]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord3.com.reml <- lme4::lmer(I(ord.com[, 3]^(1/1)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+ord1.com.reml.pval <- RLRsim::exactRLRT(ord1.com.reml)
+ord2.com.reml.pval <- RLRsim::exactRLRT(ord2.com.reml)
+ord3.com.reml.pval <- RLRsim::exactRLRT(ord3.com.reml)
+ord1.com.reml.pval
+ord2.com.reml.pval
+ord3.com.reml.pval
+fligner.test(ord.com[, 1]^(1/1), onc.dat$geno)
+fligner.test(ord.com[, 2]^(1/1), onc.dat$geno)
+fligner.test(ord.com[, 3]^(1/1), onc.dat$geno)
+summary(lm(ord.cn[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.cn[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.com[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.com[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.com[, 3] ~ spr.onc + ptc.onc, data = onc.dat))
 
 ## Network stats correlated with other lichen community aspects
 ## adonis2(cn.d.onc ~ ptc.onc + onc.rough + spr.onc +  L + Cen, data = onc.dat, sqrt = FALSE) 
