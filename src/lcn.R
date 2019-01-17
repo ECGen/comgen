@@ -4,6 +4,7 @@
 source('lcn_load_gardens.R')
 source('lcn_load_wild.R')
 
+
 ## Is there a manuscript associated with this project?
 manuscript.dir <- "../../lcn_manuscript"
 
@@ -14,8 +15,8 @@ manuscript.dir <- "../../lcn_manuscript"
 ### Do we find similar patterns?
 
 ## Create a list to generate a results table
-h2.tab <- matrix("", 7, 5)
-colnames(h2.tab) <- c("Response", "Predictor", "p-value", "H2", "R2")
+h2.tab <- matrix("", 8, 4)
+colnames(h2.tab) <- c("Response",  "H2", "R2", "p-value")
 
 ## Total cover ~ genotype
 ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), 
@@ -28,7 +29,6 @@ h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
 h2.tab[1, "H2"] <- H2(ptc.reml, g = onc.dat$geno)
 h2.tab[1, "R2"] <- R2(ptc.reml)
 h2.tab[1, "Response"] <- "Percent Lichen Cover"
-h2.tab[1, "Predictor"] <- "Tree Genotype"
 
 ## Species richness ~ genotype
 spr.reml <- lme4::lmer(I(spr.onc^(1/1)) ~ (1 | geno), 
@@ -41,7 +41,6 @@ h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
 h2.tab[2, "H2"] <- H2(spr.reml, g = onc.dat$geno)
 h2.tab[2, "R2"] <- R2(spr.reml)
 h2.tab[2, "Response"] <- "Lichen Species Richness"
-h2.tab[2, "Predictor"] <- "Tree Genotype"
 
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
@@ -53,7 +52,6 @@ h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
 h2.tab[3, "H2"] <- H2(prb.reml, g = onc.dat$geno)
 h2.tab[3, "R2"] <- R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
-h2.tab[3, "Predictor"] <- "Genotype"
 
 ## Is species richness correlated with percent cover?
 summary(lm(spr.onc ~ ptc.onc))
@@ -91,11 +89,10 @@ com.g.perm <- vegan::adonis2(onc.com^(1/4) ~ onc.geno, data = onc.dat, perm = 10
 rcom.g.perm
 com.g.perm
 
-h2.tab[4, "p-value"] <- unlist(perm.com)["Pr(>F)1"]
-h2.tab[4, "H2"] <- H2(perm.com, g = onc.dat$geno)
-h2.tab[4, "R2"] <- R2(perm.com)
+h2.tab[4, "p-value"] <- unlist(rcom.g.perm)["Pr(>F)1"]
+h2.tab[4, "H2"] <- H2(rcom.g.perm, g = onc.dat$geno)
+h2.tab[4, "R2"] <- R2(rcom.g.perm)
 h2.tab[4, "Response"] <- "Lichen Community Composition"
-h2.tab[4, "Predictor"] <- "Genotype"
 
 ## Is network similarity correlated with community composition?
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel), mrank = TRUE)
@@ -120,7 +117,6 @@ h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
 h2.tab[5, "Response"] <- "Lichen Network"
-h2.tab[5, "Predictor"] <- "Genotype"
 
                                         # db rda for network similarity
 dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ geno, data = onc.dat, distance = "bray")
@@ -130,8 +126,8 @@ H2(dbr.cn.geno)
 ## What aspects of networks explained the similiarity?
 ## L = number of edges, LD = link density, C = connectivity,
 ## dcen = degree centrality
-link.reml <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
+link.reml <- lme4::lmer(I(log(L + 0.00001)) ~ (1 | geno), 
+                          data = onc.dat, REML = TRUE)
 link.reml.pval <- RLRsim::exactRLRT(link.reml)
 link.reml.pval
 fligner.test(onc.dat$L^(1/4), onc.dat$geno)
@@ -140,15 +136,6 @@ h2.tab[6, "p-value"] <- link.reml.pval$"p.value"
 h2.tab[6, "H2"] <- H2(link.reml, g = onc.dat$geno)
 h2.tab[6, "R2"] <- R2(link.reml)
 h2.tab[6, "Response"] <- "Number of Network Links"
-h2.tab[6, "Predictor"] <- "Genotype"
-
-                                        # network modularity
-mod.reml <- lme4::lmer(I(ns.mod.onc^(1/4)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
-mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
-mod.reml.pval
-fligner.test(ns.mod.onc^(1/4), onc.dat$geno)
-shapiro.test(residuals(mod.reml))
 
                                         # network centrality
 cen.reml <- lme4::lmer(I(log(Cen + 1)) ~ (1 | geno), 
@@ -161,18 +148,32 @@ h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
-h2.tab[7, "Predictor"] <- "Genotype"
+
+
+                                        # network modularity
+mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1/4)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
+mod.reml.pval
+fligner.test(onc.ns[, "mod.lik"]^(1/4), onc.dat$geno)
+shapiro.test(residuals(mod.reml))
+h2.tab[8, "p-value"] <- mod.reml.pval$"p.value"
+h2.tab[8, "H2"] <- H2(mod.reml, g = onc.dat$geno)
+h2.tab[8, "R2"] <- R2(mod.reml)
+h2.tab[8, "Response"] <- "Network Modularity"
+
 
                                         # network stats in relation to other variables
-L.lm <- lm(L ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
-summary(L.lm)
-shapiro.test(residuals(L.lm))
-cen.lm <- lm(I(log(Cen + 1)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
-summary(cen.lm)
-shapiro.test(residuals(cen.lm))
-mod.lm <- lm(I(cn.mod.onc^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
-summary(mod.lm)
-shapiro.test(residuals((mod.lm)))
+L.aov <- aov(I(log(L + 0.001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+summary(L.aov)
+shapiro.test(residuals(L.aov))
+cen.aov <- aov(I(log(Cen + 0.00001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)1
+summary(cen.aov)
+shapiro.test(residuals(cen.aov))
+mod.aov <- aov(I(cn.mod.onc^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+summary(mod.aov)
+shapiro.test(residuals((mod.aov)))
+## 
 summary(lm(Cen ~ cn.mod.onc + L, data = onc.dat))
 summary(lm(cn.mod.onc ~ Cen + L, data = onc.dat))
 
