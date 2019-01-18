@@ -136,8 +136,10 @@ if (!(all(rownames(rflp.d) == unique(onc.geno)))){
 rflp.d <- as.dist(rflp.d)
                                         # Lichen Network Models
                                         # onc
-cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95)
-cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
+cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, 
+                 ci.p = 95, cond = TRUE)
+cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, 
+                      ci.p = 95, return.sign = TRUE)
 cn.d.onc <- netDist(cn.onc, method = "bc")
 fn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
 fn.d.onc <- netDist(fn.onc, method = "bc")

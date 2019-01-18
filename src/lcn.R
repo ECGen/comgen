@@ -3,8 +3,6 @@
 ###06Sep2018
 source('lcn_load_gardens.R')
 source('lcn_load_wild.R')
-
-
 ## Is there a manuscript associated with this project?
 manuscript.dir <- "../../lcn_manuscript"
 
@@ -108,11 +106,11 @@ ecodist::mantel(cn.mu.d.onc ~ rflp.d)
 ecodist::mantel(onc.com.mu.d ~ rflp.d)
 ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
-vegan::adonis2(onc.com.rel ~ onc.rough * geno, data = onc.dat, perm = 5000)
-
 
 ## Was lichen network similarity determined by genotype?
-cn.perm <- vegan::adonis2(cn.d.onc ~ geno, data = onc.dat, permutations = 10000)
+cn.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough + spr.onc + ptc.onc, 
+                          data = onc.dat, permutations = 10000, mrank = TRUE)
+cn.perm
 h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
@@ -138,7 +136,7 @@ h2.tab[6, "R2"] <- R2(link.reml)
 h2.tab[6, "Response"] <- "Number of Network Links"
 
                                         # network centrality
-cen.reml <- lme4::lmer(I(log(Cen + 1)) ~ (1 | geno), 
+cen.reml <- lme4::lmer(I(log(Cen + 0.000001)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 cen.reml.pval <- RLRsim::exactRLRT(cen.reml)
 cen.reml.pval
@@ -148,7 +146,6 @@ h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
-
 
                                         # network modularity
 mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1/4)) ~ (1 | geno), 
@@ -162,24 +159,21 @@ h2.tab[8, "H2"] <- H2(mod.reml, g = onc.dat$geno)
 h2.tab[8, "R2"] <- R2(mod.reml)
 h2.tab[8, "Response"] <- "Network Modularity"
 
-
                                         # network stats in relation to other variables
 L.aov <- aov(I(log(L + 0.001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(L.aov)
 shapiro.test(residuals(L.aov))
-cen.aov <- aov(I(log(Cen + 0.00001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)1
+cen.aov <- aov(I(log(Cen + 0.00001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(cen.aov)
 shapiro.test(residuals(cen.aov))
-mod.aov <- aov(I(cn.mod.onc^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(mod.aov)
 shapiro.test(residuals((mod.aov)))
 ## 
-summary(lm(Cen ~ cn.mod.onc + L, data = onc.dat))
-summary(lm(cn.mod.onc ~ Cen + L, data = onc.dat))
-
-plot(L ~ spr.onc, data = onc.dat)
-plot(L ~ ptc.onc, data = onc.dat)
-
+summary(lm(L ~ Cen + mod.lik, data = data.frame(onc.ns)))
+summary(lm(Cen ~ mod.lik + L, data = data.frame(onc.ns)))
+summary(lm(mod.lik ~ Cen + L, data = data.frame(onc.ns)))
+cor(onc.ns[, c("L", "Cen", "mod.lik")])
                                         # are these metrics correlated with network similarity
 L.d <- dist(onc.dat$L)
 cen.d <- dist(onc.dat$Cen)
@@ -188,23 +182,17 @@ mod.d <- dist(cn.mod.onc)
 adonis2(cn.d.onc ~ Cen + L + cn.mod.onc, data = onc.dat, mrank = TRUE)
 adonis2(cn.d.onc ~ Cen + cn.mod.onc + L, data = onc.dat, mrank = TRUE)
 adonis2(cn.d.onc ~ cn.mod.onc +  Cen + L, data = onc.dat, mrank = TRUE)
-adonis2(cn.d.onc ~ L + Cen + cn.mod.onc, data = onc.dat, mrank = TRUE)
+adonis2(cn.d.onc ~ L + Cen + onc.ns[, "mod.lik"], data = onc.dat, mrank = TRUE)
 
-## So, are there patterns in the centrlity of individual lichen species?
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xg"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Cs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ls"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-shapiro.test(residuals(lme4::lmer(I(log(cen.spp[, "Ch"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE)))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Xm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(cen.spp[, "Xm"]) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pm"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-## Pa has centrlity of zero 
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Pu"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
-RLRsim::exactRLRT(lme4::lmer(I(log(cen.spp[, "Rs"] + 0.00001)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+## So, are there patterns in the centrality of individual lichen species?
+sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x)
+    RLRsim::exactRLRT(lme4::lmer(I(log(x + 0.00001)) ~ (1 | geno), 
+                                 data = onc.dat, REML = TRUE)))
+sppcen.test <- do.call(rbind, lapply(sppcen.test, function(x)
+    c(x[["statistic"]], x[["p.value"]])))
+p.adjust(sppcen.test[, 2], "fdr")
 
 ### Structural Modeling
-
 ## checking variance explained by ordinations
 nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
 nms.cn <- nmds(cn.d.onc, 1, 2)

@@ -55,7 +55,7 @@ R2 <- function(x = "aov, reml, adonis2 or dbrda object"){
     }
     if (class(x)[1] == "anova.cca"){
         tab <- as.matrix(x)
-        r2 <- tab[1, "SumOfSqs"] / (tab[1, "SumOfSqs"] + tab[2, "SumOfSqs"])
+        r2 <- tab[1, "SumOfSqs"] / sum(tab[1:(nrow(tab) - 1), "SumOfSqs"])
     }else if (class(x)[1] == "aov"){
         tab <- as.matrix(anova(x))
         r2 <- tab[1, "Sum Sq"] / (tab[1, "Sum Sq"] + tab[2, "Sum Sq"])
