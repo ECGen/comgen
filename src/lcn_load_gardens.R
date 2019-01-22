@@ -136,8 +136,10 @@ if (!(all(rownames(rflp.d) == unique(onc.geno)))){
 rflp.d <- as.dist(rflp.d)
                                         # Lichen Network Models
                                         # onc
-cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95)
-cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, ci.p = 95, return.sign = TRUE)
+cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, 
+                 ci.p = 95, cond = TRUE)
+cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, 
+                      ci.p = 95, return.sign = TRUE)
 cn.d.onc <- netDist(cn.onc, method = "bc")
 fn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
 fn.d.onc <- netDist(fn.onc, method = "bc")
@@ -161,17 +163,25 @@ prb.mu.d.onc <- dist(prb.mu.onc)
                                         # network statistics
 ns.onc <- lapply(cn.onc, pack)
 ns.onc <- lapply(ns.onc, enaR::enaStructure)
-cn.mod.onc <- numeric()
+ns.onc <- lapply(ns.onc, function(x) x$ns)
+ns.onc <- do.call(rbind, ns.onc)
+                                        # modularity
+cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
 for (i in 1:length(cn.onc)){
     if (sum(sign(cn.onc[[i]])) >= 3){
-        cn.mod.onc[i] <- slot(computeModules(cn.onc[[i]]), "likelihood")
+        ## Networks with modules = 2  9 14 19 20 25 27 28 30 31 42 44 54 57
+        mod.tmp <- computeModules(cn.onc[[i]])
+        cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood") ## module likelihood
+        cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1 ## number modules
     }else{cn.mod.onc[i] <- NA}
 }
 cn.mod.onc[is.na(cn.mod.onc)] <- 0
+names(cn.mod.onc) <- c("mod.lik", "mod.n")
                                         # graph level centralization 
 dcen.onc <- unlist(lapply(cn.onc, function(x) 
     sna::centralization(x, FUN = sna::degree, normalize = FALSE)))
-onc.ns <- cbind(ns.onc, Cen = dcen.onc)
+onc.ns <- cbind(ns.onc, Cen = dcen.onc, 
+                mod.lik = cn.mod.onc[, 1], mod.n = cn.mod.onc[, 2])
 if (!(all(onc.tree == names(cn.onc)))){print("Danger Will Robinson!")}
                                         # species centralities
 cen.spp <- lapply(cn.onc, sna::degree, rescale = FALSE)
