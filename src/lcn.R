@@ -273,6 +273,7 @@ ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
 h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
 h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
+h2.tab <- h2.tab[order(h2.tab[, "H2"], decreasing = TRUE), ]
 h2.xtab <- xtable::xtable(h2.tab, 
                            caption = "Genotypic effects of cottonwood trees on the associated lichen community.", 
                           label = "tab:h2_table")
