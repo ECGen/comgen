@@ -39,6 +39,7 @@ garden.data[,1] <- as.character(garden.data[,1])
 g1 <- substr(garden.data[,1],2,2)
 g1[g1!='P'] <- 'onc'
 onc <- garden.data[g1 == 'onc',]
+colnames(onc)[which(colnames(onc) == "Ls")] <- "Lh"
 pit <- garden.data[g1 == 'P',]
 					#tree overlap between years
 unique(onc$Tree[onc$Year=='2010']) %in% unique(onc$Tree[onc$Year=='2011'])
@@ -140,7 +141,7 @@ cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets,
                  ci.p = 95, cond = TRUE)
 cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNets, 
                       ci.p = 95, return.sign = TRUE)
-cn.d.onc <- netDist(cn.onc, method = "bc")
+cn.d.onc <- netDist(cn.onc, method = "euclidean")
 fn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), freqNet, zero.diag = TRUE)
 fn.d.onc <- netDist(fn.onc, method = "bc")
                                         # pit
@@ -161,10 +162,13 @@ cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
 prb.mu.onc <- tapply(onc.rough, onc.geno, mean)
 prb.mu.d.onc <- dist(prb.mu.onc)
                                         # network statistics
-ns.onc <- lapply(cn.onc, pack)
-ns.onc <- lapply(ns.onc, enaR::enaStructure)
-ns.onc <- lapply(ns.onc, function(x) x$ns)
+ns.onc <- lapply(lapply(cn.onc, function(x) 
+    abs(sign(x))), enaR:::structure.statistics)
 ns.onc <- do.call(rbind, ns.onc)
+                                        # Ratio P / N
+ns.rpn <- unlist(lapply(cn.onc, function(x)
+    mean(x[x > 0]) / mean(x[x < 0])))
+
                                         # modularity
 cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
 for (i in 1:length(cn.onc)){

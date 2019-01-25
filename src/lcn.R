@@ -1,8 +1,17 @@
 ###LCN: ONC Garden Analyses
 ###MKLau
 ###06Sep2018
+
+## Check for supporting packages
+deps <- c("MuMIn", "lme4", "RLRsim")
+if (any(!(deps %in% installed.packages()[, 1]))){
+    sapply(deps[!(deps %in% installed.packages()[, 1])], install.packages)
+}
+
+## Load data, models and summary statistics
 source('lcn_load_gardens.R')
 source('lcn_load_wild.R')
+
 ## Is there a manuscript associated with this project?
 manuscript.dir <- "../../lcn_manuscript"
 
@@ -73,23 +82,9 @@ com.perm <- vegan::adonis2(onc.com^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc,
 rcom.perm
 com.perm
 
-## Network ~ genotype and other varibles
-set.seed(12345)
-nd.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough + spr.onc + ptc.onc, 
-                          data = onc.dat, perm = 10000, mrank = TRUE)
-nd.perm
-
-## Genotype and community
-set.seed(2)
-rcom.g.perm <- vegan::adonis2(onc.com.rel^(1/4) ~ geno, data = onc.dat, perm = 10000, mrank = TRUE)
-set.seed(2)
-com.g.perm <- vegan::adonis2(onc.com^(1/4) ~ onc.geno, data = onc.dat, perm = 10000, mrank = TRUE)
-rcom.g.perm
-com.g.perm
-
-h2.tab[4, "p-value"] <- unlist(rcom.g.perm)["Pr(>F)1"]
-h2.tab[4, "H2"] <- H2(rcom.g.perm, g = onc.dat$geno)
-h2.tab[4, "R2"] <- R2(rcom.g.perm)
+h2.tab[4, "p-value"] <- unlist(rcom.perm)["Pr(>F)1"]
+h2.tab[4, "H2"] <- H2(rcom.perm, g = onc.dat$geno)
+h2.tab[4, "R2"] <- R2(rcom.perm)
 h2.tab[4, "Response"] <- "Lichen Community Composition"
 
 ## Is network similarity correlated with community composition?
@@ -124,11 +119,11 @@ H2(dbr.cn.geno)
 ## What aspects of networks explained the similiarity?
 ## L = number of edges, LD = link density, C = connectivity,
 ## dcen = degree centrality
-link.reml <- lme4::lmer(I(log(L + 0.00001)) ~ (1 | geno), 
+link.reml <- lme4::lmer(I(log(L + 0.00000001) ) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
-link.reml.pval <- RLRsim::exactRLRT(link.reml)
+link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
 link.reml.pval
-fligner.test(onc.dat$L^(1/4), onc.dat$geno)
+fligner.test(log(onc.dat$L + 0.0000001), onc.dat$geno)
 shapiro.test(residuals(link.reml))
 h2.tab[6, "p-value"] <- link.reml.pval$"p.value"
 h2.tab[6, "H2"] <- H2(link.reml, g = onc.dat$geno)
@@ -136,9 +131,9 @@ h2.tab[6, "R2"] <- R2(link.reml)
 h2.tab[6, "Response"] <- "Number of Network Links"
 
                                         # network centrality
-cen.reml <- lme4::lmer(I(log(Cen + 0.000001)) ~ (1 | geno), 
+cen.reml <- lme4::lmer(I(Cen^(1/2))  ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
-cen.reml.pval <- RLRsim::exactRLRT(cen.reml)
+cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
 cen.reml.pval
 fligner.test(onc.dat$L^(1/1), onc.dat$geno)
 shapiro.test(residuals(cen.reml))
@@ -146,7 +141,6 @@ h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
-
                                         # network modularity
 mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1/4)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
@@ -160,16 +154,17 @@ h2.tab[8, "R2"] <- R2(mod.reml)
 h2.tab[8, "Response"] <- "Network Modularity"
 
                                         # network stats in relation to other variables
-L.aov <- aov(I(log(L + 0.001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+L.aov <- aov(I(log(L + 0.000001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(L.aov)
 shapiro.test(residuals(L.aov))
-cen.aov <- aov(I(log(Cen + 0.00001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+cen.aov <- aov(I(Cen^(1/2)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(cen.aov)
 shapiro.test(residuals(cen.aov))
 mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
 summary(mod.aov)
 shapiro.test(residuals((mod.aov)))
 ## 
+summary(lm(L ~ Cen, data = data.frame(onc.ns)))
 summary(lm(L ~ Cen + mod.lik, data = data.frame(onc.ns)))
 summary(lm(Cen ~ mod.lik + L, data = data.frame(onc.ns)))
 summary(lm(mod.lik ~ Cen + L, data = data.frame(onc.ns)))
@@ -178,19 +173,18 @@ cor(onc.ns[, c("L", "Cen", "mod.lik")])
 L.d <- dist(onc.dat$L)
 cen.d <- dist(onc.dat$Cen)
 mod.d <- dist(cn.mod.onc)
-
-adonis2(cn.d.onc ~ Cen + L + cn.mod.onc, data = onc.dat, mrank = TRUE)
-adonis2(cn.d.onc ~ Cen + cn.mod.onc + L, data = onc.dat, mrank = TRUE)
-adonis2(cn.d.onc ~ cn.mod.onc +  Cen + L, data = onc.dat, mrank = TRUE)
 adonis2(cn.d.onc ~ L + Cen + onc.ns[, "mod.lik"], data = onc.dat, mrank = TRUE)
 
 ## So, are there patterns in the centrality of individual lichen species?
 sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x)
-    RLRsim::exactRLRT(lme4::lmer(I(log(x + 0.00001)) ~ (1 | geno), 
+    RLRsim::exactRLRT(lme4::lmer(I(x^(1/4)) ~ (1 | geno), 
                                  data = onc.dat, REML = TRUE)))
 sppcen.test <- do.call(rbind, lapply(sppcen.test, function(x)
     c(x[["statistic"]], x[["p.value"]])))
 p.adjust(sppcen.test[, 2], "fdr")
+
+## Mean centrality of species
+sort(apply(cen.spp, 2, mean), decreasing = TRUE)
 
 ### Structural Modeling
 ## checking variance explained by ordinations
@@ -215,14 +209,10 @@ ord1.com.reml <- lme4::lmer(I(ord.com[, 1]^(1/1)) ~ (1 | geno),
                        data = onc.dat, REML = TRUE)
 ord2.com.reml <- lme4::lmer(I(ord.com[, 2]^(1/1)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
-ord3.com.reml <- lme4::lmer(I(ord.com[, 3]^(1/1)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
 ord1.com.reml.pval <- RLRsim::exactRLRT(ord1.com.reml)
 ord2.com.reml.pval <- RLRsim::exactRLRT(ord2.com.reml)
-ord3.com.reml.pval <- RLRsim::exactRLRT(ord3.com.reml)
 ord1.com.reml.pval
 ord2.com.reml.pval
-ord3.com.reml.pval
 fligner.test(ord.com[, 1]^(1/1), onc.dat$geno)
 fligner.test(ord.com[, 2]^(1/1), onc.dat$geno)
 fligner.test(ord.com[, 3]^(1/1), onc.dat$geno)
@@ -230,7 +220,16 @@ summary(lm(ord.cn[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
 summary(lm(ord.cn[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
 summary(lm(ord.com[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
 summary(lm(ord.com[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
-summary(lm(ord.com[, 3] ~ spr.onc + ptc.onc, data = onc.dat))
+
+### Vectors for plotting
+                                        # Composition
+vec.env <- onc.dat[, c("onc.rough", "ptc.onc", "spr.onc")]
+colnames(vec.env) <- c("BR", "PC", "SR")
+vec.com.12 <- envfit(ord.com, env = vec.env, perm = 10000, 
+                  choices = c(1,2))
+                                        # Network similarity
+vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
+                  choices = c(1,2))
 
 ## Network stats correlated with other lichen community aspects
 ## adonis2(cn.d.onc ~ ptc.onc + onc.rough + spr.onc +  L + Cen, data = onc.dat, sqrt = FALSE) 
@@ -285,7 +284,66 @@ print(h2.xtab,
 )
 
 ## Plots
-### Network diagram for explanation figure.
+## Figure: Genotype barplots Community composition NMDS with vectors 
+pdf("../results/com_chplot_onc.pdf", height = 8, width = 8)
+par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1) / 1)
+chp.coord <- ch.plot(ord.com[, 1:2], onc.geno, 
+                     cex = 2, mu.pch = 19, 
+                     pt.col = "white", 
+                     bar.col = "darkgrey")
+text(chp.coord, labels = rownames(chp.coord))
+plot(vec.com, col = "black")
+dev.off()
+
+## Figure: Lichen network
+pdf("../results/cn_onc.pdf", height = 8, width = 8)
+par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
+set.seed(123)
+net.col <- sign(netMean(cn.mu.onc))
+net.col[net.col == -1] <- 2
+net.col[net.col == 1] <- 1
+coord <- gplot(abs(netMean(cn.mu.onc)), gmode = "digraph", 
+      displaylabels = TRUE, 
+      edge.lwd = abs(netMean(cn.mu.onc)) * 20, 
+      edge.col = net.col,
+      vertex.col = "black", 
+      vertex.cex = 0.5,
+      arrowhead.cex = 0.5, 
+      label.cex = 1, 
+      main = "All Genotypes")
+cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "11", "1008")]
+for (i in 1:length(cn.mu.plot)){
+        net.col <- sign(cn.mu.plot[[i]])
+        net.col[net.col == -1] <- 2
+        net.col[net.col == 1] <- 1
+        set.seed(123)
+        gplot(abs(cn.mu.plot[[i]]), gmode = "digraph", 
+              displaylabels = TRUE, 
+              coord = coord,
+              edge.lwd = abs(cn.mu.plot[[i]]) * 20, 
+              edge.col = net.col,
+              vertex.col = "black", 
+              vertex.cex = 0.5,
+              arrowhead.cex = 0.5, 
+              label.cex = 1, 
+              main = names(cn.mu.plot)[i])
+}
+dev.off()
+
+## Figure: Genotype networks + Genotype network similarity by genotype
+pdf("../results/cn_chplot_onc.pdf", height = 8, width = 8)
+par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
+chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
+                     cex = 2, mu.pch = 19, 
+                     pt.col = "white", 
+                     bar.col = "darkgrey")
+text(chp.coord, labels = rownames(chp.coord))
+plot(vec.cn, col = "black")
+dev.off()
+
+
+## Figure: (A) Linkage and centrality by genotype and (B) Total
+##   cover and species richness predict L and Cen
 
 
 ## Lichen size distribution

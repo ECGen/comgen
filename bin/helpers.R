@@ -190,7 +190,6 @@ cond_net <- function(x){
             out[i, j] <- cp[2]
         }
     }
-    out[is.na(out)] <- 0
     return(out)
 }
 
@@ -218,7 +217,19 @@ coNets <- function(x, conditional = FALSE,
         net[ab < ci.l] <- net[ab < ci.l] * -1
     }
     if (conditional){
-        net <- cond_net(x) * sign(net)
+        ## P(Si | Sj) - P(Si)
+        ## Max is near  1 (1 - 0.0000001)
+        ## Min is near -1 (0.000001 - 1)
+        ## If a species is absent, then 0
+        ## NA are 0, i.e. no dependence
+        ## If two species are indpendent, 
+        ## i.e. P(Si,Sj) = P(Si) * P(Sj)
+        ## then P(Si | Sj) = P(Si)
+        net.null <- matrix(rep(P[, 1], ncol(net)), nrow = nrow(P))
+        net.cond <- cond_net(x) * abs(sign(net))
+        net.cond[abs(sign(net)) == 0] <- net.null[abs(sign(net)) == 0]
+        net <- net.cond - net.null
+        diag(net) <- 0
     }
     return(net)
 }
@@ -294,7 +305,12 @@ distNet <- function(x, zero.diag = TRUE, dist.obj = TRUE){
     return(d)
 }
 
-ch.plot <- function(x = 'ordination matrix', g = 'groupings', cex = 1, plot.legend = FALSE, loc = 'topleft', mu.pch = 19){
+ch.plot <- function(x = 'ordination matrix', 
+                    g = 'groupings', 
+                    cex = 1, 
+                    mu.pch = 19,
+                    pt.col = 1, 
+                    bar.col = 1){
     mu <- apply(x, 2, function(x, g) tapply(x, g, mean), g = g) 
     se <- apply(x, 2, function(x, g) tapply(x, g, function(x)
             sd(x)/sqrt(length(x))), g = g) 
@@ -305,24 +321,20 @@ ch.plot <- function(x = 'ordination matrix', g = 'groupings', cex = 1, plot.lege
     cl.xl <- mu[, 1] -  se[, 1]
     cl.yu <- mu[, 2] + se[, 2]
     cl.yl <-  mu[, 2] -  se[, 2]
-    if (plot.legend){
-                                        #coloring
-        mu.col <- rainbow(length(unique(g)))[as.numeric(unique(g))]
-        plot(mu, pch = mu.pch, cex = cex, xlim = c(min(cl.xl), max(cl.xu)), ylim = c(min(cl.yl), max(cl.yu)), col = mu.col)
-        for (i in 1:nrow(mu)){
-            lines(x = c(cl.xl[i], cl.xu[i]), y = c(mu[i, 2], mu[i, 2]))
-            lines(x = c(mu[i, 1], mu[i, 1]), y = c(cl.yl[i], cl.yu[i]))
+                                        # plotting
+    plot(mu, pch = 0, cex = 0, 
+         xlim = c(min(cl.xl), max(cl.xu)), 
+         ylim = c(min(cl.yl), max(cl.yu)))
+    for (i in 1:nrow(mu)){
+        lines(x = c(cl.xl[i], cl.xu[i]), 
+              y = c(mu[i, 2], mu[i, 2]), 
+              col = bar.col)
+        lines(x = c(mu[i, 1], mu[i, 1]), 
+              y = c(cl.yl[i], cl.yu[i]), 
+              col = bar.col)
         }
-        legend(loc, legend = rownames(se), cex = cex*0.5, pch = mu.pch, col = mu.col, border = 'grey')
-    }else{
-                                        #coloring
-        mu.col <- 'black'
-        plot(mu, pch = mu.pch, cex = cex, xlim = c(min(cl.xl), max(cl.xu)), ylim = c(min(cl.yl), max(cl.yu)), col = mu.col)
-        for (i in 1:nrow(mu)){
-            lines(x = c(cl.xl[i], cl.xu[i]), y = c(mu[i, 2], mu[i, 2]))
-            lines(x = c(mu[i, 1], mu[i, 1]), y = c(cl.yl[i], cl.yu[i]))
-        }
-    }
+    points(mu, cex = cex, col = pt.col, pch = mu.pch)
+                                        # Return
     mu
 }
 
