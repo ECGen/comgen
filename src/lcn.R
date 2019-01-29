@@ -105,6 +105,10 @@ ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 ## Was lichen network similarity determined by genotype?
 cn.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough + spr.onc + ptc.onc, 
                           data = onc.dat, permutations = 10000, mrank = TRUE)
+cn.perm.ng <- vegan::adonis2(cn.d.onc ~ onc.rough + spr.onc + ptc.onc, 
+               data = onc.dat, permutations = 10000, mrank = TRUE)
+
+
 cn.perm
 h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
@@ -164,24 +168,22 @@ mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1/4)) ~ onc.rough + ptc.onc + spr.onc, dat
 summary(mod.aov)
 shapiro.test(residuals((mod.aov)))
 ## 
-summary(lm(L ~ Cen, data = data.frame(onc.ns)))
-summary(lm(L ~ Cen + mod.lik, data = data.frame(onc.ns)))
-summary(lm(Cen ~ mod.lik + L, data = data.frame(onc.ns)))
-summary(lm(mod.lik ~ Cen + L, data = data.frame(onc.ns)))
-cor(onc.ns[, c("L", "Cen", "mod.lik")])
+cor.test(onc.ns[, "L"], onc.ns[, "Cen"])
                                         # are these metrics correlated with network similarity
 L.d <- dist(onc.dat$L)
 cen.d <- dist(onc.dat$Cen)
 mod.d <- dist(cn.mod.onc)
-adonis2(cn.d.onc ~ L + Cen + onc.ns[, "mod.lik"], data = onc.dat, mrank = TRUE)
+adonis2(cn.d.onc ~ L + Cen, data = onc.dat, mrank = TRUE)
 
 ## So, are there patterns in the centrality of individual lichen species?
 sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x)
-    RLRsim::exactRLRT(lme4::lmer(I(x^(1/4)) ~ (1 | geno), 
-                                 data = onc.dat, REML = TRUE)))
-sppcen.test <- do.call(rbind, lapply(sppcen.test, function(x)
+    lme4::lmer(I(x^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+sppcen.pval <- lapply(sppcen.test, RLRsim::exactRLRT)
+sppcen.tab <- do.call(rbind, lapply(sppcen.pval, function(x)
     c(x[["statistic"]], x[["p.value"]])))
-p.adjust(sppcen.test[, 2], "fdr")
+sppcen.h2 <- round(unlist(lapply(sppcen.test, H2)), 3)
+sppcen.h2
+
 
 ## Mean centrality of species
 sort(apply(cen.spp, 2, mean), decreasing = TRUE)
@@ -296,7 +298,7 @@ text(chp.coord, labels = rownames(chp.coord))
 plot(vec.com, col = "black")
 dev.off()
 
-## Figure: Lichen network
+## Figure: Lichen networks
 pdf("../results/cn_onc.pdf", height = 8, width = 8)
 par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
 set.seed(123)
@@ -331,8 +333,8 @@ for (i in 1:length(cn.mu.plot)){
 }
 dev.off()
 
-## Figure: Genotype networks + Genotype network similarity by genotype
-pdf("../results/cn_chplot_onc.pdf", height = 8, width = 8)
+## Figure: Genotype network similarity by genotype
+pdf("../results/cn_chplot.pdf", height = 8, width = 8)
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
                      cex = 2, mu.pch = 19, 
@@ -345,9 +347,17 @@ dev.off()
 
 ## Figure: (A) Linkage and centrality by genotype and (B) Total
 ##   cover and species richness predict L and Cen
+pdf("../results/cn_metrics.pdf", height = 8, width = 9)
+mdc.plot(onc.dat[, "geno"], onc.dat[, "L"], ylim = c(-1, 1.75), 
+         xlab = "Tree Genotype", ylab = "Standardized Metric",
+         ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
+mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"], add = TRUE, pch = 1, 
+         ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
+legend("topright", legend = c("Links", "Centralization"), pch = c(19, 1), bty = "none")
+dev.off()
 
 
-## Lichen size distribution
+## Supplementary Figure: Lichen size distribution
 pdf("../results/xg_size.pdf", height = 5, width = 5)
 plot(density(xgs.data$median.thallus),
      xlab = "Median Lichen Thallus Area (cm^2)", 
