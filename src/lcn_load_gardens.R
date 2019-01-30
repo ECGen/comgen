@@ -311,6 +311,34 @@ oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)),names(oprbmu))]
 coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
 rownames(coord) <- coord[,1]
 coord <- coord[,-1]
+                                        # Figure ordinations
+                                        # Communities
+if (file.exists("../data/lichen_networks/nms_com_onc.rda")){
+    nms.com <- dget(file = "../data/lichen_networks/nms_com_onc.rda")    
+}else{
+    set.seed(12345)
+    nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
+    dput(nms.com, file = "../data/lichen_networks/nms_com_onc.rda")
+}
+                                        # Networks
+if (file.exists("../data/lichen_networks/nms_cn_onc.rda")){
+    nms.cn <- dget(file = "../data/lichen_networks/nms_cn_onc.rda")    
+}else{
+    set.seed(12345)
+    nms.cn <- nmds(cn.d.onc, 1, 2)
+    dput(nms.cn, file = "../data/lichen_networks/nms_cn_onc.rda")
+}
+ord.com <- nmds.min(nms.com, 3)
+ord.cn <- nmds.min(nms.cn, 2)
+                                        # Vectors for plotting
+                                        # Composition
+vec.env <- onc.dat[, c("onc.rough", "ptc.onc", "spr.onc")]
+colnames(vec.env) <- c("BR", "PC", "SR")
+vec.com.12 <- envfit(ord.com, env = vec.env, perm = 10000, 
+                  choices = c(1,2))
+                                        # Network similarity
+vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
+                  choices = c(1,2))
                                         # packing into a dataframe
 tree <- onc.geno
 for (i in 1:length(unique(onc.geno))){

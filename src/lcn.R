@@ -35,10 +35,11 @@ shapiro.test(residuals(ptc.reml))
 h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
 h2.tab[1, "H2"] <- H2(ptc.reml, g = onc.dat$geno)
 h2.tab[1, "R2"] <- R2(ptc.reml)
+R2(ptc.reml)
 h2.tab[1, "Response"] <- "Percent Lichen Cover"
 
 ## Species richness ~ genotype
-spr.reml <- lme4::lmer(I(spr.onc^(1/1)) ~ (1 | geno), 
+spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
 spr.reml.pval
@@ -47,6 +48,7 @@ fligner.test(onc.dat$spr.onc^(1/2), onc.dat$geno)
 h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
 h2.tab[2, "H2"] <- H2(spr.reml, g = onc.dat$geno)
 h2.tab[2, "R2"] <- R2(spr.reml)
+R2(spr.reml)
 h2.tab[2, "Response"] <- "Lichen Species Richness"
 
 ## Bark roughness REML
@@ -58,6 +60,7 @@ shapiro.test(residuals(prb.reml))
 h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
 h2.tab[3, "H2"] <- H2(prb.reml, g = onc.dat$geno)
 h2.tab[3, "R2"] <- R2(prb.reml)
+R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
 
 ## Is species richness correlated with percent cover?
@@ -76,11 +79,16 @@ shapiro.test(residuals(spr.prb.lm))
 
 ## COM ~ genotype + Bark roughness + PTC + SPR
 set.seed(2)
+rcom.ng.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+set.seed(2)
 rcom.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
 set.seed(2)
+com.ng.perm <- vegan::adonis2(onc.com^(1/1) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+set.seed(2)
 com.perm <- vegan::adonis2(onc.com^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+
+rcom.ng.perm
 rcom.perm
-com.perm
 
 h2.tab[4, "p-value"] <- unlist(rcom.perm)["Pr(>F)1"]
 h2.tab[4, "H2"] <- H2(rcom.perm, g = onc.dat$geno)
@@ -103,13 +111,15 @@ ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
 
 ## Was lichen network similarity determined by genotype?
-cn.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough + spr.onc + ptc.onc, 
+set.seed(1234)
+cn.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough +  ptc.onc + spr.onc, 
                           data = onc.dat, permutations = 10000, mrank = TRUE)
-cn.perm.ng <- vegan::adonis2(cn.d.onc ~ onc.rough + spr.onc + ptc.onc, 
+set.seed(1234)
+cn.perm.ng <- vegan::adonis2(cn.d.onc ~ onc.rough + ptc.onc  + spr.onc, 
                data = onc.dat, permutations = 10000, mrank = TRUE)
-
-
+cn.perm.ng
 cn.perm
+
 h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
@@ -132,6 +142,7 @@ shapiro.test(residuals(link.reml))
 h2.tab[6, "p-value"] <- link.reml.pval$"p.value"
 h2.tab[6, "H2"] <- H2(link.reml, g = onc.dat$geno)
 h2.tab[6, "R2"] <- R2(link.reml)
+R2(link.reml)
 h2.tab[6, "Response"] <- "Number of Network Links"
 
                                         # network centrality
@@ -144,6 +155,7 @@ shapiro.test(residuals(cen.reml))
 h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
 h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
+R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
                                         # network modularity
 mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1/4)) ~ (1 | geno), 
@@ -188,14 +200,18 @@ sppcen.h2
 ## Mean centrality of species
 sort(apply(cen.spp, 2, mean), decreasing = TRUE)
 
-### Structural Modeling
-## checking variance explained by ordinations
-nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
-nms.cn <- nmds(cn.d.onc, 1, 2)
-range(nms.com$r2)
-range(nms.cn$r2)
-ord.cn <- nmds.min(nms.cn, 2)
+## Ordinations
+### nits = 10, 
+### iconf = random
+### epsilon = 1e-12 = acceptable change in stress
+### maxit = 500 = maximum number of iterations
 ord.com <- nmds.min(nms.com, 3)
+## Minimum stress for given dimensionality:  0.1008923 
+## r^2 for minimum stress configuration:  0.9357192 
+ord.cn <- nmds.min(nms.cn, 2)
+## Minimum stress for given dimensionality:  0.01065177 
+## r^2 for minimum stress configuration:  0.9993026 
+## checking variance explained by ordinations
 ord1.cn.reml <- lme4::lmer(I(ord.cn[, 1]^(1/1)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 ord2.cn.reml <- lme4::lmer(I(ord.cn[, 2]^(1/1)) ~ (1 | geno), 
@@ -223,20 +239,6 @@ summary(lm(ord.cn[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
 summary(lm(ord.com[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
 summary(lm(ord.com[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
 
-### Vectors for plotting
-                                        # Composition
-vec.env <- onc.dat[, c("onc.rough", "ptc.onc", "spr.onc")]
-colnames(vec.env) <- c("BR", "PC", "SR")
-vec.com.12 <- envfit(ord.com, env = vec.env, perm = 10000, 
-                  choices = c(1,2))
-                                        # Network similarity
-vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
-                  choices = c(1,2))
-
-## Network stats correlated with other lichen community aspects
-## adonis2(cn.d.onc ~ ptc.onc + onc.rough + spr.onc +  L + Cen, data = onc.dat, sqrt = FALSE) 
-## adonis2(cn.d.onc ~ geno * L , data = onc.dat, sqrt = FALSE) 
-
 
 ## Lichen size distribution
 ## X. gallericulata thalli are about 0.22 +/- 0.003 cm^2 on average
@@ -256,7 +258,6 @@ mean(xgs.data$mean.thallus)
 sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
-
 
 ### What is the structure of the bipartite networks?
                                         # test for modularity 
@@ -295,7 +296,7 @@ chp.coord <- ch.plot(ord.com[, 1:2], onc.geno,
                      pt.col = "white", 
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
-plot(vec.com, col = "black")
+plot(vec.com.12, col = "black")
 dev.off()
 
 ## Figure: Lichen networks
