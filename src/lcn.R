@@ -430,12 +430,11 @@ text(coords, labels = rownames(coords))
 
 ### Update lichen manuscript
 ### Send tables and figures to manuscript directory
-tabs.figs <- c("../results/h2_table.tex", 
-               "../results/connect_geno.pdf",
-               "../results/chp_com_onc.pdf",
-               "../results/bp_net_onc.pdf",
-               "../results/cn_chplot_onc.pdf",
-               "../results/xg_size.pdf")
+
 if (exists("manuscript.dir")){
-    sapply(tabs.figs, file.copy, to = manuscript.dir)
+    tabs.figs <- dir(manuscript.dir)
+    tab.fig.update <- dir("../results", full.names = TRUE)[dir("../results") %in% tabs.figs]
+    tab.fig.update <- c(tab.fig.update, 
+                        dir("../docs", full.names = TRUE)[dir("../docs") %in% tabs.figs])
+    sapply(fig.updates, file.copy, to = manuscript.dir, overwrite = TRUE)
 }
