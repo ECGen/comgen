@@ -311,6 +311,21 @@ oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)),names(oprbmu))]
 coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
 rownames(coord) <- coord[,1]
 coord <- coord[,-1]
+                                        # packing into a dataframe
+tree <- onc.geno
+for (i in 1:length(unique(onc.geno))){
+    tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
+}
+tree <- factor(tree)
+onc.dat <- data.frame(PC = ptc.onc, SR = spr.onc, 
+                      geno = factor(onc.geno), tree = tree, 
+                      BR = onc.rough, onc.ns[, c("L", "Cen")])
+                                        # Plot calculations
+pw.onc <- onc.com.rel[, colnames(onc.com.rel) != "ds"]
+pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE), 
+                 order(apply(pw.onc, 2, sum), decreasing = TRUE)]
+rownames(pw.onc) <- onc.geno
+col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
                                         # Figure ordinations
                                         # Communities
 if (file.exists("../data/lichen_networks/nms_com_onc.rda")){
@@ -332,29 +347,13 @@ ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
                                         # Vectors for plotting
                                         # Composition
-vec.env <- onc.dat[, c("onc.rough", "ptc.onc", "spr.onc")]
+vec.env <- onc.dat[, c("BR", "PC", "SR")]
 colnames(vec.env) <- c("BR", "PC", "SR")
 vec.com.12 <- envfit(ord.com, env = vec.env, perm = 10000, 
                   choices = c(1,2))
                                         # Network similarity
 vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
                   choices = c(1,2))
-                                        # packing into a dataframe
-tree <- onc.geno
-for (i in 1:length(unique(onc.geno))){
-    tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
-}
-tree <- factor(tree)
-onc.dat <- data.frame(ptc.onc, spr.onc, 
-                      geno = factor(onc.geno), tree = tree, 
-                      onc.rough, onc.ns[, c("L", "Cen")])
-                                        # Plot calculations
-pw.onc <- onc.com.rel[, colnames(onc.com.rel) != "ds"]
-pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE), 
-                 order(apply(pw.onc, 2, sum), decreasing = TRUE)]
-rownames(pw.onc) <- onc.geno
-col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
-
                                         # onc
 if (!("mod_obsval_onc.csv" %in% dir("../data/lichen_networks"))){
         mod.onc <- slot(bipartite::computeModules(rel(onc.com[, -ncol(onc.com)]), 

@@ -26,11 +26,11 @@ h2.tab <- matrix("", 8, 4)
 colnames(h2.tab) <- c("Response",  "H2", "R2", "p-value")
 
 ## Total cover ~ genotype
-ptc.reml <- lme4::lmer(I(ptc.onc^(1/2)) ~ (1 | geno), 
+ptc.reml <- lme4::lmer(I(PC^(1/2)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
 ptc.reml.pval
-fligner.test(onc.dat$ptc.onc^(1/2), onc.dat$geno)
+fligner.test(onc.dat$PC^(1/2), onc.dat$geno)
 shapiro.test(residuals(ptc.reml))
 h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
 h2.tab[1, "H2"] <- H2(ptc.reml, g = onc.dat$geno)
@@ -39,12 +39,12 @@ R2(ptc.reml)
 h2.tab[1, "Response"] <- "Percent Lichen Cover"
 
 ## Species richness ~ genotype
-spr.reml <- lme4::lmer(I(spr.onc^(1/2)) ~ (1 | geno), 
+spr.reml <- lme4::lmer(I(SR^(1/2)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
 spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
 spr.reml.pval
 shapiro.test(residuals(spr.reml))
-fligner.test(onc.dat$spr.onc^(1/2), onc.dat$geno)
+fligner.test(onc.dat$SR^(1/2), onc.dat$geno)
 h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
 h2.tab[2, "H2"] <- H2(spr.reml, g = onc.dat$geno)
 h2.tab[2, "R2"] <- R2(spr.reml)
@@ -52,10 +52,10 @@ R2(spr.reml)
 h2.tab[2, "Response"] <- "Lichen Species Richness"
 
 ## Bark roughness REML
-prb.reml <- lme4::lmer(I(onc.rough^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+prb.reml <- lme4::lmer(I(BR^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
 prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
 prb.reml.pval
-fligner.test(onc.dat$onc.rough^(1/2), onc.dat$geno)
+fligner.test(onc.dat$BR^(1/2), onc.dat$geno)
 shapiro.test(residuals(prb.reml))
 h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
 h2.tab[3, "H2"] <- H2(prb.reml, g = onc.dat$geno)
@@ -64,29 +64,32 @@ R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
 
 ## Is species richness correlated with percent cover?
-summary(lm(spr.onc ~ ptc.onc))
+cor.test(onc.dat[, "SR"], onc.dat[, "PC"], data = onc.dat)
 
 ## Were these correlated with bark roughness?
-ptc.prb.lm <- lm(I(ptc.onc^(1/2)) ~ I(onc.rough^(1/2)))
+ptc.prb.lm <- lm(I(PC^(1/2)) ~ I(BR^(1/2)), data = onc.dat)
 summary(ptc.prb.lm)
-fligner.test(onc.dat$ptc.onc, onc.dat$onc.rough)
+fligner.test(onc.dat$PC, onc.dat$BR)
 shapiro.test(residuals(ptc.prb.lm))
 
-spr.prb.lm <- lm(I(spr.onc^(1)) ~ I(onc.rough^(1/2)))
+spr.prb.lm <- lm(I(SR^(1)) ~ I(BR^(1/2)), data = onc.dat)
 summary(spr.prb.lm)
-fligner.test(onc.dat$spr.onc^(1), onc.dat$onc.rough)
+fligner.test(onc.dat$SR^(1), onc.dat$BR)
 shapiro.test(residuals(spr.prb.lm))
 
 ## COM ~ genotype + Bark roughness + PTC + SPR
 set.seed(2)
-rcom.ng.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+rcom.ng.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ BR + PC + SR, 
+                               data = onc.dat, perm = 10000, mrank = TRUE)
 set.seed(2)
-rcom.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+rcom.perm <- vegan::adonis2(onc.com.rel^(1/1) ~ geno + BR + PC + SR, 
+                            data = onc.dat, perm = 10000, mrank = TRUE)
 set.seed(2)
-com.ng.perm <- vegan::adonis2(onc.com^(1/1) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
+com.ng.perm <- vegan::adonis2(onc.com^(1/1) ~ BR + PC + SR, 
+                              data = onc.dat, perm = 10000, mrank = TRUE)
 set.seed(2)
-com.perm <- vegan::adonis2(onc.com^(1/1) ~ geno + onc.rough + ptc.onc + spr.onc, data = onc.dat, perm = 10000, mrank = TRUE)
-
+com.perm <- vegan::adonis2(onc.com^(1/1) ~ geno + BR + PC + SR, 
+                           data = onc.dat, perm = 10000, mrank = TRUE)
 rcom.ng.perm
 rcom.perm
 
@@ -97,29 +100,26 @@ h2.tab[4, "Response"] <- "Lichen Community Composition"
 
 ## Is network similarity correlated with community composition?
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel), mrank = TRUE)
-spr.d <- dist(onc.dat$spr.onc)
-ptc.d <- dist(onc.dat$ptc.onc)
-prb.d <- dist(onc.dat$onc.rough)
+spr.d <- dist(onc.dat$SR)
+ptc.d <- dist(onc.dat$PC)
+prb.d <- dist(onc.dat$BR)
 ### rough -> cover -> rich -> net
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel) + spr.d + ptc.d + prb.d, mrank = TRUE)
-
 
 ## Partial Mantels using RFLP distance
 ecodist::mantel(cn.mu.d.onc ~ rflp.d)
 ecodist::mantel(onc.com.mu.d ~ rflp.d)
 ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
-
 ## Was lichen network similarity determined by genotype?
 set.seed(1234)
-cn.perm <- vegan::adonis2(cn.d.onc ~ geno + onc.rough +  ptc.onc + spr.onc, 
+cn.perm <- vegan::adonis2(cn.d.onc ~ geno + BR +  PC + SR, 
                           data = onc.dat, permutations = 10000, mrank = TRUE)
 set.seed(1234)
-cn.perm.ng <- vegan::adonis2(cn.d.onc ~ onc.rough + ptc.onc  + spr.onc, 
+cn.perm.ng <- vegan::adonis2(cn.d.onc ~ BR + PC  + SR, 
                data = onc.dat, permutations = 10000, mrank = TRUE)
 cn.perm.ng
 cn.perm
-
 h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
@@ -157,6 +157,7 @@ h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
 h2.tab[7, "R2"] <- R2(cen.reml)
 R2(cen.reml)
 h2.tab[7, "Response"] <- "Network Centrality"
+
                                         # network modularity
 mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1/4)) ~ (1 | geno), 
                        data = onc.dat, REML = TRUE)
@@ -170,22 +171,24 @@ h2.tab[8, "R2"] <- R2(mod.reml)
 h2.tab[8, "Response"] <- "Network Modularity"
 
                                         # network stats in relation to other variables
-L.aov <- aov(I(log(L + 0.000001)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+L.aov <- aov(I(log(L + 0.000001)) ~ BR + PC + SR, data = onc.dat)
 summary(L.aov)
 shapiro.test(residuals(L.aov))
-cen.aov <- aov(I(Cen^(1/2)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+cen.aov <- aov(I(Cen^(1/2)) ~ BR + PC + SR, data = onc.dat)
 summary(cen.aov)
 shapiro.test(residuals(cen.aov))
-mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1/4)) ~ onc.rough + ptc.onc + spr.onc, data = onc.dat)
+mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1/4)) ~ BR + PC + SR, data = onc.dat)
 summary(mod.aov)
 shapiro.test(residuals((mod.aov)))
+
 ## 
 cor.test(onc.ns[, "L"], onc.ns[, "Cen"])
+
                                         # are these metrics correlated with network similarity
 L.d <- dist(onc.dat$L)
 cen.d <- dist(onc.dat$Cen)
 mod.d <- dist(cn.mod.onc)
-adonis2(cn.d.onc ~ L + Cen, data = onc.dat, mrank = TRUE)
+cn.L.cen.perm <- adonis2(cn.d.onc ~ L + Cen, data = onc.dat, mrank = TRUE)
 
 ## So, are there patterns in the centrality of individual lichen species?
 sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x)
@@ -195,7 +198,6 @@ sppcen.tab <- do.call(rbind, lapply(sppcen.pval, function(x)
     c(x[["statistic"]], x[["p.value"]])))
 sppcen.h2 <- round(unlist(lapply(sppcen.test, H2)), 3)
 sppcen.h2
-
 
 ## Mean centrality of species
 sort(apply(cen.spp, 2, mean), decreasing = TRUE)
@@ -234,10 +236,10 @@ ord2.com.reml.pval
 fligner.test(ord.com[, 1]^(1/1), onc.dat$geno)
 fligner.test(ord.com[, 2]^(1/1), onc.dat$geno)
 fligner.test(ord.com[, 3]^(1/1), onc.dat$geno)
-summary(lm(ord.cn[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
-summary(lm(ord.cn[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
-summary(lm(ord.com[, 1] ~ spr.onc + ptc.onc, data = onc.dat))
-summary(lm(ord.com[, 2] ~ spr.onc + ptc.onc, data = onc.dat))
+summary(lm(ord.cn[, 1] ~ SR + PC, data = onc.dat))
+summary(lm(ord.cn[, 2] ~ SR + PC, data = onc.dat))
+summary(lm(ord.com[, 1] ~ SR + PC, data = onc.dat))
+summary(lm(ord.com[, 2] ~ SR + PC, data = onc.dat))
 
 
 ## Lichen size distribution
@@ -277,8 +279,8 @@ h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
 h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
 h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
 h2.tab <- h2.tab[order(h2.tab[, "H2"], decreasing = TRUE), ]
-h2.xtab <- xtable::xtable(h2.tab, 
-                           caption = "Genotypic effects of cottonwood trees on the associated lichen community.", 
+h2.xtab <- xtable::xtable(h2.tab, caption = 
+    "Genotypic effects of cottonwood trees on the associated lichen community.", 
                           label = "tab:h2_table")
 print(h2.xtab,
       type = "latex",
@@ -286,6 +288,76 @@ print(h2.xtab,
       include.rownames = FALSE,
       include.colnames = TRUE
 )
+
+                                        # community permanova
+rcom.ng.perm.xtab <- xtable::xtable(rcom.ng.perm, caption = 
+    "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
+                          label = "tab:com_ng_perm")
+print(rcom.ng.perm.xtab,
+      type = "latex",
+      file = "../results/com_ng_perm_table.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+rcom.perm.xtab <- xtable::xtable(rcom.perm, caption = 
+    "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
+                          label = "tab:rcom_perm")
+print(rcom.perm.xtab,
+      type = "latex",
+      file = "../results/rcom_perm.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+                                        # network permanova
+cn.perm.ng.xtab <- xtable::xtable(cn.perm.ng, caption = 
+    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
+                          label = "tab:cn_perm_ng")
+print(cn.perm.ng.xtab,
+      type = "latex",
+      file = "../results/cn_perm_ng.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+cn.perm.xtab <- xtable::xtable(cn.perm, caption = 
+    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
+                          label = "tab:cn_perm")
+print(cn.perm.xtab,
+      type = "latex",
+      file = "../results/cn_perm.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+                                        # network metrics anova
+L.aov.xtab <- xtable::xtable(L.aov, caption = 
+    "ANOVA F Table showing the predictors of the number of network links.", 
+                          label = "tab:L_aov")
+print(L.aov.xtab,
+      type = "latex",
+      file = "../results/L_aov.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+cen.aov.xtab <- xtable::xtable(cen.aov, caption = 
+    "ANOVA F Table showing the predictors of network centralization.", 
+                          label = "tab:cen_aov")
+print(cen.aov.xtab,
+      type = "latex",
+      file = "../results/cen_aov.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+                                        # networks and network metrics
+                                        # permanova
+cn.L.cen.perm.xtab <- xtable::xtable(cn.L.cen.perm, caption = 
+    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
+                          label = "tab:cn_L_cen_perm")
+print(cn.L.cen.perm.xtab,
+      type = "latex",
+      file = "../results/cn_L_cen_perm.tex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+
 
 ## Plots
 ## Figure: Genotype barplots Community composition NMDS with vectors 
@@ -436,5 +508,12 @@ if (exists("manuscript.dir")){
     tab.fig.update <- dir("../results", full.names = TRUE)[dir("../results") %in% tabs.figs]
     tab.fig.update <- c(tab.fig.update, 
                         dir("../docs", full.names = TRUE)[dir("../docs") %in% tabs.figs])
-    sapply(fig.updates, file.copy, to = manuscript.dir, overwrite = TRUE)
+    sapply(tab.fig.update, file.copy, to = manuscript.dir, overwrite = TRUE)
+                                        # supplementary figures
+    si.dir <- paste0(manuscript.dir, "/supplement")
+    si <- dir(si.dir)
+    si.update <- dir("../results", full.names = TRUE)[dir("../results") %in% si]
+    si.update <- c(si.update, dir("../docs", full.names = TRUE)[dir("../docs") %in% si])
+    sapply(si.update, file.copy, to = si.dir, 
+           overwrite = TRUE)
 }
