@@ -1,84 +1,4 @@
                                         # heritability
-H2 <- function(x = "aov, reml, adonis2 or dbrda object", g = "genotype vector", perm = 10000){
-    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
-        warning("Unknown object.")
-        stop()
-    }
-    if (class(x)[1] == "anova.cca"){
-        if (any(g == "genotype vector")){
-            warning("Please supply a genotype vector.")
-            stop()
-        }
-        tab <- as.matrix(x)
-        MSa <- tab[1, "SumOfSqs"] / tab[1, "Df"]
-        MSw <- tab[2, "SumOfSqs"] / tab[2, "Df"]
-    }else if (class(x)[1] == "aov"){
-        if (any(g == "genotype vector")){
-            warning("Please supply a genotype vector.")
-            stop()
-        }
-        g <- x$model[,2]
-        tab <- as.matrix(anova(x))
-        MSa <- tab[1, "Mean Sq"]
-        MSw <- tab[2, "Mean Sq"]
-    }
-                                        # Adjust MS for sample size
-    if (class(x)[1] == "anova.cca" | class(x)[1] == "aov"){
-        if (all(duplicated(table(g)))){
-            k <- table(g)[1]
-        }else{
-            S <- length(unique(g))
-            n. <- length(g)
-            ni <- table(g)
-            k <- (1/(S-1)) * (n. - (sum(ni^2) / n.))
-        }
-        s2.a <- (MSa - MSw) / k
-        s2.w <- MSw
-    }
-    if (class(x)[1] == "dbrda"){
-        aov.tab <- as.matrix(anova(x, permutations = perm), all = TRUE)
-        s2.a <- aov.tab[1, "Variance"]
-        s2.w <- aov.tab[2, "Variance"] 
-    }else if (class(x)[1] == "lmerMod"){
-        s2.a <- as.data.frame((summary(x)[["varcor"]]))[1, "sdcor"]^2
-        s2.w <- as.data.frame((summary(x)[["varcor"]]))[2, "sdcor"]^2
-    }
-                                        # Heritability
-    s2.a /  (s2.a + s2.w)
-}
-
-                                        # r-square
-R2 <- function(x = "aov, reml, adonis2 or dbrda object"){
-    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
-        warning("Unknown object.")
-        stop()
-    }
-    if (class(x)[1] == "anova.cca"){
-        tab <- as.matrix(x)
-        r2 <- tab[1, "SumOfSqs"] / sum(tab[1:(nrow(tab) - 1), "SumOfSqs"])
-    }else if (class(x)[1] == "aov"){
-        tab <- as.matrix(anova(x))
-        r2 <- tab[1, "Sum Sq"] / (tab[1, "Sum Sq"] + tab[2, "Sum Sq"])
-    }
-    if (class(x)[1] == "dbrda"){
-        r2 <- vegan::RsquareAdj(x)$r.squared
-    }else if (class(x)[1] == "lmerMod"){
-        r2 <- MuMIn::r.squaredGLMM(x)[, "R2c"]
-    }
-    return(r2)
-}
-
-                                        #
-rel <- function(x, rel.type = "max"){
-    if (rel.type == "max"){
-        apply(x , 2, function(x) x / max(x))
-    }else if (rel.type == "sum"){
-        apply(x , 2, function(x) x / sum(x))
-    }else{
-        warning("Unknown relativization type.")
-    }
-}
-
                                         # shuf.vec
 shuf.vec <- function(x){
     x <- matrix(c(x, rep(0, length(x))), ncol = 2)
@@ -164,6 +84,209 @@ freqNet <- function(x, zero.diag = FALSE){
     x
 }
 
+rmZeros <- function(x, zero.diag = TRUE){
+    if (zero.diag){diag(x) <- 0}
+    x[apply(x, 1, sum) != 0, apply(x, 2, sum) != 0]
+}
+
+meanNet <- function(x, zero.diag = TRUE){
+    mu <- x[[1]]
+    for (i in 2:length(x)){
+        mu <- mu + x[[i]]
+    }
+    mu <- mu / length(x)
+    if (zero.diag){diag(mu) <- 0}
+    return(mu)
+}
+
+varNet <- function(x, zero.diag = TRUE){
+    mu <- meanNet(x, zero.diag = zero.diag)
+    v <- (x[[1]] - mu)^2
+    for (i in 2:length(x)){
+        v <- v + (x[[i]] - mu)^2
+    }
+    v <- v / length(x)
+    if (zero.diag){diag(v) <- 0}
+    return(v)
+}
+
+distNet <- function(x, zero.diag = TRUE, dist.obj = TRUE){
+    d <- matrix(0, nrow = length(x), ncol = length(x))
+    for (i in 1:nrow(d)){
+        for (j in 1:ncol(d)){
+            xi <- x[[i]]
+            xj <- x[[j]]
+            if (zero.diag){diag(xi) <- diag(xj) <- 0}
+            d[i, j] <- sqrt(sum((xi - xj)^2))
+        }
+    }
+    if (dist.obj){d <- as.dist(d)}
+    return(d)
+}
+
+cs <- function(x){nestedchecker(x)[[1]][1]}
+mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
+
+
+### Added to comgenR package
+                                        # added to comgenR
+netMean <- function(x, zero.na = TRUE){
+    x <- Reduce("+", x) / sum(unlist(x))
+    if (zero.na){x[is.na(x)] <- 0}
+    x
+}
+
+                                        # added to comgenR
+ch.plot <- function(x = 'ordination matrix', 
+                    g = 'groupings', 
+                    cex = 1, 
+                    mu.pch = 19,
+                    pt.col = 1, 
+                    bar.col = 1){
+    mu <- apply(x, 2, function(x, g) tapply(x, g, mean), g = g) 
+    se <- apply(x, 2, function(x, g) tapply(x, g, function(x)
+            sd(x)/sqrt(length(x))), g = g) 
+    mu <- na.omit(mu) 
+    se <- na.omit(se)
+                                        #error bars
+    cl.xu <- mu[, 1] +  se[, 1]
+    cl.xl <- mu[, 1] -  se[, 1]
+    cl.yu <- mu[, 2] + se[, 2]
+    cl.yl <-  mu[, 2] -  se[, 2]
+                                        # plotting
+    plot(mu, pch = 0, cex = 0, 
+         xlim = c(min(cl.xl), max(cl.xu)), 
+         ylim = c(min(cl.yl), max(cl.yu)))
+    for (i in 1:nrow(mu)){
+        lines(x = c(cl.xl[i], cl.xu[i]), 
+              y = c(mu[i, 2], mu[i, 2]), 
+              col = bar.col)
+        lines(x = c(mu[i, 1], mu[i, 1]), 
+              y = c(cl.yl[i], cl.yu[i]), 
+              col = bar.col)
+        }
+    points(mu, cex = cex, col = pt.col, pch = mu.pch)
+                                        # Return
+    mu
+}
+
+
+
+                                        # My dotchart
+                                        # added to comgenR
+mdc.plot <- function(x, y, pch = 19, col = 1, 
+                     ylim = c(-3, 3), xlab, ylab,
+                     ord, std = TRUE, add = FALSE, lg = 0, ug = 1){
+    if (std){y <- (y - mean(y)) / sd(y)}
+    x <- factor(x)
+    mu <- tapply(y, x, mean)
+    se <- tapply(y, x, function(x) sd(x) / sqrt(length(x)))
+    if (exists("ord")){
+        se <- se[ord]
+        mu <- mu[ord]
+    }
+    se.bars <- matrix(c(mu + se, mu - se), nrow = 2, byrow = TRUE)
+    n <- nlevels(x)
+    x.grid <- seq(lg, ug, by = 1 / (length(unique(x)) + 1))
+    if (!exists("xlab")){xlab = ""}
+    if (!exists("ylab")){ylab = ""}
+    if (!add){
+        plot(x.grid, rep(0, length(x.grid)), pch = "", 
+             ylab = ylab, xlab = xlab, xaxt = "none", ylim = ylim)
+    }
+    axis(1, at = x.grid[(1:n + 1)], labels = levels(x))
+    points(x.grid[(1:n + 1)], mu, pch = pch)
+    for (i in 1:length(mu)){
+        lines(rep(x.grid[(1:n + 1)][i], 2), c(mu[i] - se[i], mu[i] + se[i]))
+    }
+}
+
+                                        # This has now been added to the 
+                                        # comgenR package.
+H2 <- function(x = "aov, reml, adonis2 or dbrda object", g = "genotype vector", perm = 10000){
+    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
+        warning("Unknown object.")
+        stop()
+    }
+    if (class(x)[1] == "anova.cca"){
+        if (any(g == "genotype vector")){
+            warning("Please supply a genotype vector.")
+            stop()
+        }
+        tab <- as.matrix(x)
+        MSa <- tab[1, "SumOfSqs"] / tab[1, "Df"]
+        MSw <- tab[2, "SumOfSqs"] / tab[2, "Df"]
+    }else if (class(x)[1] == "aov"){
+        if (any(g == "genotype vector")){
+            warning("Please supply a genotype vector.")
+            stop()
+        }
+        g <- x$model[,2]
+        tab <- as.matrix(anova(x))
+        MSa <- tab[1, "Mean Sq"]
+        MSw <- tab[2, "Mean Sq"]
+    }
+                                        # Adjust MS for sample size
+    if (class(x)[1] == "anova.cca" | class(x)[1] == "aov"){
+        if (all(duplicated(table(g)))){
+            k <- table(g)[1]
+        }else{
+            S <- length(unique(g))
+            n. <- length(g)
+            ni <- table(g)
+            k <- (1/(S-1)) * (n. - (sum(ni^2) / n.))
+        }
+        s2.a <- (MSa - MSw) / k
+        s2.w <- MSw
+    }
+    if (class(x)[1] == "dbrda"){
+        aov.tab <- as.matrix(anova(x, permutations = perm), all = TRUE)
+        s2.a <- aov.tab[1, "Variance"]
+        s2.w <- aov.tab[2, "Variance"] 
+    }else if (class(x)[1] == "lmerMod"){
+        s2.a <- as.data.frame((summary(x)[["varcor"]]))[1, "sdcor"]^2
+        s2.w <- as.data.frame((summary(x)[["varcor"]]))[2, "sdcor"]^2
+    }
+                                        # Heritability
+    s2.a /  (s2.a + s2.w)
+}
+
+                                        # r-square
+                                        # This has now been added to the 
+                                        # comgenR package.
+R2 <- function(x = "aov, reml, adonis2 or dbrda object"){
+    if (!(class(x)[1] %in% c("anova.cca", "aov", "dbrda", "lmerMod"))){
+        warning("Unknown object.")
+        stop()
+    }
+    if (class(x)[1] == "anova.cca"){
+        tab <- as.matrix(x)
+        r2 <- tab[1, "SumOfSqs"] / sum(tab[1:(nrow(tab) - 1), "SumOfSqs"])
+    }else if (class(x)[1] == "aov"){
+        tab <- as.matrix(anova(x))
+        r2 <- tab[1, "Sum Sq"] / (tab[1, "Sum Sq"] + tab[2, "Sum Sq"])
+    }
+    if (class(x)[1] == "dbrda"){
+        r2 <- vegan::RsquareAdj(x)$r.squared
+    }else if (class(x)[1] == "lmerMod"){
+        r2 <- MuMIn::r.squaredGLMM(x)[, "R2c"]
+    }
+    return(r2)
+}
+
+                                        #
+                                        # This has now been added to the 
+                                        # comgenR package.
+rel <- function(x, rel.type = "max"){
+    if (rel.type == "max"){
+        apply(x , 2, function(x) x / max(x))
+    }else if (rel.type == "sum"){
+        apply(x , 2, function(x) x / sum(x))
+    }else{
+        warning("Unknown relativization type.")
+    }
+}
+                                        # Added comgenR
 cond_prob <- function(a, b){
     ## P(B) = B / N
     ## P(A) = A / N
@@ -178,7 +301,7 @@ cond_prob <- function(a, b){
     p.b_a <- p.ab / p.a
     return(c(p.a_b, p.b_a))
 }
-
+                                        # Added comgenR
 cond_net <- function(x){
     out <- matrix(0, nrow = ncol(x), ncol = ncol(x))
     rownames(out) <- colnames(out) <- colnames(x)
@@ -192,7 +315,8 @@ cond_net <- function(x){
     }
     return(out)
 }
-
+                                        # 
+                                        # Added comgenR
 coNets <- function(x, conditional = FALSE, 
                    ci.p = 95, scale = FALSE, return.signs = FALSE){
     Z.tab <- c("80" = 1.282, "85" = 1.440, "90" = 1.645, "95" = 1.960, "99" = 2.576)
@@ -234,6 +358,7 @@ coNets <- function(x, conditional = FALSE,
     return(net)
 }
 
+                                        # Added comgenR
 netDist <- function(x, zero.na = TRUE, method = "euclidean"){
     out <- array(0, dim = rep(length(x), 2))
     if (!is.null(names(x))){
@@ -260,112 +385,4 @@ netDist <- function(x, zero.na = TRUE, method = "euclidean"){
     dist(out)
 }
 
-netMean <- function(x, zero.na = TRUE){
-    x <- Reduce("+", x) / sum(unlist(x))
-    if (zero.na){x[is.na(x)] <- 0}
-    x
-}
 
-rmZeros <- function(x, zero.diag = TRUE){
-    if (zero.diag){diag(x) <- 0}
-    x[apply(x, 1, sum) != 0, apply(x, 2, sum) != 0]
-}
-
-meanNet <- function(x, zero.diag = TRUE){
-    mu <- x[[1]]
-    for (i in 2:length(x)){
-        mu <- mu + x[[i]]
-    }
-    mu <- mu / length(x)
-    if (zero.diag){diag(mu) <- 0}
-    return(mu)
-}
-
-varNet <- function(x, zero.diag = TRUE){
-    mu <- meanNet(x, zero.diag = zero.diag)
-    v <- (x[[1]] - mu)^2
-    for (i in 2:length(x)){
-        v <- v + (x[[i]] - mu)^2
-    }
-    v <- v / length(x)
-    if (zero.diag){diag(v) <- 0}
-    return(v)
-}
-
-distNet <- function(x, zero.diag = TRUE, dist.obj = TRUE){
-    d <- matrix(0, nrow = length(x), ncol = length(x))
-    for (i in 1:nrow(d)){
-        for (j in 1:ncol(d)){
-            xi <- x[[i]]
-            xj <- x[[j]]
-            if (zero.diag){diag(xi) <- diag(xj) <- 0}
-            d[i, j] <- sqrt(sum((xi - xj)^2))
-        }
-    }
-    if (dist.obj){d <- as.dist(d)}
-    return(d)
-}
-
-ch.plot <- function(x = 'ordination matrix', 
-                    g = 'groupings', 
-                    cex = 1, 
-                    mu.pch = 19,
-                    pt.col = 1, 
-                    bar.col = 1){
-    mu <- apply(x, 2, function(x, g) tapply(x, g, mean), g = g) 
-    se <- apply(x, 2, function(x, g) tapply(x, g, function(x)
-            sd(x)/sqrt(length(x))), g = g) 
-    mu <- na.omit(mu) 
-    se <- na.omit(se)
-                                        #error bars
-    cl.xu <- mu[, 1] +  se[, 1]
-    cl.xl <- mu[, 1] -  se[, 1]
-    cl.yu <- mu[, 2] + se[, 2]
-    cl.yl <-  mu[, 2] -  se[, 2]
-                                        # plotting
-    plot(mu, pch = 0, cex = 0, 
-         xlim = c(min(cl.xl), max(cl.xu)), 
-         ylim = c(min(cl.yl), max(cl.yu)))
-    for (i in 1:nrow(mu)){
-        lines(x = c(cl.xl[i], cl.xu[i]), 
-              y = c(mu[i, 2], mu[i, 2]), 
-              col = bar.col)
-        lines(x = c(mu[i, 1], mu[i, 1]), 
-              y = c(cl.yl[i], cl.yu[i]), 
-              col = bar.col)
-        }
-    points(mu, cex = cex, col = pt.col, pch = mu.pch)
-                                        # Return
-    mu
-}
-
-cs <- function(x){nestedchecker(x)[[1]][1]}
-mm <- function(x){slot(bipartite::computeModules(x),'likelihood')}
-
-                                        # My dotchart
-mdc.plot <- function(x, y, pch = 19, col = 1, 
-                     ylim = c(-3, 3), xlab, ylab,
-                     ord, std = TRUE, add = FALSE, lg = 0, ug = 1){
-    if (std){y <- (y - mean(y)) / sd(y)}
-    x <- factor(x)
-    mu <- tapply(y, x, mean)
-    se <- tapply(y, x, function(x) sd(x) / sqrt(length(x)))
-    if (exists("ord")){
-        se <- se[ord]
-        mu <- mu[ord]
-    }
-    se.bars <- matrix(c(mu + se, mu - se), nrow = 2, byrow = TRUE)
-    n <- nlevels(x)
-    x.grid <- seq(lg, ug, by = 1 / (length(unique(x)) + 1))
-    if (!exists("xlab")){xlab = ""}
-    if (!exists("ylab")){ylab = ""}
-    if (!add){
-        plot(x.grid, rep(0, length(x.grid)), pch = "", 
-             ylab = ylab, xlab = xlab, xaxt = "none", ylim = ylim)
-    }
-    axis(1, at = x.grid[(1:n + 1)], labels = levels(x))
-    points(x.grid[(1:n + 1)], mu, pch = pch)
-    for (i in 1:length(mu)){
-        lines(rep(x.grid[(1:n + 1)][i], 2), c(mu[i] - se[i], mu[i] + se[i]))
-    }
-}

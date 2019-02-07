@@ -2,33 +2,97 @@
 ### ACN study
 ### Pit data collected 2012
 
-source('../bin/helpers.R')
-library(sna)
-library(vegan)
+library(ComGenR)
 source("loadPitdata.R")
 
+## Network Plot
+net.col <- sign(netMean(cn.acn))
+net.col[net.col == -1] <- 2
+net.col[net.col == 1] <- 1
+coord <- gplot(abs(netMean(cn.acn)), gmode = "digraph", 
+               displaylabels = TRUE, 
+               edge.lwd = abs(netMean(cn.acn)) * 100, 
+               edge.col = net.col,
+               vertex.col = "black", 
+               vertex.cex = 0.5,
+               arrowhead.cex = 0.5, 
+               label.cex = 1, 
+               main = "All Trees")
+
+
 ### Genotype effect
-vegan::adonis2(nd.acn.pit ~ geno * leaf.type, data = tree.info, sqrt.dist = TRUE)
-vegan::adonis2(nd.acn.liv.pit ~ geno, data = tree.info[tree.info[, "leaf.type"] == "live", ], 
-               sqrt.dist = TRUE)
-vegan::adonis2(nd.acn.sen.pit ~ geno, data = tree.info[tree.info[, "leaf.type"] == "sen", ], 
-               sqrt.dist = TRUE)
+#########################
+## Total abundance
+#########################
+abund <- apply(com.acn, 1, sum)
+reml.abund.acn <- lme4::lmer(I(abund^(1/2)) ~ (1 | geno), 
+                           data = acn.dat,
+                           REML = TRUE)
+p.reml.abund.acn <- RLRsim::exactRLRT(reml.abund.acn)
+p.reml.abund.acn
 
 
-reml.dc <- lme4::lmer(I(all.dc^(1/1)) ~ (1 | geno) * leaf.type, 
-                       data = tree.info,
-                       REML = TRUE)
-reml.pval.dc <- RLRsim::exactRLRT(reml.dc)
-reml.pval.dc
+#########################
+## Richness
+#########################
+rich <- apply(com.acn, 1, function(x) sum(sign(x)))
+reml.rich.acn <- lme4::lmer(I(rich^(1/2)) ~ (1 | geno), 
+                           data = acn.dat,
+                           REML = TRUE)
+p.reml.rich.acn <- RLRsim::exactRLRT(reml.rich.acn)
+p.reml.rich.acn
 
-reml.dc.liv <- lme4::lmer(I(liv.dc^(1/1)) ~ (1 | geno), 
-                       data = tree.info[tree.info[, "leaf.type"] == "live", ],
-                       REML = TRUE)
-reml.pval.dc.liv <- RLRsim::exactRLRT(reml.dc.liv)
-reml.pval.dc.liv
+#########################
+## Community Similarity
+#########################
+rel.com.acn <- rel(com.acn)
+ds <- rep(min(rel.com.acn[rel.com.acn != 0]) / 100, nrow(rel.com.acn))
+rel.com.acn <- cbind(rel.com.acn, ds)
+vegan::adonis2(rel.com.acn ~ geno, strata = acn.dat[, "leaf.type"], 
+              data = acn.dat, perm = 10000, sqrt.dist = FALSE, mrank = FALSE)
 
-reml.dc.sen <- lme4::lmer(I(sen.dc^(1/1)) ~ (1 | geno), 
-                       data = tree.info[tree.info[, "leaf.type"] == "sen", ],
-                       REML = TRUE)
-reml.pval.dc.sen <- RLRsim::exactRLRT(reml.dc.sen)
-reml.pval.dc.sen
+#########################
+## Network
+#########################
+set.seed(1234)
+vegan::adonis2(d.cn.acn ~ geno, strata = acn.dat[, "leaf.type"], 
+              data = acn.dat, perm = 10000, sqrt.dist = FALSE, mrank = FALSE)
+                                        # senescent versus live
+vegan::adonis2(d.cn.acn ~ leaf.type * geno, 
+               data = acn.dat, sqrt.dist = TRUE, mrank = FALSE)
+vegan::adonis2(netDist(cn.acn[acn.dat[, "leaf.type"]  == "live"]) ~ geno, 
+               data = acn.dat[acn.dat[, "leaf.type"] == "live", ], 
+               sqrt.dist = TRUE, mrank = TRUE)
+vegan::adonis2(netDist(cn.acn[acn.dat[, "leaf.type"]  == "sen"]) ~ geno, 
+               data = acn.dat[acn.dat[, "leaf.type"] == "sen", ], 
+               sqrt.dist = TRUE, mrank = TRUE)
+#########################
+## Network metrics
+#########################
+                                        # number of links
+reml.l.acn <- lme4::lmer(I(l.cn.acn^(1/1)) ~ (1 | geno), 
+                           data = acn.dat,
+                           REML = TRUE)
+p.reml.l.acn <- RLRsim::exactRLRT(reml.l.acn)
+p.reml.l.acn
+                                        # centralization
+reml.cen.acn <- lme4::lmer(I(cen.cn.acn^(1/2)) ~ (1 | geno), 
+                           data = acn.dat,
+                           REML = TRUE)
+p.reml.cen.acn <- RLRsim::exactRLRT(reml.cen.acn)
+p.reml.cen.acn
+#########################
+## Plots
+#########################
+                                        # abundance and richness
+mdc.plot(acn.dat[, "geno"], abund, 
+         xlab = "Genotype", ylab = "Standardized Score", 
+         ylim = c(-1.5, 1.5), pch = 1)
+mdc.plot(acn.dat[, "geno"], rich, 
+         xlab = "Genotype", ylab = "Standardized Score", 
+         add = TRUE, pch = 19)
+                                        # Network ordination
+coord <- ch.plot(ord.cn.acn, g = acn.dat[, "geno"], cex = 3, mu.pch = 19, pt.col = "white")
+text(coord, labels = rownames(coord))
+plot(vec.com.acn, col = "grey")
+plot(vec.nm.acn, col = "red")

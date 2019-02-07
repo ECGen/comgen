@@ -10,76 +10,53 @@ pit[is.na(pit)] <- 0
 ### necrosis <- pit$fungal
 pit <- pit[,colnames(pit) != 'fungal']
 
-### combine pb 
+## Remove 1007
+## Has high variability
+remove.1007 <- FALSE
+if (remove.1007){pit <- pit[pit[, "geno"] != "1007", ]}
+
+## Remove mite
+pit <- pit[, colnames(pit) != "mite"]
+
+## combine pb 
 pb <- pit$pb.upper + pit$pb.lower + pit$pb.woody 
 pb.pred <- pit$pb.pred + pit$pb.woody.pred + pit$pb.hole
 pb.abort <- pit$pb.abort
 pit <- pit[,!(grepl('pb',colnames(pit)))]
 pit <- data.frame(pit,pb.abort,pb.pred,pb)
 pit <- data.frame(pit[,1:6],pit[,ncol(pit):7])
+tree.info <- paste(pit[, "tree"], pit[, "geno"], pit[, "leaf.type"])
+tree.arth <- pit[, 7:ncol(pit)]
+tree.arth <- split(tree.arth, tree.info)
 
-### separating into trees
-tree.info <- pit[,c(1,2,3,6)]
-tree.arth <- pit[,7:ncol(pit)]
-tree.arth <- split(tree.arth,paste(tree.info[,1],
-                                   tree.info[,2],
-                                   tree.info[,3]))
-tree.info <- tree.info[!(duplicated(tree.info)),]
+## community matrix
+com.acn <- do.call(rbind, lapply(tree.arth, function(x) apply(x, 2, sum)))
 
-### coerce into numeric matrices
-arth.mats <- lapply(tree.arth,data.frame)
-arth.mats <- lapply(arth.mats,as.matrix)
-
-### species totals for each tree + richness + total abundance
-spp.tot <- do.call(rbind,lapply(tree.arth,function(x) apply(x,2,sum)))
-R <- apply(sign(spp.tot),1,sum)
-A <- apply(spp.tot,1,sum)
-spp.tot <- cbind(spp.tot,R,A)
-
-### tree level networks for arthropods
-tree.nets <- lapply(arth.mats, coNets)
-
-## Genotype average network 
-## within each 
-liv.nets <- tree.nets[tree.info[,1] == 'live']
-sen.nets <- tree.nets[tree.info[,1] == 'sen']
-for (i in 1:length(liv.nets)){
-    diag(liv.nets[[i]]) <- 0
-    diag(sen.nets[[i]]) <- 0
-}
-
-liv.evc <- unlist(lapply(liv.nets, function(x) centralization(x, FUN='evcent')))
-sen.evc <- unlist(lapply(sen.nets, function(x) centralization(x, FUN='evcent'))
-)
-
-all.dc <- unlist(lapply(tree.nets, function(x) centralization(x, FUN='degree', normalize = FALSE)))
-liv.dc <- all.dc[tree.info$leaf.type == 'live']
-sen.dc <- all.dc[tree.info$leaf.type == 'sen']
-
-### species eigen centralities
-liv.spc <- list()
-for (i in 1:length(liv.nets)){
-        liv.spc[[i]] <- evcent(liv.nets[[i]],gmode='graph')
-}
-liv.spc <- do.call(rbind,liv.spc)
-liv.spc[is.na(liv.spc)] <- 0
-colnames(liv.spc) <- colnames(liv.nets[[1]])
-
-sen.spc <- list()
-for (i in 1:length(sen.nets)){
-        sen.spc[[i]] <- evcent(sen.nets[[i]],gmode='graph')
-}
-sen.spc <- do.call(rbind,sen.spc)
-sen.spc[is.na(sen.spc)] <- 0
-colnames(sen.spc) <- colnames(sen.nets[[1]])
-
-### edge degree
-liv.ord <- unlist(lapply(liv.nets, ord))
-sen.ord <- unlist(lapply(sen.nets, ord))
+## tree level networks for arthropods
+cn.acn <- lapply(tree.arth, coNets, ci.p = 95, cond = TRUE)
 
 ## tree net distances
-nd.acn.pit <- netDist(tree.nets)
-nd.acn.liv.pit <- netDist(liv.nets)
-nd.acn.sen.pit <- netDist(sen.nets)
+d.cn.acn <- netDist(cn.acn)
 
+## network stats
+l.cn.acn <- do.call(rbind, lapply(cn.acn, enaR:::structure.statistics))[, "L"]
+cen.cn.acn <- unlist(lapply(cn.acn, 
+                            function(x) 
+                                sna::centralization(x, FUN = sna::degree, normalize = FALSE)), 
+                     )
+nm.cn.acn <- data.frame(L = l.cn.acn, C = cen.cn.acn)
 
+## tree info
+acn.dat <- data.frame(do.call(rbind, strsplit(names(cn.acn), split = " ")))
+names(acn.dat) <- c("tree", "geno", "leaf.type")
+
+## Network Ordination
+set.seed(1234)
+nms.cn.acn <- nmds(d.cn.acn, 2, 2)
+ord.cn.acn <- nmds.min(nms.cn.acn)
+vec.com.acn <- envfit(ord.cn.acn, com.acn[, apply(com.acn, 2, sum) > 10])
+vec.nm.acn <- envfit(ord.cn.acn, nm.cn.acn)
+
+## ## Modularity of bipartite networks
+## computeModules(com.acn[grepl("live", rownames(com.acn)), ])
+## computeModules(com.acn[grepl("sen", rownames(com.acn)), ])
