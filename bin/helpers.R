@@ -174,32 +174,6 @@ ch.plot <- function(x = 'ordination matrix',
 
                                         # My dotchart
                                         # added to comgenR
-mdc.plot <- function(x, y, pch = 19, col = 1, 
-                     ylim = c(-3, 3), xlab, ylab,
-                     ord, std = TRUE, add = FALSE, lg = 0, ug = 1){
-    if (std){y <- (y - mean(y)) / sd(y)}
-    x <- factor(x)
-    mu <- tapply(y, x, mean)
-    se <- tapply(y, x, function(x) sd(x) / sqrt(length(x)))
-    if (exists("ord")){
-        se <- se[ord]
-        mu <- mu[ord]
-    }
-    se.bars <- matrix(c(mu + se, mu - se), nrow = 2, byrow = TRUE)
-    n <- nlevels(x)
-    x.grid <- seq(lg, ug, by = 1 / (length(unique(x)) + 1))
-    if (!exists("xlab")){xlab = ""}
-    if (!exists("ylab")){ylab = ""}
-    if (!add){
-        plot(x.grid, rep(0, length(x.grid)), pch = "", 
-             ylab = ylab, xlab = xlab, xaxt = "none", ylim = ylim)
-    }
-    axis(1, at = x.grid[(1:n + 1)], labels = levels(x))
-    points(x.grid[(1:n + 1)], mu, pch = pch)
-    for (i in 1:length(mu)){
-        lines(rep(x.grid[(1:n + 1)][i], 2), c(mu[i] - se[i], mu[i] + se[i]))
-    }
-}
 
                                         # This has now been added to the 
                                         # comgenR package.

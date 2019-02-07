@@ -2,7 +2,6 @@
 ### ACN study
 ### Pit data collected 2012
 
-
 pit <- read.csv('../data/acn/arth_cooc_PIT_Lau.csv')
 pit[is.na(pit)] <- 0
 
@@ -51,11 +50,19 @@ acn.dat <- data.frame(do.call(rbind, strsplit(names(cn.acn), split = " ")))
 names(acn.dat) <- c("tree", "geno", "leaf.type")
 
 ## Network Ordination
-set.seed(1234)
-nms.cn.acn <- nmds(d.cn.acn, 2, 2)
+if (file.exists("../results/nms_cn_acn.rda")){
+    nms.cn.acn <- dget("../results/nms_cn_acn.rda")
+}else {
+    set.seed(1234)
+    nms.cn.acn <- nmds(d.cn.acn, 2, 2)
+    dput(nms.cn.acn, "../results/nms_cn_acn.rda")
+}
 ord.cn.acn <- nmds.min(nms.cn.acn)
-vec.com.acn <- envfit(ord.cn.acn, com.acn[, apply(com.acn, 2, sum) > 10])
+vec.com.acn <- envfit(ord.cn.acn, 
+                      com.acn[, apply(com.acn, 2, sum) > 10])
 vec.nm.acn <- envfit(ord.cn.acn, nm.cn.acn)
+
+
 
 ## ## Modularity of bipartite networks
 ## computeModules(com.acn[grepl("live", rownames(com.acn)), ])
