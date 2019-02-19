@@ -1,26 +1,42 @@
-### script for loading data for the
-### ACN study
-### Pit data collected 2012
+---
+title: "Genetic Effects of a Foundation Tree on Networks of Leaf Modifying Arthropods"
+date: 
+output: pdf_document
+theme: bootswatch
+---
 
+```{r}
 ## Load datasets
 pit <- read.csv('../data/acn/arth_cooc_PIT_Lau.csv')
 pit[is.na(pit)] <- 0
+```
 
+```{r}
 ## Should any genotypes be removed?
 rm.1007 <- TRUE
 
-## Restrict main analysis to live leaves only
+```
 
+```{r}
+## Restrict main analysis to live leaves only
 ### separating out "fungal" necrosis
 ### necrosis <- pit$fungal
 pit <- pit[,colnames(pit) != 'fungal']
+```
 
+```{r}
 ## Remove 1007
 if (rm.1007){pit <- pit[pit[, "geno"] != "1007", ]}
 
+```
+
+```{r}
 ## Remove mite
 pit <- pit[, colnames(pit) != "mite"]
 
+```
+
+```{r}
 ## combine pb 
 pb <- pit$pb.upper + pit$pb.lower + pit$pb.woody 
 pb.pred <- pit$pb.pred + pit$pb.woody.pred + pit$pb.hole
@@ -32,15 +48,37 @@ tree.info <- paste(pit[, "tree"], pit[, "geno"], pit[, "leaf.type"])
 tree.arth <- pit[, 7:ncol(pit)]
 tree.arth <- split(tree.arth, tree.info)
 
+```
+
+```{r}
+## Limit senscent trees with greater than 20 leaves
+n.sen <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "sen"], nrow))
+n.live <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "live"], nrow))
+sen.trees <- tree.arth[names(tree.arth) %in% names(n.sen)[n.sen >= 20]]
+sen.dat <- data.frame(do.call(rbind, strsplit(names(sen.trees), split = " ")))
+colnames(sen.dat) <- c("tree", "geno", "leaf.type")
+com.sen <- do.call(rbind, lapply(sen.trees, function(x) apply(x, 2 ,sum)))
+```
+
+```{r}
 ## community matrix
 com.acn <- do.call(rbind, lapply(tree.arth, function(x) apply(x, 2, sum)))
 
+```
+
+```{r}
 ## tree level networks for arthropods
 cn.acn <- lapply(tree.arth, coNet, ci.p = 95, cond = TRUE)
 
+```
+
+```{r}
 ## tree net distances
 d.cn.acn <- netDist(cn.acn)
 
+```
+
+```{r}
 ## network stats
 l.cn.acn <- do.call(rbind, lapply(cn.acn, enaR:::structure.statistics))[, "L"]
 cen.cn.acn <- unlist(lapply(cn.acn, 
@@ -49,16 +87,22 @@ cen.cn.acn <- unlist(lapply(cn.acn,
                      )
 nm.cn.acn <- data.frame(L = l.cn.acn, C = cen.cn.acn)
 
+```
+
+```{r}
 ## tree info
 acn.dat <- data.frame(do.call(rbind, strsplit(names(cn.acn), split = " ")))
 names(acn.dat) <- c("tree", "geno", "leaf.type")
 
+```
+
+```{r}
 ## Network Ordination
 if (file.exists("../results/nms_cn_acn.rda")){
     nms.cn.acn <- dget("../results/nms_cn_acn.rda")
 }else {
     set.seed(1234)
-    nms.cn.acn <- nmds(d.cn.acn, 2, 2)
+    ##    nms.cn.acn <- nmds(d.cn.acn, 2, 2)
     nms.cn.acn <- nmds(netDist(cn.acn[grepl("live", names(cn.acn))]), 2, 2)
     dput(nms.cn.acn, "../results/nms_cn_acn.rda")
 }
@@ -67,15 +111,16 @@ vec.com.acn <- envfit(ord.cn.acn,
                       com.acn[grepl("live", rownames(com.acn)), apply(com.acn, 2, sum) > 10])
 vec.nm.acn <- envfit(ord.cn.acn, nm.cn.acn[grepl("live", rownames(nm.cn.acn)), ])
 
-## Limit senscent trees with greater than 20 leaves
-n.sen <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "sen"], nrow))
-n.live <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "live"], nrow))
-sen.trees <- tree.arth[names(tree.arth) %in% names(n.sen)[n.sen >= 20]]
-sen.dat <- data.frame(do.call(rbind, strsplit(names(sen.trees), split = " ")))
-colnames(sen.dat) <- c("tree", "geno", "leaf.type")
-com.sen <- do.call(rbind, lapply(sen.trees, function(x) apply(x, 2 ,sum)))
-cn.sen <- lapply(sen.trees, coNets, ci.p = 95, cond = TRUE)
+```
 
-## ## Modularity of bipartite networks
-## computeModules(com.acn[grepl("live", rownames(com.acn)), ])
-## computeModules(com.acn[grepl("sen", rownames(com.acn)), ])
+```{r}
+cn.sen <- lapply(sen.trees, coNet, ci.p = 95, cond = TRUE)
+
+```
+
+```{r eval = false}
+## Modularity of bipartite networks
+computeModules(com.acn[grepl("live", rownames(com.acn)), ])
+computeModules(com.acn[grepl("sen", rownames(com.acn)), ])
+```
+
