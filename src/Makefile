@@ -10,7 +10,8 @@ main:
 
 # all: main response
 
-view: ../results/acn_notebook.pdf 
+# view: ../results/acn_notebook.pdf 
 
 clean:
+
 
