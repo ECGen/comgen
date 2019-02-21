@@ -1,1 +1,1 @@
-rmarkdown::render("acn_notbook.Rmd", output_file="../results/acn_notebook.pdf")
+rmarkdown::render("acn_notebook.Rmd", output_file="../results/acn_notebook.pdf")

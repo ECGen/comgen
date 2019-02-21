@@ -7,7 +7,7 @@ theme: bootswatch
 
 
 # Libraries
-```{r cache = TRUE}
+```{r cache = FALSE, results = "hide", echo = FALSE}
 libs <- c("ComGenR", "coNet")
 if (!(all(libs %in% installed.packages()[, 1]))){
     devtools::install_github("ECGen/ComGenR")
@@ -15,6 +15,7 @@ if (!(all(libs %in% installed.packages()[, 1]))){
 }
 sapply(libs, require, character.only = TRUE)
 ```
+
 
 # Species/Functional Groups
 
