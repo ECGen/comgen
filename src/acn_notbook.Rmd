@@ -5,39 +5,70 @@ output: pdf_document
 theme: bootswatch
 ---
 
-```{r}
+
+# Libraries
+```{r cache = TRUE}
+libs <- c("ComGenR", "coNet")
+if (!(all(libs %in% installed.packages()[, 1]))){
+    devtools::install_github("ECGen/ComGenR")
+    devtools::install_github("ECGen/coNet", ref = "master")
+}
+sapply(libs, require, character.only = TRUE)
+```
+
+# Species/Functional Groups
+
+- PB = P. betae 
+- pb.pred = parasitic fly
+- pb.abort = 
+- edge.fold = sawfly
+- pinch =
+- mid.miner = lep
+- edge.miner = lep
+- tip.miner = lep
+- fish.eye = ??
+- tier = lep
+- thrips = Thysanura
+- chew.holes = ??
+- chomp = large herbivore
+- scrape = radula
+- chew.edge = lep?
+
+
+# Pre-processing Data
 ## Load datasets
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 pit <- read.csv('../data/acn/arth_cooc_PIT_Lau.csv')
 pit[is.na(pit)] <- 0
 ```
 
-```{r}
 ## Should any genotypes be removed?
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 rm.1007 <- TRUE
 
 ```
 
-```{r}
 ## Restrict main analysis to live leaves only
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 ### separating out "fungal" necrosis
 ### necrosis <- pit$fungal
 pit <- pit[,colnames(pit) != 'fungal']
 ```
 
-```{r}
 ## Remove 1007
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 if (rm.1007){pit <- pit[pit[, "geno"] != "1007", ]}
 
 ```
 
-```{r}
 ## Remove mite
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 pit <- pit[, colnames(pit) != "mite"]
 
 ```
 
-```{r}
 ## combine pb 
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 pb <- pit$pb.upper + pit$pb.lower + pit$pb.woody 
 pb.pred <- pit$pb.pred + pit$pb.woody.pred + pit$pb.hole
 pb.abort <- pit$pb.abort
@@ -50,36 +81,27 @@ tree.arth <- split(tree.arth, tree.info)
 
 ```
 
-```{r}
-## Limit senscent trees with greater than 20 leaves
-n.sen <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "sen"], nrow))
-n.live <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "live"], nrow))
-sen.trees <- tree.arth[names(tree.arth) %in% names(n.sen)[n.sen >= 20]]
-sen.dat <- data.frame(do.call(rbind, strsplit(names(sen.trees), split = " ")))
-colnames(sen.dat) <- c("tree", "geno", "leaf.type")
-com.sen <- do.call(rbind, lapply(sen.trees, function(x) apply(x, 2 ,sum)))
-```
 
-```{r}
 ## community matrix
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 com.acn <- do.call(rbind, lapply(tree.arth, function(x) apply(x, 2, sum)))
 
 ```
 
-```{r}
 ## tree level networks for arthropods
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 cn.acn <- lapply(tree.arth, coNet, ci.p = 95, cond = TRUE)
 
 ```
 
-```{r}
 ## tree net distances
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 d.cn.acn <- netDist(cn.acn)
 
 ```
 
-```{r}
 ## network stats
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 l.cn.acn <- do.call(rbind, lapply(cn.acn, enaR:::structure.statistics))[, "L"]
 cen.cn.acn <- unlist(lapply(cn.acn, 
                             function(x) 
@@ -89,15 +111,26 @@ nm.cn.acn <- data.frame(L = l.cn.acn, C = cen.cn.acn)
 
 ```
 
-```{r}
 ## tree info
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 acn.dat <- data.frame(do.call(rbind, strsplit(names(cn.acn), split = " ")))
 names(acn.dat) <- c("tree", "geno", "leaf.type")
 
 ```
 
-```{r}
+## Limit senscent trees with greater than 20 leaves
+```{r cache = TRUE, eval = TRUE, results = "hide"}
+n.sen <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "sen"], nrow))
+n.live <- unlist(lapply(tree.arth[acn.dat[, "leaf.type"] == "live"], nrow))
+sen.trees <- tree.arth[names(tree.arth) %in% names(n.sen)[n.sen >= 20]]
+sen.dat <- data.frame(do.call(rbind, strsplit(names(sen.trees), split = " ")))
+colnames(sen.dat) <- c("tree", "geno", "leaf.type")
+com.sen <- do.call(rbind, lapply(sen.trees, function(x) apply(x, 2 ,sum)))
+```
+
+
 ## Network Ordination
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 if (file.exists("../results/nms_cn_acn.rda")){
     nms.cn.acn <- dget("../results/nms_cn_acn.rda")
 }else {
@@ -113,13 +146,18 @@ vec.nm.acn <- envfit(ord.cn.acn, nm.cn.acn[grepl("live", rownames(nm.cn.acn)), ]
 
 ```
 
-```{r}
+```{r cache = TRUE, eval = TRUE, results = "hide"}
 cn.sen <- lapply(sen.trees, coNet, ci.p = 95, cond = TRUE)
 
 ```
 
-```{r eval = false}
+
+# Main Results
+
+
+
 ## Modularity of bipartite networks
+```{r cache = TRUE, eval = FALSE}
 computeModules(com.acn[grepl("live", rownames(com.acn)), ])
 computeModules(com.acn[grepl("sen", rownames(com.acn)), ])
 ```
