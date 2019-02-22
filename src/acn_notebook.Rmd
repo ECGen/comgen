@@ -5,8 +5,6 @@ output: pdf_document
 theme: bootswatch
 ---
 
-
-
 ```{r "libraries", eval = TRUE, results = 'hide', echo = FALSE, message = FALSE}
 libs <- c("ComGenR", "coNet")
 if (!(all(libs %in% installed.packages()[, 1]))){
@@ -15,7 +13,6 @@ if (!(all(libs %in% installed.packages()[, 1]))){
 }
 sapply(libs, require, character.only = TRUE, quietly = TRUE)
 ```
-
 
 # Species/Functional Groups
 
@@ -99,8 +96,7 @@ d.cn.acn <- netDist(cn.acn, method = "euclidean")
 ```{r "net metrics", cache = TRUE, eval = TRUE, results = "hide"}
 l.cn.acn <- do.call(rbind, lapply(cn.acn, enaR:::structure.statistics))[, "L"]
 cen.cn.acn <- unlist(lapply(cn.acn, function(x) 
-    sna::centralization(x, FUN = sna::degree, normalize = FALSE)), 
-                     )
+    sna::centralization(x, FUN = sna::degree, normalize = FALSE)))
 nm.cn.acn <- data.frame(L = l.cn.acn, C = cen.cn.acn)
 
 ```
@@ -146,12 +142,18 @@ cn.sen <- lapply(sen.trees, coNet, ci.p = 95, cond = TRUE)
 
 ```
 
+## Leaf sample size relativization
+```{r "leaf isa", cache = TRUE, eval = TRUE, results = "hide"}
+lsr <- unlist(lapply(tree.arth, nrow))
+com.acn.lsr <- com.acn / lsr
+```
+
 # Main Results
 
 Note: genotype 1007 is removed because it only has one rep
 
 ## Genotype replication
-```{r "", cache = TRUE, eval = TRUE, results = "show"}
+```{r "geno isa", cache = TRUE, eval = TRUE, results = "show"}
 table(acn.dat[acn.dat[, "leaf.type"] == "live", "geno"])
 table(sen.dat[, "geno"])
 ```
@@ -317,9 +319,39 @@ t.test(pb3.d)
 
 ```
 
+## Leaf type indicator species
+```{r cache = TRUE, eval = TRUE, echo = TRUE}
+isa.type <- labdsv::indval(com.acn.lsr, acn.dat[, "leaf.type"])
+summary(isa.type)
+
+```
+
+## Genotype indicator species
+```{r cache = TRUE, eval = TRUE, echo = TRUE}
+isa.geno <- labdsv::indval(com.acn.lsr, acn.dat[, "geno"])
+summary(isa.geno)
+```
+
+## Genotype-species clusters
+```{r cache = TRUE, eval = TRUE, echo = TRUE}
+gsc <- computeModules(com.acn.lsr)
+slot(gsc, "likelihood")
+```
+
+## Cluster based on PB similarity
+```{r cache = TRUE, eval = TRUE, echo = FALSE, message = FALSE}
+ls.com.acn <- apply(com.acn, 2, function(x, y) tapply(x, y, sum), y = acn.dat[, "tree"])
+ls.com.geno <- tapply(as.character(acn.dat[, "geno"]), acn.dat[, "tree"], function(x) x[1])
+ls.pb <- data.frame(pb = ls.com.acn[, "pb"], ds = rep(0.0001, nrow(ls.com.acn)))
+adonis2(vegdist(ls.pb) ~ ls.com.geno, mrank = FALSE, sqrt.dist = TRUE, perm = 10000)
+pb.ord <- nmds(vegdist(ls.pb), 2, 2)
+
+```
+
+## 
 
 ## Modularity of bipartite networks
-```{r cache = TRUE, eval = FALSE}
+```{r cache = TRUE, eval = FALSE, echo = TRUE}
 bipartite::computeModules(com.acn[grepl("live", 
                                         rownames(com.acn)), ])
 bipartite::computeModules(com.acn[grepl("sen", 
@@ -334,7 +366,33 @@ bipartite::computeModules(com.acn[grepl("sen",
 - Genotypes differ in network structure on living leaves
 - Response to PB is linked to senescence, more PB higher prob(senscence)
 
-```{r "", cache = TRUE, eval = TRUE, results = "show"}
+```{r "pb sen vs live", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5}
+## mdc.plot(ls.com.geno, ls.pb[, 1], ylim = c(0, 25), 
+##          xlab = "Tree Genotype", ylab = "P. betae", std = FALSE,
+##          ord = order(tapply(ls.pb[, 1], ls.com.geno, mean), decreasing = TRUE))
+mdc.plot(acn.dat[acn.dat[, "leaf.type"] == "sen", "geno"], 
+         com.acn[acn.dat[, "leaf.type"] == "sen", "pb"], ylim = c(0, 16), 
+         xlab = "Tree Genotype", ylab = "P. betae", std = FALSE,
+         ord = order(tapply(com.acn[acn.dat[, "leaf.type"] == "sen", "pb"], 
+             acn.dat[acn.dat[, "leaf.type"] == "sen" , "geno"], mean), decreasing = TRUE))
+
+mdc.plot(acn.dat[acn.dat[, "leaf.type"] == "live", "geno"], 
+         com.acn[acn.dat[, "leaf.type"] == "live", "pb"], 
+         pch = 1, xlab = "Tree Genotype", ylab = "P. betae", std = FALSE,
+         ord = order(tapply(com.acn[acn.dat[, "leaf.type"] == "sen", "pb"], 
+             acn.dat[acn.dat[, "leaf.type"] == "sen" , "geno"], mean), decreasing = TRUE), 
+         add = TRUE, xjit = 0.0001)
+legend("topright", legend = c("Senescent", "Living"), pch = c(19, 1))
+```
+
+```{r "pb ordination", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5}
+coord <- ch.plot(nmds.min(pb.ord), g = ls.com.geno, mu.pch = 19, pt.col = "white", cex = 4)
+text(coord, labels = rownames(coord))
+plot(envfit(nmds.min(pb.ord), ls.pb))
+```
+
+
+```{r "", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5}
                                         # Pb frequency
 plot(table(pit[, "leaf.type"]))
 table(pit[pit[, "leaf.type"] == "live", "pb"])
@@ -343,7 +401,7 @@ table(pit[pit[, "leaf.type"] == "sen", "pb"])
 
 Need to fix the following:
 
-```{r "", cache = TRUE, eval = FALSE, results = "show"}
+```{r "", cache = TRUE, eval = FALSE, results = "show", dev = "pdf"}
                                         # total abundance (live vs sen)
                                         # richness (live vs sen)
 mdc.plot(acn.dat[, "leaf.type"], abund, ylim = c(-1.5, 1.5), 
@@ -356,7 +414,7 @@ legend("topright", legend = c("Abundance", "Richness"), pch = c(19, 1), bty = "n
 
 Need to fix the following:
 
-```{r "", cache = TRUE, eval = FALSE, results = "show"}
+```{r "", cache = TRUE, eval = FALSE, results = "show", dev = "pdf"}
                                      # abundance and richness
 mdc.plot(acn.dat[, "geno"], abund, ylim = c(-1.5, 1.5), 
          xlab = "Tree Genotype", ylab = "Standardized Metric",
@@ -368,7 +426,7 @@ legend("topright", legend = c("Abundance", "Richness"), pch = c(19, 1), bty = "n
 
 Need to fix the following:
 
-```{r "", cache = TRUE, eval = FALSE, results = "show"}
+```{r "", cache = TRUE, eval = FALSE, results = "show", dev = "pdf"}
                                         # Links and centralization
 mdc.plot(acn.dat[, "geno"], l.cn.acn, ylim = c(-1, 1.5), 
          xlab = "Tree Genotype", ylab = "Standardized Metric",
@@ -380,7 +438,7 @@ legend("topright", legend = c("Links", "Centralization"), pch = c(19, 1), bty = 
 
 ## Network Plots
 
-```{r "", cache = TRUE, eval = TRUE, results = "show"}
+```{r "", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
                                        # Live versus Sen
 par(mfrow = c(1, 2))
 set.seed(12234)
@@ -413,7 +471,7 @@ gplot(abs(netMean(cn.sen)),
       main = "Senescent")
 ```
 
-```{r "", cache = TRUE, eval = TRUE, results = "show"}
+```{r "", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
                                         # By Genotype
 par(mfrow = c(1, 2))
 set.seed(12234)
@@ -450,13 +508,18 @@ for (i in unique(acn.dat[, "geno"])){
 # dev.off()
 ```
 
-```{r "", cache = TRUE, eval = TRUE, results = "show"}
+```{r "", cache = TRUE, dev = "pdf", fig.height = 5, fig.width = 5, fig.cap = "Network distance ordination"}
                                         # Network ordination
 coord <- ch.plot(ord.cn.acn, g = acn.dat[acn.dat[, "leaf.type"] == "live", "geno"], 
                  cex = 3, mu.pch = 19, pt.col = "white")
 text(coord, labels = rownames(coord))
 plot(vec.com.acn, col = "grey")
 plot(vec.nm.acn, col = "red")
+```
+
+## Bipartite representation
+```{r "", cache = TRUE, dev = "pdf", fig.height = 10, fig.width = 5}
+plotModuleWeb(gsc)
 ```
 
 # Library call script
@@ -467,4 +530,14 @@ if (!(all(libs %in% installed.packages()[, 1]))){
     devtools::install_github("ECGen/coNet", ref = "master")
 }
 sapply(libs, require, character.only = TRUE, quietly = TRUE)
+```
+
+# Tables
+
+```{r results = "asis", eval = TRUE}
+vf.com.tab <- data.frame(vec.com.acn$vectors[c("r", "pvals")])
+vf.com.tab <- vf.com.tab[order(vf.com.tab[, "r"], decreasing = TRUE),]
+print(xtable::xtable(vf.com.tab, 
+                     caption = "Table of leaf modifier vector analyses.", 
+                     digits = 3))
 ```
