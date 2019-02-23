@@ -244,10 +244,23 @@ set.seed(12234)
 vegan::adonis2(netDist(cn.acn[acn.dat[, "leaf.type"] == "live"]) ~ geno,  
                data = acn.dat[acn.dat[, "leaf.type"] == "live", ],
                sqrt.dist = FALSE, mrank = TRUE)
+                                        # with PB
+pb <- com.acn[grepl("live", rownames(com.acn)), "pb"]
+set.seed(12234)
+vegan::adonis2(netDist(cn.acn[acn.dat[, "leaf.type"] == "live"]) ~ pb + geno,  
+               data = acn.dat[acn.dat[, "leaf.type"] == "live", ],
+               sqrt.dist = FALSE, mrank = TRUE)
+
                                         # Senescence
 set.seed(12234)
 vegan::adonis2(netDist(cn.sen) ~ geno,  data = sen.dat, 
                sqrt.dist = FALSE, mrank = TRUE)
+                                        # with pb
+pb.sen <- com.sen[, "pb"]
+set.seed(12234)
+vegan::adonis2(netDist(cn.sen) ~ geno + pb.sen,  data = sen.dat, 
+               sqrt.dist = FALSE, mrank = TRUE)
+
 ```
 
 ## Network metrics
@@ -366,7 +379,7 @@ bipartite::computeModules(com.acn[grepl("sen",
 - Genotypes differ in network structure on living leaves
 - Response to PB is linked to senescence, more PB higher prob(senscence)
 
-```{r "pb sen vs live", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5}
+```{r "pb sen vs live", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 6}
 ## mdc.plot(ls.com.geno, ls.pb[, 1], ylim = c(0, 25), 
 ##          xlab = "Tree Genotype", ylab = "P. betae", std = FALSE,
 ##          ord = order(tapply(ls.pb[, 1], ls.com.geno, mean), decreasing = TRUE))
@@ -385,7 +398,7 @@ mdc.plot(acn.dat[acn.dat[, "leaf.type"] == "live", "geno"],
 legend("topright", legend = c("Senescent", "Living"), pch = c(19, 1))
 ```
 
-```{r "pb ordination", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5}
+```{r "pb ordination", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5, warning = FALSE}
 coord <- ch.plot(nmds.min(pb.ord), g = ls.com.geno, mu.pch = 19, pt.col = "white", cex = 4)
 text(coord, labels = rownames(coord))
 plot(envfit(nmds.min(pb.ord), ls.pb))
