@@ -261,18 +261,18 @@ sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
 
-### What is the structure of the bipartite networks?
-                                        # test for modularity 
-                                        # modularity p-values
-p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
-           onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb), 
-           pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb))
-                                        # ses modularity
-ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
-             onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
-             pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb))
-# nest.pit <- bipartite::nestedness(pit.com.gm.rel)
-## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+## ### What is the structure of the bipartite networks?
+##                                         # test for modularity 
+##                                         # modularity p-values
+## p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
+##            onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb), 
+##            pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb))
+##                                         # ses modularity
+## ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
+##              onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
+##              pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb))
+## # nest.pit <- bipartite::nestedness(pit.com.gm.rel)
+## ## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
 
 ## Tables
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
@@ -490,19 +490,22 @@ for (i in 1:length(cn.wild)){
                                 match(colnames(cn.onc[[1]]), colnames(cn.wild[[i]]))]
 }
 cn.all <- append(cn.all, cn.onc)
-
 cn.d.all <- netDist(cn.all, method = "bc")
 
 if (!exists("cn.nms.all")){cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))}
 
-labs <- c(rep("wild", length(cn.wild)), og)
+labs <- c(rep("wild", length(cn.wild)), onc.geno)
 coords <- ch.plot(cn.nms.all, labs, mu.pch = "")
 points(coords, pch = 19, col = "white", cex = 2)
-text(coords, labels = rownames(coords))
+text(coords[grep("wild", rownames(coords)), 1],
+     coords[grep("wild", rownames(coords)), 2],
+     labels = "W", col = "red")
+text(coords[!grepl("wild", rownames(coords)), ],
+     labels = rownames(coords)[!grepl("wild", rownames(coords))],
+     col = "black")
 
 ### Update lichen manuscript
 ### Send tables and figures to manuscript directory
-
 if (exists("manuscript.dir")){
     tabs.figs <- dir(manuscript.dir)
     tab.fig.update <- dir("../results", full.names = TRUE)[dir("../results") %in% tabs.figs]
