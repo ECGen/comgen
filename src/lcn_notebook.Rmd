@@ -1,10 +1,10 @@
 ---
 title: "LCN: Lichen interaction network study"
 author: MK Lau
+output: pdf_document
 ---
 
 ```{r echo = FALSE, eval = TRUE, results = "hide", warnings = FALSE, message = FALSE}
-
 ## Check for supporting packages
 pkg.list <- c("MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
                                         # Install packages that are not installed
@@ -523,8 +523,6 @@ ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')
 
 ```{r cache = TRUE}
 
-## Is there a manuscript associated with this project?
-manuscript.dir <- "../../lcn_manuscript"
 
 ### REML
 
@@ -771,21 +769,40 @@ mean(xgs.data$mean.thallus)
 sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
+                                        # ONC and Wild Stand (Uintah)
+                                        # Network distances
+cn.all <- cn.wild
+for (i in 1:length(cn.wild)){
+    cn.all[[i]] <- cn.wild[[i]][match(rownames(cn.onc[[1]]), rownames(cn.wild[[i]])), 
+                                match(colnames(cn.onc[[1]]), colnames(cn.wild[[i]]))]
+}
+cn.all <- append(cn.all, cn.onc)
+cn.d.all <- netDist(cn.all, method = "bc")
 
-## ### What is the structure of the bipartite networks?
-##                                         # test for modularity 
-##                                         # modularity p-values
-## p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
-##            onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb), 
-##            pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb))
-##                                         # ses modularity
-## ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
-##              onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
-##              pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb))
-## # nest.pit <- bipartite::nestedness(pit.com.gm.rel)
-## ## sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+if (!exists("cn.nms.all")){cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))}
 
-## Tables
+```
+
+```{r bp_mod, eval = FALSE, echo = FALSE}
+
+### What is the structure of the bipartite networks?
+                                        # test for modularity 
+                                        # modularity p-values
+p.mod <- c(wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
+           onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb), 
+           pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb))
+                                        # ses modularity
+ses.mod <- c(wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
+             onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
+             pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb))
+# nest.pit <- bipartite::nestedness(pit.com.gm.rel)
+sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
+
+```
+
+# Tables
+
+```{r h2_table, results = "asis"}
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
 h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
 h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
@@ -795,68 +812,152 @@ h2.xtab <- xtable::xtable(h2.tab, caption =
                           label = "tab:h2_table")
 print(h2.xtab,
       type = "latex",
+      include.rownames = FALSE,
+      include.colnames = TRUE
+)
+```
+
+```{r write_h2_table, results = "hide", echo = FALSE}
+print(h2.xtab,
+      type = "latex",
       file = "../results/h2_table.tex",
       include.rownames = FALSE,
       include.colnames = TRUE
 )
 
+```
+
+
+```{r com_ng_perm_table, results = "asis"}
                                         # community permanova
 rcom.ng.perm.xtab <- xtable::xtable(rcom.ng.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
                           label = "tab:com_ng_perm")
 print(rcom.ng.perm.xtab,
       type = "latex",
-      file = "../results/com_ng_perm_table.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+```
+
+```{r write_com_ng_perm_table, results = "hide", echo = FALSE}
+print(rcom.ng.perm.xtab,
+      type = "latex",
+      file = "../results/com_ng_perm_table.tex",
+   include.rownames = TRUE,
+      include.colnames = TRUE
+)
+
+```
+
+```{r rcom_perm, results = "asis"}
 rcom.perm.xtab <- xtable::xtable(rcom.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
                           label = "tab:rcom_perm")
+print(rcom.perm.xtab,
+      type = "latex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+```
+
+```{r write_rcom_perm, results = "hide", echo = FALSE}
 print(rcom.perm.xtab,
       type = "latex",
       file = "../results/rcom_perm.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
+```
+
+```{r cn_perm_ng, results = "asis"}
                                         # network permanova
 cn.perm.ng.xtab <- xtable::xtable(cn.perm.ng, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
                           label = "tab:cn_perm_ng")
 print(cn.perm.ng.xtab,
       type = "latex",
-      file = "../results/cn_perm_ng.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+```
+
+```{r write_cn_perm_ng, results = "hide", echo = FALSE}
+print(cn.perm.ng.xtab,
+      type = "latex",
+      file = "../results/cn_perm_ng.tex",
+   include.rownames = TRUE,
+      include.colnames = TRUE
+)
+
+```
+
+```{r cn_perm, results = "asis"}
 cn.perm.xtab <- xtable::xtable(cn.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
                           label = "tab:cn_perm")
+print(cn.perm.xtab,
+      type = "latex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+```
+
+```{r write_cn_perm, results = "hide", echo = FALSE}
 print(cn.perm.xtab,
       type = "latex",
       file = "../results/cn_perm.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
+```
+
+```{r L_aov, results = "asis"}
                                         # network metrics anova
 L.aov.xtab <- xtable::xtable(L.aov, caption = 
     "ANOVA F Table showing the predictors of the number of network links.", 
                           label = "tab:L_aov")
 print(L.aov.xtab,
       type = "latex",
-      file = "../results/L_aov.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+```
+
+```{r write_L_aov, results = "hide", echo = FALSE}
+print(L.aov.xtab,
+      type = "latex",
+      file = "../results/L_aov.tex",
+   include.rownames = TRUE,
+      include.colnames = TRUE
+)
+
+```
+
+```{r cen_aov, results = "asis"}
 cen.aov.xtab <- xtable::xtable(cen.aov, caption = 
     "ANOVA F Table showing the predictors of network centralization.", 
                           label = "tab:cen_aov")
+print(cen.aov.xtab,
+      type = "latex",
+      include.rownames = TRUE,
+      include.colnames = TRUE
+)
+```
+
+```{r write_cen_aov, results = "hide", echo = FALSE}
 print(cen.aov.xtab,
       type = "latex",
       file = "../results/cen_aov.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
+```
+
+```{r cn_L_cen_perm, results = "asis"}
                                         # networks and network metrics
                                         # permanova
 cn.L.cen.perm.xtab <- xtable::xtable(cn.L.cen.perm, caption = 
@@ -864,15 +965,25 @@ cn.L.cen.perm.xtab <- xtable::xtable(cn.L.cen.perm, caption =
                           label = "tab:cn_L_cen_perm")
 print(cn.L.cen.perm.xtab,
       type = "latex",
-      file = "../results/cn_L_cen_perm.tex",
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+```
 
+```{r write_cn_L_cen_perm, results = "hide", echo = FALSE}
+print(cn.L.cen.perm.xtab,
+      type = "latex",
+      file = "../results/cn_L_cen_perm.tex",
+   include.rownames = TRUE,
+      include.colnames = TRUE
+)
 
-## Plots
+```
+
+# Plots
+
 ## Figure: Genotype barplots Community composition NMDS with vectors 
-pdf("../results/com_chplot_onc.pdf", height = 8, width = 8)
+```{r com_chplot_onc, height = 8, width = 8}
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1) / 1)
 chp.coord <- ch.plot(ord.com[, 1:2], onc.geno, 
                      cex = 2, mu.pch = 19, 
@@ -880,10 +991,10 @@ chp.coord <- ch.plot(ord.com[, 1:2], onc.geno,
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
 plot(vec.com.12, col = "black")
-dev.off()
+```
 
 ## Figure: Lichen networks
-pdf("../results/cn_onc.pdf", height = 8, width = 8)
+```{r cn_onc, height = 8, width = 8}
 par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
 set.seed(123)
 net.col <- sign(netMean(cn.mu.onc))
@@ -915,10 +1026,10 @@ for (i in 1:length(cn.mu.plot)){
               label.cex = 1, 
               main = names(cn.mu.plot)[i])
 }
-dev.off()
+```
 
 ## Figure: Genotype network similarity by genotype
-pdf("../results/cn_chplot.pdf", height = 8, width = 8)
+```{r cn_chplot, height = 8, width = 8}
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
                      cex = 2, mu.pch = 19, 
@@ -926,32 +1037,32 @@ chp.coord <- ch.plot(cn.nms.onc, onc.geno,
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
 plot(vec.cn, col = "black")
-dev.off()
+```
 
 
 ## Figure: (A) Linkage and centrality by genotype and (B) Total
 ##   cover and species richness predict L and Cen
-pdf("../results/cn_metrics.pdf", height = 8, width = 9)
+```{r cn_metrics, height = 8, width = 9}
 mdc.plot(onc.dat[, "geno"], onc.dat[, "L"], ylim = c(-1, 1.75), 
          xlab = "Tree Genotype", ylab = "Standardized Metric",
          ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
 mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"], add = TRUE, pch = 1, 
          ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
 legend("topright", legend = c("Links", "Centralization"), pch = c(19, 1), bty = "none")
-dev.off()
+```
 
 
 ## Supplementary Figure: Lichen size distribution
-pdf("../results/xg_size.pdf", height = 5, width = 5)
+```{r xg_size, height = 5, width = 5}
 plot(density(xgs.data$median.thallus),
      xlab = "Median Lichen Thallus Area (cm^2)", 
      main = "")
 abline(v = median(xgs.data$median.thallus, na.rm = TRUE), lty = 2)
-dev.off()
+```
 
 
 ### Figure 2
-pdf("../results/cn_chplot_onc.pdf", height = 5, width = 12)
+```{r cn_chplot_onc, height = 5, width = 12}
 par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1) / 2)
 gplot(netMean(cn.mu.onc), gmode = "graph", 
       displaylabels = TRUE, 
@@ -961,10 +1072,10 @@ legend("topleft", legend = "A", bty = "n", cex = 1.5)
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, cex = 1.5)
 plot(nv.onc, col = "darkgrey")
 legend("topleft", legend = "B", bty = "n", cex = 1.5)
-dev.off()
+```
 
+```{r bp_net_onc}
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
-pdf("../results/bp_net_onc.pdf")
 bipartite::plotweb(pw.onc, method = "normal", 
                    text.rot = 45, 
                    col.low = col.pal[mods.onc$tree], 
@@ -974,37 +1085,25 @@ bipartite::plotweb(pw.onc, method = "normal",
                    col.interaction = "grey70",
                    bor.col.interaction = "grey70", 
                    labsize = 1.5)
-dev.off()
+```
 
-pdf("../results/chp_com_onc.pdf")
+```{r chp_com_onc}
 ch.plot(nms.onc, onc.geno)
-##plot(cv.onc, col = "grey30")
-dev.off()
-
+## plot(cv.onc, col = "grey30")
 ## legend("topleft", legend = "A")
+```
 
-pdf("../results/connect_geno.pdf", width = 12, height = 7)
+
+
+```{r connect_geno, width = 12, height = 7}
 g.order <- tapply(ns.onc[, "C"], onc.geno, mean)
 g.order <- names(g.order)[order(g.order, decreasing = TRUE)]
 onc.g <- factor(onc.geno, levels = g.order)
 plot(ns.onc[, "C"] ~ onc.g, xlab = "Tree Genotype", ylab = "Lichen Network Connectance (C)")
-dev.off()
+```
 
-### Wild Stands
-
-### Compare Stands
-
-### Which wild uintah trees are similar to garden trees?
-cn.all <- cn.wild
-for (i in 1:length(cn.wild)){
-    cn.all[[i]] <- cn.wild[[i]][match(rownames(cn.onc[[1]]), rownames(cn.wild[[i]])), 
-                                match(colnames(cn.onc[[1]]), colnames(cn.wild[[i]]))]
-}
-cn.all <- append(cn.all, cn.onc)
-cn.d.all <- netDist(cn.all, method = "bc")
-
-if (!exists("cn.nms.all")){cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))}
-
+## Which wild uintah trees are similar to garden trees?
+```{r onc_wild_ord}
 labs <- c(rep("wild", length(cn.wild)), onc.geno)
 coords <- ch.plot(cn.nms.all, labs, mu.pch = "")
 points(coords, pch = 19, col = "white", cex = 2)
@@ -1014,24 +1113,32 @@ text(coords[grep("wild", rownames(coords)), 1],
 text(coords[!grepl("wild", rownames(coords)), ],
      labels = rownames(coords)[!grepl("wild", rownames(coords))],
      col = "black")
+```
 
-### Update lichen manuscript
+
+# Send results to manuscript
+
+```{r }
+manuscript.dir <- "../../lcn_manuscript"
 ### Send tables and figures to manuscript directory
 if (exists("manuscript.dir")){
     tabs.figs <- dir(manuscript.dir)
-    tab.fig.update <- dir("../results", full.names = TRUE)[dir("../results") %in% tabs.figs]
+    tab.fig.update <- dir("../results/lcn_notebook_files/figure-latex/", 
+                          full.names = TRUE)[
+                              dir("../results/lcn_notebook_files/figure-latex/") %in% tabs.figs]
     tab.fig.update <- c(tab.fig.update, 
                         dir("../docs", full.names = TRUE)[dir("../docs") %in% tabs.figs])
     sapply(tab.fig.update, file.copy, to = manuscript.dir, overwrite = TRUE)
                                         # supplementary figures
     si.dir <- paste0(manuscript.dir, "/supplement")
     si <- dir(si.dir)
-    si.update <- dir("../results", full.names = TRUE)[dir("../results") %in% si]
+    si.update <- dir("../results/lcn_notebook_files/figure-latex/", 
+                     full.names = TRUE)[
+                         dir("../results/lcn_notebook_files/figure-latex/") %in% si]
     si.update <- c(si.update, dir("../docs", full.names = TRUE)[dir("../docs") %in% si])
     sapply(si.update, file.copy, to = si.dir, 
            overwrite = TRUE)
 }
-
 
 ```
 
