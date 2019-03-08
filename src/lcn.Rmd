@@ -32,9 +32,6 @@ sapply(c(pkg.list, "ComGenR", "coNet"), library, quietly = TRUE, character.only 
 ## Trees were removed from the analysis genotype RL6 and N1.31
 ## No physciods
 ## Lecanoras merged
-
-                                        # Loading some misc helper functions
-# source('../bin/helpers.R')
                                         # Loading data
 xgal.size <- gdata::read.xls("../data/lichen_networks/ONC_Xgal_SizeData_May2011.xls")
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
@@ -1071,8 +1068,6 @@ sapply(c(pkg.list, "ComGenR", "coNet"), library, quietly = TRUE, character.only 
 ## No physciods
 ## Lecanoras merged
 
-                                        # Loading some misc helper functions
-# source('../bin/helpers.R')
                                         # Loading data
 xgal.size <- gdata::read.xls("../data/lichen_networks/ONC_Xgal_SizeData_May2011.xls")
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
