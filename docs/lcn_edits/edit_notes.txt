@@ -2,6 +2,18 @@
 
 \textbf{TGW: networks as evolved traits.}
 \textbf{MKL: is lichen plural?}
+
+This is the first study to conduct an examination of how evolutionary
+dynamics can impact the architecture of ecological networks at a scale
+relevant to microevolutionary processes in a natural
+ecosystem. Previous work consists of Joe's work, Art's work, Dave's
+work, Hal Mooney's work, Thompson Lab (Japanese collaborator,
+Guimaraes). \textit{In silico} simulations of evolutionary dynamics of
+networks has been done as well, and although such studies provide a
+way to study novel evolutionary systems (e.g. Fortuna 2014), this
+work is highly abstracted from real ecosystems. 
+
+
 \textbf{LJL: I think a key point in the first paragraph is to point
   out that networks are believe in part to emerge out of complex
   evolutionary interactions. But, to-date, the patterns observed in
@@ -10,10 +22,20 @@
   ecological species networks at the scale relevant to the actual
   workings of microevolutionary processes (e.g., the genotype or
   population level).}
+
+This is the first study of its kind to include replicated networks
+associated with individual tree genotypes, providing a powerful tool
+for observing the effects of genetically based traits of individual
+trees on the networks of associated communities.
+
 \textbf{LJL: I think the thing that needs to emerge in this paragraph
   is that even though there is some incling that genotype is relevant
   in community networks, as based on our few past studies, no study
   has truely examined networks on individual trees.}
+
+I'll add the natural stand trees to the figure and a sentence to the
+results and the discussion stating the results.
+
 \textbf{You mention the naturally established stand but then that data
   doesn’t get included in the manuscript. I do like the idea of
   including the field data. We might need to cross reference IDs of
@@ -22,6 +44,11 @@
   there. We would just want to make sure the same names are applied to
   taxa in the same quatrats on each tree. It probably wouldn’t take
   long.}
+
+I'll add the JoE paper to the discussion of community genetics. I'll
+also add the Des Roches paper to the same paragraph, along with the
+Barker paper. I've removed the Elamo paper citation.
+
 \textbf{LJL: If I recall, the Elamo paper just looks at genetic
   correlations between pairwise individual abundances. I would suggest
   maybe it doesn’t deserve to be in this 1st paragraph. Perhaps it
@@ -32,6 +59,9 @@
   woudl put both of these as citation in the community genetics
   paragraphs (2 of 3) instead of the first paragrpah, which focuses on
   the general network lit.}
+
+
+
 \textbf{LJL: 
 I agree that there is a general overarching theme that evolution
 occurs in a community network context, but I’m not sure that we should

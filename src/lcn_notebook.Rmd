@@ -4,7 +4,8 @@ author: MK Lau
 output: pdf_document
 ---
 
-```{r echo = FALSE, eval = TRUE, results = "hide", warnings = FALSE, message = FALSE}
+```{r load-data, echo = FALSE, eval = TRUE, results = "hide", warnings = FALSE, message = FALSE}
+
 ## Check for supporting packages
 pkg.list <- c("MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
                                         # Install packages that are not installed
@@ -318,6 +319,30 @@ for (i in 1:length(unique(onc.geno))){
 }
 tree <- factor(tree)
 tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+                                        # add chemistry data
+onc.nc <- read.csv("../data/lichen_networks/ONC_phytochem_NC.csv")
+onc.tan <- read.csv("../data/lichen_networks/ONC_phytochem_tannin.csv")
+onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
+onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
+                                        # rename headers
+                                        # mass is in mg
+colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
+colnames(onc.tan)[1] <- "tree.id"
+colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
+                                        # add C:N ratio
+onc.nc$rCN <- onc.nc$N / onc.nc$C
+                                        # remove trees not in onc.dat
+                                        # makes missing samples NA
+onc.dat <- data.frame(onc.dat, 
+                   C = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "C"],
+                   N = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "N"],
+                   CN = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "rCN"], 
+                   CT = onc.tan[match(onc.dat[, "tree.id"], 
+                       onc.tan[, "tree.id"]), "CT"])
+                                        # collect into a single df
 onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, 
                       geno = factor(onc.geno), tree = tree, 
                       BR = onc.rough, onc.ns[, c("L", "Cen")])
@@ -350,7 +375,7 @@ ord.cn <- nmds.min(nms.cn, 2)
                                         # Composition
 vec.env <- onc.dat[, c("BR", "PC", "SR")]
 colnames(vec.env) <- c("BR", "PC", "SR")
-vec.com.12 <- envfit(ord.com, env = vec.env, perm = 10000, 
+vec.com <- envfit(ord.com, env = vec.env, perm = 10000, 
                   choices = c(1,2))
                                         # Network similarity
 vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
@@ -466,7 +491,6 @@ gnu19.dbh <- dbh[age$tree.id == 'gnu.19']
 new <- data.frame(dbh=seq(min(dbh),max(dbh),by=0.1))
 age.final <- na.omit(age.final)
 pred.age <- predict(lm(age.final~dbh,data=age),new)
-plot(pred.age~new[,1])
 gnu19.age <- as.numeric(pred.age[new[,1] == gnu19.dbh])
                                         #
 tree.age <- age[match(names(prb.wild),age[,1]),2]
@@ -519,29 +543,10 @@ ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')
 
 ```
 
-```{r bark_chem, eval = FALSE}
-
-### Import chemistry data
-onc.nc <- read.csv("../data/lichen_networks/ONC_phytochem_NC.csv")
-onc.tan <- read.csv("../data/lichen_networks/ONC_phytochem_tannin.csv")
-onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
-onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
-as.character(onc.nc[, 1]) 
-as.character(onc.nc[, 1])[match(onc.dat[, "tree.id"], 
-                                as.character(onc.nc[, 1]))]
-
-onc.dat[!onc.dat[, "tree.id"] %in% onc.tan[ ,1], "tree.id"]
-
-onc.nc[grep("N1.", onc.nc[ ,1]), 1]
-
-
-```
-
-
 
 # Results 
 
-```{r cache = TRUE}
+```{r results, cache = TRUE}
 
 
 ### REML
@@ -591,6 +596,22 @@ h2.tab[3, "H2"] <- H2(prb.reml, g = onc.dat$geno)
 h2.tab[3, "R2"] <- R2(prb.reml)
 R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
+
+## condensed tannins  REML
+ct.reml <- lme4::lmer(I(CT^(1/4)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+ct.reml.pval <- RLRsim::exactRLRT(ct.reml)
+ct.reml.pval
+fligner.test(onc.dat$CT^(1/4), onc.dat$geno)
+shapiro.test(residuals(ct.reml))
+
+
+## CN ratio REML
+cnr.reml <- lme4::lmer(I(CN^(1/1)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
+cnr.reml.pval
+fligner.test(onc.dat$CN^(1/1), onc.dat$geno)
+shapiro.test(residuals(cnr.reml))
+
 
 ## Is species richness correlated with percent cover?
 cor.test(onc.dat[, "SR"], onc.dat[, "PC"], data = onc.dat)
@@ -1003,14 +1024,14 @@ print(cn.L.cen.perm.xtab,
 # Plots
 
 ## Figure: Genotype barplots Community composition NMDS with vectors 
-```{r com_chplot_onc, height = 8, width = 8}
+```{r com_chplot_onc, height = 5, width = 5}
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1) / 1)
 chp.coord <- ch.plot(ord.com[, 1:2], onc.geno, 
                      cex = 2, mu.pch = 19, 
                      pt.col = "white", 
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
-plot(vec.com.12, col = "black")
+plot(vec.com.12, col = "black", lwd = 4)
 ```
 
 ## Figure: Lichen networks
@@ -1133,12 +1154,14 @@ text(coords[grep("wild", rownames(coords)), 1],
 text(coords[!grepl("wild", rownames(coords)), ],
      labels = rownames(coords)[!grepl("wild", rownames(coords))],
      col = "black")
+
 ```
 
 
 # Send results to manuscript
 
 ```{r }
+
 manuscript.dir <- "../../lcn_manuscript"
 ### Send tables and figures to manuscript directory
 if (exists("manuscript.dir")){
@@ -1165,7 +1188,7 @@ if (exists("manuscript.dir")){
 
 # Loading and pre-processing data
 
-```{r echo = TRUE, eval = FALSE}
+```{r load-data-echo, echo = TRUE, eval = FALSE}
 
 ## Check for supporting packages
 pkg.list <- c("MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "bipartite", "RColorBrewer", "enaR", "devtools")
@@ -1194,7 +1217,6 @@ sapply(c(pkg.list, "ComGenR", "coNet"), library, quietly = TRUE, character.only 
 ## Trees were removed from the analysis genotype RL6 and N1.31
 ## No physciods
 ## Lecanoras merged
-
                                         # Loading data
 xgal.size <- gdata::read.xls("../data/lichen_networks/ONC_Xgal_SizeData_May2011.xls")
 garden.data <- read.csv('../data/lichen_networks/LCO_data_ONC_PIT.csv')
@@ -1480,7 +1502,32 @@ for (i in 1:length(unique(onc.geno))){
     tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
 }
 tree <- factor(tree)
-onc.dat <- data.frame(PC = ptc.onc, SR = spr.onc, 
+tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+                                        # add chemistry data
+onc.nc <- read.csv("../data/lichen_networks/ONC_phytochem_NC.csv")
+onc.tan <- read.csv("../data/lichen_networks/ONC_phytochem_tannin.csv")
+onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
+onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
+                                        # rename headers
+                                        # mass is in mg
+colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
+colnames(onc.tan)[1] <- "tree.id"
+colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
+                                        # add C:N ratio
+onc.nc$rCN <- onc.nc$N / onc.nc$C
+                                        # remove trees not in onc.dat
+                                        # makes missing samples NA
+onc.dat <- data.frame(onc.dat, 
+                   C = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "C"],
+                   N = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "N"],
+                   CN = onc.nc[match(onc.dat[, "tree.id"], 
+                        onc.nc[, "tree.id"]), "rCN"], 
+                   CT = onc.tan[match(onc.dat[, "tree.id"], 
+                       onc.tan[, "tree.id"]), "CT"])
+                                        # collect into a single df
+onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, 
                       geno = factor(onc.geno), tree = tree, 
                       BR = onc.rough, onc.ns[, c("L", "Cen")])
                                         # Plot calculations
@@ -1628,14 +1675,16 @@ gnu19.dbh <- dbh[age$tree.id == 'gnu.19']
 new <- data.frame(dbh=seq(min(dbh),max(dbh),by=0.1))
 age.final <- na.omit(age.final)
 pred.age <- predict(lm(age.final~dbh,data=age),new)
+plot(pred.age~new[,1])
 gnu19.age <- as.numeric(pred.age[new[,1] == gnu19.dbh])
+                                        #
 tree.age <- age[match(names(prb.wild),age[,1]),2]
 tree.age[is.na(tree.age)] <- gnu19.age
 names(tree.age) <- age[match(names(prb.wild),age[,1]),1]
 age <- tree.age
                                         # networks
 cn.wild <- lapply(wild.q, coNet)
-cn.mu.wild <- meanNet(cn.wild)
+cn.mu.wild <- netMean(cn.wild)
 cn.d.wild <- netDist(cn.wild, method = 'bc')
                                         #co-occurrence patterns
 wco <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='pos'))
