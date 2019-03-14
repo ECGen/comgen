@@ -673,15 +673,6 @@ h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
 h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm =10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
 h2.tab[5, "Response"] <- "Lichen Network"
-
-                                        # Adding chemistry
-vegan::adonis2(onc.com.rel[!is.na(onc.dat[, "CN"]),]^(1/1) ~  BR + PC + SR + CT + CN, data = na.omit(onc.dat), perm = 10000, mrank = TRUE)
-cn.d.onc.chem <- as.dist(as.matrix(cn.d.onc)[!is.na(onc.dat[, "CN"]),
-                                     !is.na(onc.dat[, "CN"])])
-vegan::adonis2(cn.d.onc.chem ~ geno + BR +  PC + SR + CT + CN, 
-               data = na.omit(onc.dat), permutations = 10000, mrank = TRUE)
-
-
                                         # db rda for network similarity
 dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ geno, data = onc.dat, distance = "bray")
 anova(dbr.cn.geno, permutations = 5000)
