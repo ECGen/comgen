@@ -514,45 +514,6 @@ wild.dat <- data.frame(tree = names(tree.age),
                        age = tree.age, BR = prb.wild, 
                        PC = pc.wild, SR = sr.wild,
                        L = ns.wild[, "L"], Cen = dcen.wild)
-                                        #co-occurrence patterns
-wco <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='pos'))
-wch <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='neg'))
-                                        #get ses values
-                                        #"z" "means" "pval" "simulated" "method" "statistic" "alternative"
-                                        #ws <- lapply(wild.q,function(x) oecosimu(x,cs,method='r1',burnin=100,thin=10,nsimul=5000))
-                                        #wses <- unlist(lapply(ws,function(x) x$oecosimu[[1]]))
-                                        #wsmu <- unlist(lapply(ws,function(x) x$oecosimu[[2]]))
-                                        #wsp <- unlist(lapply(ws,function(x) x$oecosimu[[3]]))
-                                        #wsim <- do.call(rbind,lapply(ws,function(x) x$oecosimu[[4]]))
-                                        #rownames(wsim) <- names(wild.q)
-                                        #ws <- cbind(wses,wsmu,wsp)
-                                        #write.csv(ws,file='../data/wild_ses_21mar2014.csv')
-## Araujo Coordinate Values
-coord <- read.csv('../data/lichen_networks/lcn_coord_onc.csv')
-rownames(coord) <- coord[,1]
-coord <- coord[,-1]
-
-                                        # wild
-if (!("mod_obsval_wild.csv" %in% dir("../data/lichen_networks"))){
-        mod.wild <- slot(bipartite::computeModules(rel(wild.com), deep = FALSE), 
-                         "likelihood")
-        write.csv(mod.wild, file = "../data/lichen_networks/mod_obsval_wild.csv", row.names = FALSE)
-}else{
-    mod.wild <- read.csv(file = "../data/lichen_networks/mod_obsval_wild.csv")[, 1]
-}
-if (!("mod_simvals_wild.csv" %in% dir("../data/lichen_networks"))){
-        wild.sweb <- simulate(vegan::nullmodel(wild.com, method = "swsh_samp_c"), 99)
-for (i in 1:dim(wild.sweb)[3]){wild.sweb[,, i] <- rel(wild.sweb[,, i])}
-        wild.smod <- apply(wild.sweb, 3, bipartite::computeModules)
-        mods.wild.sweb <- unlist(lapply(wild.smod, slot, name = "likelihood"))
-        write.csv(mods.wild.sweb, file = "../data/lichen_networks/mod_simvals_wild.csv", row.names = FALSE)
-# nest.wild <- bipartite::nestedness(wild.com.rel)
-}else{
-    mods.wild.sweb <- read.csv(file = "../data/lichen_networks/mod_simvals_wild.csv")[, 1]
-}
-
-###Rename data objects for simplicity
-ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')
 
 ```
 
@@ -823,7 +784,6 @@ sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
                                         # ONC and Wild Stand (Uintah)
-all.dat <- 
                                         # Network distances
 cn.all <- cn.wild
 for (i in 1:length(cn.wild)){
