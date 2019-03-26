@@ -372,8 +372,7 @@ ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
                                         # Vectors for plotting
                                         # Composition
-vec.env <- onc.dat[, c("BR", "PC", "SR")]
-colnames(vec.env) <- c("BR", "PC", "SR")
+vec.env <- onc.dat[, c("BR", "PC", "SR", "L", "Cen")]
 vec.com <- envfit(ord.com, env = vec.env, perm = 10000, 
                   choices = c(1,2))
                                         # Network similarity
@@ -496,10 +495,25 @@ tree.age <- age[match(names(prb.wild),age[,1]),2]
 tree.age[is.na(tree.age)] <- gnu19.age
 names(tree.age) <- age[match(names(prb.wild),age[,1]),1]
 age <- tree.age
+                                        # percent cover
+pc.wild <- unlist(lapply(wild.q, function(x) sum(apply(x, 1, function(x) sign(sum(x))))))
+                                        # richness
+sr.wild <- unlist(lapply(wild.q, function(x) sum(sign(apply(x, 2, sum)))))
                                         # networks
 cn.wild <- lapply(wild.q, coNet)
 cn.mu.wild <- netMean(cn.wild)
 cn.d.wild <- netDist(cn.wild, method = 'bc')
+                                        # network stats
+ns.wild <- do.call(rbind, lapply(lapply(cn.wild, function(x) 
+    abs(sign(x))), enaR:::structure.statistics))
+                                        # centralization
+dcen.wild <- unlist(lapply(cn.wild, function(x) 
+    sna::centralization(x, FUN = sna::degree, normalize = FALSE)))
+                                        # wild data frame
+wild.dat <- data.frame(tree = names(tree.age), 
+                       age = tree.age, BR = prb.wild, 
+                       PC = pc.wild, SR = sr.wild,
+                       L = ns.wild[, "L"], Cen = dcen.wild)
                                         #co-occurrence patterns
 wco <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='pos'))
 wch <- do.call(rbind,lapply(wild.q,function(x,t) apply(CoCo(x,type=t),2,sum),t='neg'))
@@ -809,6 +823,7 @@ sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
                                         # ONC and Wild Stand (Uintah)
+all.dat <- 
                                         # Network distances
 cn.all <- cn.wild
 for (i in 1:length(cn.wild)){
@@ -817,8 +832,17 @@ for (i in 1:length(cn.wild)){
 }
 cn.all <- append(cn.all, cn.onc)
 cn.d.all <- netDist(cn.all, method = "bc")
+cn.nms.geno <- c(rep("wild", length(cn.wild)), onc.geno)
+if (!exists("cn.nms.all")){
 
-if (!exists("cn.nms.all")){cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))}
+    set.seed(12345)
+    cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))
+    vec.all <- envfit(cn.nms.all[cn.nms.geno != "wild",], 
+                      onc.dat[, c("BR", "SR", "PC", "L", "Cen")])
+                                        # jitter identical points
+    cn.nms.all[cn.nms.geno == "H10", ] <- cn.nms.all[cn.nms.geno == "H10", ] - 0.2
+
+}
 
 ```
 
@@ -1029,7 +1053,7 @@ chp.coord <- ch.plot(ord.com[, 1:2], onc.geno,
                      pt.col = "white", 
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
-plot(vec.com.12, col = "black", lwd = 4)
+plot(vec.com, col = "black", lwd = 4)
 ```
 
 ## Figure: Lichen networks
@@ -1142,19 +1166,20 @@ plot(ns.onc[, "C"] ~ onc.g, xlab = "Tree Genotype", ylab = "Lichen Network Conne
 ```
 
 ## Which wild uintah trees are similar to garden trees?
-```{r onc_wild_ord}
-labs <- c(rep("wild", length(cn.wild)), onc.geno)
-coords <- ch.plot(cn.nms.all, labs, mu.pch = "")
+
+```{r cn_chplot_all, width = 5, height = 7}
+
+coords <- ch.plot(cn.nms.all, cn.nms.geno, mu.pch = "", cex = 2)
 points(coords, pch = 19, col = "white", cex = 2)
-text(coords[grep("wild", rownames(coords)), 1],
-     coords[grep("wild", rownames(coords)), 2],
-     labels = "W", col = "red")
 text(coords[!grepl("wild", rownames(coords)), ],
      labels = rownames(coords)[!grepl("wild", rownames(coords))],
      col = "black")
+text(coords[grep("wild", rownames(coords)), 1],
+     coords[grep("wild", rownames(coords)), 2],
+     labels = "Wild", col = "red")
+plot(vec.all, col = "black", cex = 1.23)
 
 ```
-
 
 # Send results to manuscript
 
@@ -1725,10 +1750,4 @@ for (i in 1:dim(wild.sweb)[3]){wild.sweb[,, i] <- rel(wild.sweb[,, i])}
 ws <- read.csv('../data/lichen_networks/wild_ses_21mar2014.csv')
 
 ```
-
-
-
-
-
-
 
