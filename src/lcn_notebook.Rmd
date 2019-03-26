@@ -784,6 +784,8 @@ sd(xgs.data$mean.thallus) / (length(xgs.data$mean.thallus) - 1)
 mean(xgs.data$median.thallus)
 sd(xgs.data$median.thallus) / (length(xgs.data$median.thallus) - 1)
                                         # ONC and Wild Stand (Uintah)
+all.dat <- rbind(wild.dat[, c("BR", "PC", "SR", "L", "Cen")], 
+                 onc.dat[, c("BR", "PC", "SR", "L", "Cen")])
                                         # Network distances
 cn.all <- cn.wild
 for (i in 1:length(cn.wild)){
@@ -794,14 +796,11 @@ cn.all <- append(cn.all, cn.onc)
 cn.d.all <- netDist(cn.all, method = "bc")
 cn.nms.geno <- c(rep("wild", length(cn.wild)), onc.geno)
 if (!exists("cn.nms.all")){
-
     set.seed(12345)
     cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))
-    vec.all <- envfit(cn.nms.all[cn.nms.geno != "wild",], 
-                      onc.dat[, c("BR", "SR", "PC", "L", "Cen")])
+    vec.all <- envfit(cn.nms.all, all.dat)
                                         # jitter identical points
     cn.nms.all[cn.nms.geno == "H10", ] <- cn.nms.all[cn.nms.geno == "H10", ] - 0.2
-
 }
 
 ```
