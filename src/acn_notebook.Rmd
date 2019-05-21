@@ -132,11 +132,11 @@ acn.dat <- data.frame(acn.dat, nm.cn.acn)
 ```
 
 ## Network ordination
-```{r "net ord", cache = TRUE, eval = TRUE, results = "hide"}
+```{r "net_ord", cache = TRUE, eval = TRUE, results = "hide"}
 if (file.exists("../results/nms_cn_acn.rda")){
     nms.cn.acn <- dget("../results/nms_cn_acn.rda")
 }else {
-    set.seed(1234)
+    set.seed(123)
     ##    nms.cn.acn <- nmds(d.cn.acn, 2, 2)
     nms.cn.acn <- nmds(netDist(cn.acn[grepl("live", names(cn.acn))]), 2, 2)
     dput(nms.cn.acn, "../results/nms_cn_acn.rda")
@@ -331,8 +331,9 @@ bipartite::computeModules(com.acn[grepl("live",
 
 ## Main Results
 
-### 
-```{r "Network ordination", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5, warning = FALSE}
+### Network Ordination
+
+```{r "network_ord", cache = TRUE, eval = TRUE, results = "show", dev = "pdf", fig.height = 5, fig.width = 5, warning = FALSE}
 coord <- ch.plot(ord.cn.acn, g = acn.dat[, "geno"], 
                  cex = 3, mu.pch = 19, pt.col = "white")
 text(coord, labels = rownames(coord))
@@ -341,8 +342,7 @@ plot(vec.nm.acn, col = "red")
 ```
 
 ### Abundance and richness by genotype
-
-```{r "Std Plots Richness and Abundance", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
+```{r "std_plot_R_A", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
                                      # abundance and richness
 mdc.plot(acn.dat[, "geno"], abund, ylim = c(-1.5, 2.0), 
          xlab = "Tree Genotype", ylab = "Standardized Metric", pch = 1, 
@@ -353,8 +353,7 @@ legend("topright", legend = c("Abundance", "Richness"), pch = c(1, 19), bty = "n
 ```
 
 ### Network metrics by genotype
-
-```{r "Network metrics by genotype", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
+```{r "std_plot_NM", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
 mdc.plot(acn.dat[, "geno"], acn.dat[, "Links"], ylim = c(-1, 2.5), 
          pch = 1, 
          xlab = "Tree Genotype", ylab = "Standardized Metric",
@@ -373,8 +372,7 @@ legend("topright", legend = c("Links", "Centralization", "Modularity"),
 ```
 
 ## Network Plots
-
-```{r "", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
+```{r "network_genotype_means", cache = TRUE, eval = TRUE, results = "show", dev = "pdf"}
                                         # By Genotype
 par(mfrow = c(1, 2))
 set.seed(12234)
@@ -382,7 +380,7 @@ net.col <- sign(netMean(cn.acn))
 net.col[net.col == -1] <- 2
 net.col[net.col == 1] <- "darkgrey"
 # pdf(file = "../results/acn_live_nets.pdf", width = 9, height = 9)
-par(mfrow = c(3, 3), mar = c(0, 0, 1, 0))
+par(mfrow = c(2, 4), mar = c(0, 0, 1, 0))
 coord <- gplot(abs(netMean(cn.acn[acn.dat[, "leaf.type"] == "live"])), 
                gmode = "digraph", 
                displaylabels = TRUE, 
@@ -392,7 +390,7 @@ coord <- gplot(abs(netMean(cn.acn[acn.dat[, "leaf.type"] == "live"])),
                vertex.cex = 0.5,
                arrowhead.cex = 0.5, 
                label.cex = 0.75, 
-               main = "Mean")
+               main = "")
 for (i in unique(acn.dat[, "geno"])){
     gplot(abs(netMean(cn.acn[acn.dat[, "geno"] == i & 
                                  acn.dat[, "leaf.type"] == "live"])), 
@@ -418,7 +416,6 @@ plotModuleWeb(gsc)
 ```
 
 # Tables
-
 ```{r results = "asis", eval = TRUE}
 vf.cn.tab <- data.frame(vec.cn.acn$vectors[c("r", "pvals")])
 vf.cn.tab <- data.frame(species = 
