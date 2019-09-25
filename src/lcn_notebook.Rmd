@@ -1,10 +1,15 @@
 ---
 title: "LCN: Lichen interaction network study"
 author: MK Lau
-output_format: pdf_document
 ---
 
-```{r load-data, echo = FALSE, eval = TRUE, results = "hide", warnings = FALSE, message = FALSE}
+<!-- 
+rmarkdown::render("lcn_notebook.Rmd", 
+	output_format = "pdf_document", 
+	output_dir = "../results") 
+-->
+
+```{r load-data, echo = FALSE, results = "hide", warnings = FALSE, message = FALSE}
 
 ## Check for supporting packages
 pkg.list <- c("MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
@@ -38,8 +43,8 @@ sapply(c(pkg.list, "ComGenR", "conetto"), library,
 ## No physciods
 ## Lecanoras merged
                                         # Loading data
-xgal.size <- read.csv("../data/ONC_Xgal_SizeData_May2011.csv")
-garden.data <- read.csv('../data/LCO_data_ONC_PIT.csv')
+xgal.size <- read.csv("../data/lichen_networks/ONC_Xgal_SizeData_May2011.csv")
+garden.data <- read.csv("../data/lichen_networks/LCO_data_ONC_PIT.csv")
                                         # remove genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]
 garden.data <- garden.data[garden.data$Tree!='N1.31',]
@@ -111,7 +116,7 @@ xgs.data <- xgs.data[apply(xgs.data[, grep("Thallus",
                                            colnames(xgs.data))], 1, 
                            function(x) !(all(is.na(x)))),]
                                         # Roughness in the Garden
-rough <- read.csv('../data/ONC_raw_roughness.csv')
+rough <- read.csv("../data/lichen_networks/ONC_raw_roughness.csv")
                                         # Isolate roughness
 rough <- rough[, 1:5]
                                         # Isolate north quadrats
@@ -123,7 +128,7 @@ r.tree <- sub('-', '\\.', r.tree)
 r.tree <- sub('\\.0', '\\.', r.tree)
 names(avg.rough) <- r.tree
                                         # match roughness to to ses values
-load('../data/lcn_onc_ses.rda')
+load("../data/lichen_networks/lcn_onc_ses.rda")
 onc.ses <- unlist(os[,1])
 onc.ses[is.na(onc.ses)] <- 0
 names(onc.ses) <- rownames(os)
@@ -133,7 +138,7 @@ ses.tree <- as.character(sapply(names(onc.ses),
 onc.rough <- avg.rough[match(ses.tree, r.tree)]
 if (!(all(ses.tree == names(onc.rough)))){print('Holy Crap!')}
        ## RFLP distance values from Zink from Martinsen
-rflp.d <- readLines('../data/rflp_queller_goodnight.txt')
+rflp.d <- readLines("../data/lichen_networks/rflp_queller_goodnight.txt")
 rflp.d <- lapply(rflp.d, strsplit,split='\t')
 rflp.d <- lapply(rflp.d, function(x) x[[1]])
 rflp.d[[61]] <- c(rflp.d[[61]], "")
@@ -262,14 +267,14 @@ if (!(all(c(all(rownames(as.matrix(rflp.d)) ==
 
                                         # Bipartite analysis
 nperm <- 20
-if (!(file.exists("../data/nest_rel_onc.rda"))){
+if (!(file.exists("../data/lichen_networks/nest_rel_onc.rda"))){
     nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"], 
                            n.nulls = 999)
-    dput(nest.onc, "../data/nest_rel_onc.rda")
+    dput(nest.onc, "../data/lichen_networks/nest_rel_onc.rda")
 }else{
-  nest.onc <- dget("../data/nest_rel_onc.rda")
+  nest.onc <- dget("../data/lichen_networks/nest_rel_onc.rda")
 }
-if (!(file.exists("../data/null_mod_onc.csv"))){
+if (!(file.exists("../data/lichen_networks/null_mod_onc.csv"))){
     obs.mod.onc <- bipartite::computeModules(
                                 onc.com.rel[, colnames(onc.com.rel) != "ds"])
     mods.onc <- tail(apply(slot(obs.mod.onc, "modules"), 2, 
@@ -283,18 +288,18 @@ if (!(file.exists("../data/null_mod_onc.csv"))){
     sim.onc <- lapply(sim.onc, function(x) x / max(x))
     nul.mod.onc <- lapply(sim.onc, function(x) bipartite::computeModules(x))
     nul.mod.onc <- unlist(lapply(nul.mod.onc, slot, "likelihood"))
-    dput(mods.onc, "../data/mod_list_onc.rda")
+    dput(mods.onc, "../data/lichen_networks/mod_list_onc.rda")
     write.csv(slot(obs.mod.onc, "likelihood"), 
-              "../data/obs_mod_onc.csv", 
+              "../data/lichen_networks/obs_mod_onc.csv", 
               row.names = FALSE)
     write.csv(nul.mod.onc, 
-              "../data/null_mod_onc.csv", 
+              "../data/lichen_networks/null_mod_onc.csv", 
               row.names = FALSE)
 }else{
-    obs.mod.onc <- read.csv("../data/obs_mod_onc.csv")[1]
-    nul.mod.onc <- read.csv("../data/null_mod_onc.csv")[,1]
+    obs.mod.onc <- read.csv("../data/lichen_networks/obs_mod_onc.csv")[1]
+    nul.mod.onc <- read.csv("../data/lichen_networks/null_mod_onc.csv")[,1]
     z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
-    mods.onc <- dget("../data/mod_list_onc.rda")
+    mods.onc <- dget("../data/lichen_networks/mod_list_onc.rda")
 }
 pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) / 
   length(nul.mod.onc)
@@ -306,25 +311,25 @@ bp.mod.onc <- round(unlist(c(nperm = nperm, obs = obs.mod.onc,
 
 ## NMDS ordinations
                                         # community ordination
-if (!file.exists("../data/onc_nmds.csv")){
+if (!file.exists("../data/lichen_networks/onc_nmds.csv")){
     nms.info.onc <- capture.output(nms.onc <- nmds.min(nmds(
         vegdist(onc.com.rel), 2, 2)))
-    write.csv(nms.onc, "../data/onc_nmds.csv", 
+    write.csv(nms.onc, "../data/lichen_networks/onc_nmds.csv", 
               row.names = FALSE)
     write.table(nms.info.onc, 
-                "../data/onc_nmds_info.txt", 
+                "../data/lichen_networks/onc_nmds_info.txt", 
                 col.names = FALSE, row.names = FALSE)
-}else{nms.onc <- read.csv("../data/onc_nmds.csv")}
+}else{nms.onc <- read.csv("../data/lichen_networks/onc_nmds.csv")}
                                         # Network ordination
-if (!(file.exists("../data/conet_nmds.csv"))){
+if (!(file.exists("../data/lichen_networks/conet_nmds.csv"))){
     cn.nmds.stats.onc <- capture.output(
       cn.nms.onc <- nmds.min(nmds(cn.d.onc, 2, 2)))
-    write.csv(cn.nms.onc, "../data/conet_nmds.csv", 
+    write.csv(cn.nms.onc, "../data/lichen_networks/conet_nmds.csv", 
               row.names = FALSE)
     write.table(cn.nmds.stats.onc, 
-                "../data/conet_nmds_info.txt", 
+                "../data/lichen_networks/conet_nmds_info.txt", 
                 col.names = FALSE, row.names = FALSE)
-}else{cn.nms.onc <- read.csv("../data/conet_nmds.csv")}
+}else{cn.nms.onc <- read.csv("../data/lichen_networks/conet_nmds.csv")}
                                         # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
                                         R = onc.rough, 
@@ -343,7 +348,7 @@ oms.d <- dist(oms[match(rownames(as.matrix(rflp.d)),names(oms))])
 oprbmu <- tapply(onc.rough,onc.geno,mean)
 oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)),names(oprbmu))]
                                         #get araujo coordinates
-coord <- read.csv('../data/lcn_coord_onc.csv')
+coord <- read.csv("../data/lichen_networks/lcn_coord_onc.csv")
 rownames(coord) <- coord[,1]
 coord <- coord[,-1]
                                         # packing into a dataframe
@@ -355,8 +360,8 @@ for (i in 1:length(unique(onc.geno))){
 tree <- factor(tree)
 tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
                                         # add chemistry data
-onc.nc <- read.csv("../data/ONC_phytochem_NC.csv")
-onc.tan <- read.csv("../data/ONC_phytochem_tannin.csv")
+onc.nc <- read.csv("../data/lichen_networks/ONC_phytochem_NC.csv")
+onc.tan <- read.csv("../data/lichen_networks/ONC_phytochem_tannin.csv")
 onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
 onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
                                         # rename headers
@@ -367,7 +372,7 @@ colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
                                         # add C:N ratio
 onc.nc$rCN <- onc.nc$N / onc.nc$C
                                         # pH data
-onc.ph <- read.csv("../data/ONC_Bark_lichen_pH_data.csv")
+onc.ph <- read.csv("../data/lichen_networks/ONC_Bark_lichen_pH_data.csv")
 onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
 onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
                                         # N7.16 is possibly N7.10
@@ -401,20 +406,20 @@ rownames(pw.onc) <- onc.geno
 col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
                                         # Figure ordinations
                                         # Communities
-if (file.exists("../data/nms_com_onc.rda")){
-    nms.com <- dget(file = "../data/nms_com_onc.rda")    
+if (file.exists("../data/lichen_networks/nms_com_onc.rda")){
+    nms.com <- dget(file = "../data/lichen_networks/nms_com_onc.rda")    
 }else{
     set.seed(12345)
     nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
-    dput(nms.com, file = "../data/nms_com_onc.rda")
+    dput(nms.com, file = "../data/lichen_networks/nms_com_onc.rda")
 }
                                         # Networks
-if (file.exists("../data/nms_cn_onc.rda")){
-    nms.cn <- dget(file = "../data/nms_cn_onc.rda")    
+if (file.exists("../data/lichen_networks/nms_cn_onc.rda")){
+    nms.cn <- dget(file = "../data/lichen_networks/nms_cn_onc.rda")    
 }else{
     set.seed(12345)
     nms.cn <- nmds(cn.d.onc, 1, 2)
-    dput(nms.cn, file = "../data/nms_cn_onc.rda")
+    dput(nms.cn, file = "../data/lichen_networks/nms_cn_onc.rda")
 }
 ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
@@ -427,58 +432,58 @@ vec.com <- envfit(ord.com, env = vec.env, perm = 10000,
 vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
                   choices = c(1,2))
                                         # onc
-if (!("mod_obsval_onc.csv" %in% dir("../data"))){
+if (!("mod_obsval_onc.csv" %in% dir("../data/lichen_networks"))){
   mod.onc <- slot(bipartite::computeModules(rel(onc.com[, -ncol(onc.com)]), 
                                                   deep = FALSE), 
                          "likelihood")
-  write.csv(mod.onc, file = "../data/mod_obsval_onc.csv", row.names = FALSE)
+  write.csv(mod.onc, file = "../data/lichen_networks/mod_obsval_onc.csv", row.names = FALSE)
 }else{
-  mod.onc <- read.csv(file = "../data/mod_obsval_onc.csv")[, 1]
+  mod.onc <- read.csv(file = "../data/lichen_networks/mod_obsval_onc.csv")[, 1]
 }
-if (!("mod_simvals_onc.csv" %in% dir("../data"))){
+if (!("mod_simvals_onc.csv" %in% dir("../data/lichen_networks"))){
         onc.sweb <- simulate(vegan::nullmodel(onc.com[, -ncol(onc.com)], 
                                               method = "swsh_samp_c"), 99)
         for (i in 1:dim(onc.sweb)[3]){onc.sweb[,, i] <- rel(onc.sweb[,, i])}
         onc.smod <- apply(onc.sweb, 3, bipartite::computeModules)
         mods.onc.sweb <- unlist(lapply(onc.smod, slot, name = "likelihood"))
         write.csv(mods.onc.sweb, 
-                  file = "../data/mod_simvals_onc.csv", 
+                  file = "../data/lichen_networks/mod_simvals_onc.csv", 
                   row.names = FALSE)
 # nest.onc <- bipartite::nestedness(onc.com.rel)
 }else{
     mods.onc.sweb <- read.csv(
-      file = "../data/mod_simvals_onc.csv")[, 1]
+      file = "../data/lichen_networks/mod_simvals_onc.csv")[, 1]
 }
 
                                         # pit
-if (!("mod_obsval_pit.csv" %in% dir("../data"))){
+if (!("mod_obsval_pit.csv" %in% dir("../data/lichen_networks"))){
         mod.pit <- slot(bipartite::computeModules(rel(pit.com), deep = FALSE), 
                          "likelihood")
         write.csv(mod.pit, 
-                  file = "../data/mod_obsval_pit.csv", 
+                  file = "../data/lichen_networks/mod_obsval_pit.csv", 
                   row.names = FALSE)
 }else{
     mod.pit <- read.csv(
-      file = "../data/mod_obsval_pit.csv")[, 1]
+      file = "../data/lichen_networks/mod_obsval_pit.csv")[, 1]
 }
-if (!("mod_simvals_pit.csv" %in% dir("../data"))){
+if (!("mod_simvals_pit.csv" %in% dir("../data/lichen_networks"))){
   pit.sweb <- simulate(vegan::nullmodel(pit.com, method = "swsh_samp_c"), 99)
 for (i in 1:dim(pit.sweb)[3]){pit.sweb[,, i] <- rel(pit.sweb[,, i])}
   pit.smod <- apply(pit.sweb, 3, bipartite::computeModules)
   mods.pit.sweb <- unlist(lapply(pit.smod, slot, name = "likelihood"))
   write.csv(mods.pit.sweb, 
-            file = "../data/mod_simvals_pit.csv", 
+            file = "../data/lichen_networks/mod_simvals_pit.csv", 
             row.names = FALSE)
 # nest.pit <- bipartite::nestedness(pit.com.rel)
 }else{
   mods.pit.sweb <- read.csv(
-    file = "../data/mod_simvals_pit.csv")[, 1]
+    file = "../data/lichen_networks/mod_simvals_pit.csv")[, 1]
 }
 
 ### Wild data
 ###
 ###
-x <- read.csv('../data/lco_Apr2012.csv')
+x <- read.csv("../data/lichen_networks/lco_Apr2012.csv")
                                         #remove notes
 x <- x[,colnames(x)!='NOTES.']
 x <- x[,colnames(x)!='dead']
@@ -510,7 +515,7 @@ wild.com.rel <- apply(wild.com, 2, function(x) x/max(x))
 wild.com.rel[is.na(wild.com.rel)] <- 0
 wild.q <- lapply(split(x,x$tree),function(x) x[,-1:-4])
                                         #data from lamit
-env <- read.csv('../data/Uinta2012_all_data_from_Lamit.csv')
+env <- read.csv("../data/lichen_networks/Uinta2012_all_data_from_Lamit.csv")
 env <- env[is.na(env$Pct.Roughness) == FALSE,]
 env[,1] <- sub('\\?','',
                sub('\\.0','\\.', 
@@ -538,7 +543,7 @@ x.split <- as.character(x$tree)
 env.split <- as.character(env$Tree.ID)
 prb.wild <- tapply(env$Pct.Roughness,env.split,mean) #percent rough bark
                                         #age
-age <- read.csv("../data/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
+age <- read.csv("../data/lichen_networks/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
 dbh <- age$DBH.cm_01
 age.final <- age$AgeFinal.U
 age <- data.frame(tree.id = age[,1], age.final = age$AgeFinal.U)
