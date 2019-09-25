@@ -8,7 +8,8 @@ output_format: pdf_document
 
 ## Check for supporting packages
 pkg.list <- c("MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
-              "bipartite", "RColorBrewer", "enaR", "devtools")
+              "bipartite", "RColorBrewer", "enaR", "devtools", 
+              "xtable")
        ## install packages that are not installed
 if (any(!(pkg.list %in% installed.packages()[, 1]))){
     sapply(pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))], 
@@ -70,8 +71,8 @@ onc.geno <- unlist(sapply(names(onc.q),
 pit.geno <- unlist(sapply(names(pit.q),
                           function(x) strsplit(x,split=' ')[[1]][2]))
                                         # Xgal size data
-xgs <- xgal.size[-1:-4, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
-xgs.cols <- xgal.size[4, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+xgs <- xgal.size[-1:-7, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+xgs.cols <- xgal.size[7, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
 colnames(xgs) <- gsub("\\#", "", as.character(unlist(xgs.cols)))
 xgs <- xgs[, 1:13]
 xgs <- apply(xgs, 2, gsub, pattern = "\\,", replacement = "") 
@@ -132,7 +133,7 @@ ses.tree <- as.character(sapply(names(onc.ses),
 onc.rough <- avg.rough[match(ses.tree, r.tree)]
 if (!(all(ses.tree == names(onc.rough)))){print('Holy Crap!')}
        ## RFLP distance values from Zink from Martinsen
-rflp.d <- readLines('../data/acn/rflp_queller_goodnight.txt')
+rflp.d <- readLines('../data/lichen_networks/rflp_queller_goodnight.txt')
 rflp.d <- lapply(rflp.d, strsplit,split='\t')
 rflp.d <- lapply(rflp.d, function(x) x[[1]])
 rflp.d[[61]] <- c(rflp.d[[61]], "")
@@ -156,22 +157,22 @@ rflp.d <- as.dist(rflp.d)
                                         # Lichen Network Models
                                         # onc
 cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet, 
-                 ci.p = 95, cond = TRUE)
+                 ci.p = 95)
 cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet, 
                       ci.p = 95)
-cn.d.onc <- netDist(cn.onc, method = "euclidean")
+cn.d.onc <- distNet(cn.onc, method = "euclidean")
                                         # pit
 cn.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNet, ci.p = 95)
 cn.sign.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNet, ci.p = 95)
-cn.d.pit <- netDist(cn.pit, method = "bc")
+cn.d.pit <- distNet(cn.pit, method = "bc")
                                         # genotype means and mean distances
 onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
 cn.mu.onc <- list()
 for (i in 1:length(unique(onc.geno))){
-    cn.mu.onc[[i]] <- netMean(cn.onc[onc.geno == unique(onc.geno)[i]])
+    cn.mu.onc[[i]] <- meanNet(cn.onc[onc.geno == unique(onc.geno)[i]])
 }
 names(cn.mu.onc) <- unique(onc.geno)
-cn.mu.d.onc <- netDist(cn.mu.onc, method = "bc")
+cn.mu.d.onc <- distNet(cn.mu.onc, method = "bc")
                                         # mean bark roughness calculations
 prb.mu.onc <- tapply(onc.rough, onc.geno, mean)
 prb.mu.d.onc <- dist(prb.mu.onc)
@@ -682,7 +683,7 @@ RLRsim::exactRLRT(pc1.reml)
 pc2.reml <- lme4::lmer(I(Comp.2^(1/1)) ~ (1 | geno), 
                        data = onc.dat.test, REML = TRUE)
 RLRsim::exactRLRT(pc2.reml)
-cn.d.onc.test <- netDist(cn.onc[as.character(onc.dat.test[!is.na(onc.dat.test[, "Comp.1"]), "tree.id"])])
+cn.d.onc.test <- distNet(cn.onc[as.character(onc.dat.test[!is.na(onc.dat.test[, "Comp.1"]), "tree.id"])])
 adonis2(cn.d.onc.test ~ Comp.1 * Comp.2, data = onc.dat.test)
 mantel(cn.d.onc.test ~ dist(na.omit(onc.dat[, c("pH", "CN", "CT")])))
 
@@ -894,7 +895,7 @@ for (i in 1:length(cn.wild)){
                                 match(colnames(cn.onc[[1]]), colnames(cn.wild[[i]]))]
 }
 cn.all <- append(cn.all, cn.onc)
-cn.d.all <- netDist(cn.all, method = "bc")
+cn.d.all <- distNet(cn.all, method = "bc")
 cn.nms.geno <- c(rep("wild", length(cn.wild)), onc.geno)
 if (!exists("cn.nms.all")){
     set.seed(12345)
@@ -926,6 +927,7 @@ sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
 # Tables
 
 ```{r h2_table, results = "asis"}
+
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
 h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
 h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
@@ -938,9 +940,11 @@ print(h2.xtab,
       include.rownames = FALSE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_h2_table, results = "hide", echo = FALSE}
+
 print(h2.xtab,
       type = "latex",
       file = "../results/h2_table.tex",
@@ -952,6 +956,7 @@ print(h2.xtab,
 
 
 ```{r com_ng_perm_table, results = "asis"}
+
                                         # community permanova
 rcom.ng.perm.xtab <- xtable::xtable(rcom.ng.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
@@ -961,9 +966,11 @@ print(rcom.ng.perm.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_com_ng_perm_table, results = "hide", echo = FALSE}
+
 print(rcom.ng.perm.xtab,
       type = "latex",
       file = "../results/com_ng_perm_table.tex",
@@ -974,6 +981,7 @@ print(rcom.ng.perm.xtab,
 ```
 
 ```{r rcom_perm, results = "asis"}
+
 rcom.perm.xtab <- xtable::xtable(rcom.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of community similarity.", 
                           label = "tab:rcom_perm")
@@ -982,9 +990,11 @@ print(rcom.perm.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_rcom_perm, results = "hide", echo = FALSE}
+
 print(rcom.perm.xtab,
       type = "latex",
       file = "../results/rcom_perm.tex",
@@ -995,6 +1005,7 @@ print(rcom.perm.xtab,
 ```
 
 ```{r cn_perm_ng, results = "asis"}
+
                                         # network permanova
 cn.perm.ng.xtab <- xtable::xtable(cn.perm.ng, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
@@ -1004,9 +1015,11 @@ print(cn.perm.ng.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_cn_perm_ng, results = "hide", echo = FALSE}
+
 print(cn.perm.ng.xtab,
       type = "latex",
       file = "../results/cn_perm_ng.tex",
@@ -1017,6 +1030,7 @@ print(cn.perm.ng.xtab,
 ```
 
 ```{r cn_perm, results = "asis"}
+
 cn.perm.xtab <- xtable::xtable(cn.perm, caption = 
     "PerMANOVA Pseudo-F Table showing the predictors of network similarity.", 
                           label = "tab:cn_perm")
@@ -1025,9 +1039,11 @@ print(cn.perm.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_cn_perm, results = "hide", echo = FALSE}
+
 print(cn.perm.xtab,
       type = "latex",
       file = "../results/cn_perm.tex",
@@ -1038,6 +1054,7 @@ print(cn.perm.xtab,
 ```
 
 ```{r L_aov, results = "asis"}
+
                                         # network metrics anova
 L.aov.xtab <- xtable::xtable(L.aov, caption = 
     "ANOVA F Table showing the predictors of the number of network links.", 
@@ -1047,9 +1064,11 @@ print(L.aov.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_L_aov, results = "hide", echo = FALSE}
+
 print(L.aov.xtab,
       type = "latex",
       file = "../results/L_aov.tex",
@@ -1060,6 +1079,7 @@ print(L.aov.xtab,
 ```
 
 ```{r cen_aov, results = "asis"}
+
 cen.aov.xtab <- xtable::xtable(cen.aov, caption = 
     "ANOVA F Table showing the predictors of network centralization.", 
                           label = "tab:cen_aov")
@@ -1068,9 +1088,11 @@ print(cen.aov.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_cen_aov, results = "hide", echo = FALSE}
+
 print(cen.aov.xtab,
       type = "latex",
       file = "../results/cen_aov.tex",
@@ -1081,6 +1103,7 @@ print(cen.aov.xtab,
 ```
 
 ```{r cn_L_cen_perm, results = "asis"}
+
                                         # networks and network metrics
                                         # permanova
 cn.L.cen.perm.xtab <- xtable::xtable(cn.L.cen.perm, caption = 
@@ -1091,9 +1114,11 @@ print(cn.L.cen.perm.xtab,
       include.rownames = TRUE,
       include.colnames = TRUE
 )
+
 ```
 
 ```{r write_cn_L_cen_perm, results = "hide", echo = FALSE}
+
 print(cn.L.cen.perm.xtab,
       type = "latex",
       file = "../results/cn_L_cen_perm.tex",
@@ -1107,6 +1132,7 @@ print(cn.L.cen.perm.xtab,
 
 ## Figure: Genotype barplots Community composition NMDS with vectors 
 ```{r com_chplot_onc, height = 5, width = 5}
+
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1) / 1)
 chp.coord <- ch.plot(ord.com[, 1:2], onc.geno, 
                      cex = 2, mu.pch = 19, 
@@ -1114,10 +1140,12 @@ chp.coord <- ch.plot(ord.com[, 1:2], onc.geno,
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
 plot(vec.com, col = "black", lwd = 4)
+
 ```
 
 ## Figure: Lichen networks
 ```{r cn_onc, height = 8, width = 8}
+
 par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
 set.seed(123)
 net.col <- sign(netMean(cn.mu.onc))
@@ -1149,10 +1177,12 @@ for (i in 1:length(cn.mu.plot)){
               label.cex = 1, 
               main = names(cn.mu.plot)[i])
 }
+
 ```
 
 ## Figure: Genotype network similarity by genotype
 ```{r cn_chplot, height = 8, width = 8}
+
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
                      cex = 2, mu.pch = 19, 
@@ -1160,32 +1190,38 @@ chp.coord <- ch.plot(cn.nms.onc, onc.geno,
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
 plot(vec.cn, col = "black")
+
 ```
 
 
 ## Figure: (A) Linkage and centrality by genotype and (B) Total
 ##   cover and species richness predict L and Cen
 ```{r cn_metrics, height = 8, width = 9}
+
 mdc.plot(onc.dat[, "geno"], onc.dat[, "L"], ylim = c(-1, 1.75), 
          xlab = "Tree Genotype", ylab = "Standardized Metric",
          ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
 mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"], add = TRUE, pch = 1, 
          ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE))
 legend("topright", legend = c("Links", "Centralization"), pch = c(19, 1), bty = "none")
+
 ```
 
 
 ## Supplementary Figure: Lichen size distribution
 ```{r xg_size, height = 5, width = 5}
+
 plot(density(xgs.data$median.thallus),
      xlab = "Median Lichen Thallus Area (cm^2)", 
      main = "")
 abline(v = median(xgs.data$median.thallus, na.rm = TRUE), lty = 2)
+
 ```
 
 
 ### Figure 2
 ```{r cn_chplot_onc, height = 5, width = 12}
+
 par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1) / 2)
 gplot(netMean(cn.mu.onc), gmode = "graph", 
       displaylabels = TRUE, 
@@ -1195,9 +1231,11 @@ legend("topleft", legend = "A", bty = "n", cex = 1.5)
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, cex = 1.5)
 plot(nv.onc, col = "darkgrey")
 legend("topleft", legend = "B", bty = "n", cex = 1.5)
+
 ```
 
 ```{r bp_net_onc}
+
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 bipartite::plotweb(pw.onc, method = "normal", 
                    text.rot = 45, 
@@ -1208,21 +1246,26 @@ bipartite::plotweb(pw.onc, method = "normal",
                    col.interaction = "grey70",
                    bor.col.interaction = "grey70", 
                    labsize = 1.5)
+
 ```
 
 ```{r chp_com_onc}
+
 ch.plot(nms.onc, onc.geno)
 ## plot(cv.onc, col = "grey30")
 ## legend("topleft", legend = "A")
+
 ```
 
 
 
 ```{r connect_geno, width = 12, height = 7}
+
 g.order <- tapply(ns.onc[, "C"], onc.geno, mean)
 g.order <- names(g.order)[order(g.order, decreasing = TRUE)]
 onc.g <- factor(onc.geno, levels = g.order)
 plot(ns.onc[, "C"] ~ onc.g, xlab = "Tree Genotype", ylab = "Lichen Network Connectance (C)")
+
 ```
 
 ## Which wild uintah trees are similar to garden trees?
@@ -1272,6 +1315,7 @@ if (exists("manuscript.dir")){
 # Loading and pre-processing data
 
 ```{r load-data-echo, echo = TRUE, eval = FALSE}
+
 ## This is a place-holder for the echoing the data loading code. 
 
 ```
