@@ -239,6 +239,11 @@ ptc.onc <- unlist(lapply(onc.q,
                                         # Species richness
 spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, 
                  function(x) sum(sign(x)))
+                                        # Diversity
+spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+                                        # Evenness
+spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
+spe.onc[is.na(spe.onc)] <- 0
                                         # Vectors for network similarity
 ## ns.vec.onc <- envfit(ord, 
 ##        data.frame(onc.ns[, c("L", "Cen")], 
@@ -382,6 +387,7 @@ onc.ph[!is.na(onc.ph[, "pH2"]), "pH"] <-
   apply(onc.ph[!is.na(onc.ph[, "pH2"]), c("pH","pH2")], 1, mean)
                                         # collect into a single df
 onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, 
+                      SD = spd.onc, SE = spe.onc,
                       geno = factor(onc.geno), tree = tree, 
                       BR = onc.rough, onc.ns[, c("L", "Cen")])
                                         # Get to match onc.dat
@@ -601,7 +607,7 @@ wild.dat <- data.frame(tree = names(tree.age),
 ### Do we find similar patterns?
 
 ## Create a list to generate a results table
-h2.tab <- matrix("", 8, 4)
+h2.tab <- matrix("", 10, 4)
 colnames(h2.tab) <- c("Response",  "H2", "R2", "p-value")
 
 ## Total cover ~ genotype
@@ -629,6 +635,7 @@ h2.tab[2, "H2"] <- H2(spr.reml, g = onc.dat$geno)
 h2.tab[2, "R2"] <- R2(spr.reml)
 R2(spr.reml)
 h2.tab[2, "Response"] <- "Lichen Species Richness"
+
 
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(BR^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
@@ -796,6 +803,34 @@ h2.tab[8, "p-value"] <- mod.reml.pval$"p.value"
 h2.tab[8, "H2"] <- H2(mod.reml, g = onc.dat$geno)
 h2.tab[8, "R2"] <- R2(mod.reml)
 h2.tab[8, "Response"] <- "Network Modularity"
+
+## Added diversity and evenness
+
+## Species diversity ~ genotype
+spd.reml <- lme4::lmer(I(SD^(1/2)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
+spd.reml.pval
+shapiro.test(residuals(spd.reml))
+fligner.test(onc.dat$SD^(1/2), onc.dat$geno)
+h2.tab[9, "p-value"] <- spd.reml.pval$"p.value"
+h2.tab[9, "H2"] <- H2(spd.reml, g = onc.dat$geno)
+h2.tab[9, "R2"] <- R2(spd.reml)
+R2(spd.reml)
+h2.tab[9, "Response"] <- "Lichen Species Diversity"
+
+## Species diversity ~ genotype
+spe.reml <- lme4::lmer(I(SE^(1/4)) ~ (1 | geno), 
+                       data = onc.dat, REML = TRUE)
+spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
+spe.reml.pval
+shapiro.test(residuals(spe.reml))
+fligner.test(onc.dat$SD^(1/2), onc.dat$geno)
+h2.tab[10, "p-value"] <- spe.reml.pval$"p.value"
+h2.tab[10, "H2"] <- H2(spe.reml, g = onc.dat$geno)
+h2.tab[10, "R2"] <- R2(spe.reml)
+R2(spe.reml)
+h2.tab[10, "Response"] <- "Lichen Species Evenness"
 
 
                                         # network stats in relation to other variables
