@@ -643,7 +643,7 @@ R2(prb.reml)
 h2.tab[3, "Response"] <- "Percent Rough Bark"
 
 ## pH ~ genotype
-ph.reml <- lme4::lmer(I(log(pH)) ~ (1 | geno), 
+ph.reml <- lme4::lmer(I(pH^(1/2)) ~ (1 | geno), 
                        data = na.omit(onc.dat), REML = TRUE)
 ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
 ph.reml.pval
@@ -654,7 +654,6 @@ shapiro.test(residuals(ph.reml))
 # h2.tab[1, "R2"] <- R2(ph.reml)
 R2(ph.reml)
 # h2.tab[1, "Response"] <- "Percent Lichen Cover"
-
 
 ## condensed tannins  REML
 ct.reml <- lme4::lmer(I(CT^(1/4)) ~ (1 | geno), data = onc.dat, REML = TRUE)
