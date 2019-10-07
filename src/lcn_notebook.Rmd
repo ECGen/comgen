@@ -431,7 +431,7 @@ ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
                                         # Vectors for plotting
                                         # Composition
-vec.env <- onc.dat[, c("BR", "PC", "SR", "L", "Cen")]
+vec.env <- onc.dat[, c("BR", "SR", "Cen")]
 vec.com <- envfit(ord.com, env = vec.env, perm = 10000, 
                   choices = c(1,2))
                                         # Network similarity
@@ -1177,7 +1177,7 @@ chp.coord <- ch.plot(ord.com[, 1:2], onc.geno,
                      pt.col = "white", 
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord))
-plot(vec.com, col = "black", lwd = 4)
+plot(vec.com, col = "black", lwd = 7)
 
 ```
 
@@ -1189,25 +1189,31 @@ set.seed(123)
 net.col <- sign(meanNet(cn.mu.onc))
 net.col[net.col == -1] <- 2
 net.col[net.col == 1] <- 1
+net.elwd <- (abs(meanNet(cn.mu.onc)) * 10)^2
 coord <- gplot(abs(meanNet(cn.mu.onc)), gmode = "digraph", 
       displaylabels = TRUE, 
-      edge.lwd = abs(meanNet(cn.mu.onc)) * 20, 
+      edge.lwd = net.elwd, 
       edge.col = net.col,
       vertex.col = "black", 
       vertex.cex = 0.5,
       arrowhead.cex = 0.5, 
       label.cex = 1, 
       main = "All Genotypes")
-cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "11", "1008")]
+cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% 
+                        c("996", "WC5", "1008")]
+cn.mu.plot <- cn.mu.plot[
+  order(unlist(lapply(cn.mu.plot, 
+                      function(x) sum(abs(sign(x))))))]
 for (i in 1:length(cn.mu.plot)){
         net.col <- sign(cn.mu.plot[[i]])
         net.col[net.col == -1] <- 2
         net.col[net.col == 1] <- 1
+        net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
         set.seed(123)
         gplot(abs(cn.mu.plot[[i]]), gmode = "digraph", 
               displaylabels = TRUE, 
               coord = coord,
-              edge.lwd = abs(cn.mu.plot[[i]]) * 20, 
+              edge.lwd = net.elwd, 
               edge.col = net.col,
               vertex.col = "black", 
               vertex.cex = 0.5,
@@ -1223,14 +1229,15 @@ for (i in 1:length(cn.mu.plot)){
 
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
-                     cex = 2, mu.pch = 19, 
+                     cex = 3, lwd = 2.5, mu.pch = 19, 
                      pt.col = "white", 
                      bar.col = "darkgrey")
-text(chp.coord, labels = rownames(chp.coord))
+text(chp.coord, labels = rownames(chp.coord), cex = 0.65)
 plot(vec.cn, col = "black")
 
 ```
 
+## Figure: A) Lichen networks
 
 ## Figure: (A) Linkage and centrality by genotype and (B) Total
 ##   cover and species richness predict L and Cen
