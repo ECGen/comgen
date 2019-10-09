@@ -170,8 +170,6 @@ cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet,
 cn.sign.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet, 
                       ci.p = 95)
 cn.d.onc <- distNet(cn.onc, method = "euclidean")
-cn.d.onc.na <- distNet(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id], 
-                       method = "euclidean")
                                         # pit
 cn.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNet, ci.p = 95)
 cn.sign.pit <- lapply(split(pit[, -1:-6], pit[, "Tree"]), coNet, ci.p = 95)
@@ -218,10 +216,6 @@ cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
                   sna::degree, rescale = FALSE)
 cen.spp <- do.call(rbind, cen.spp)
 colnames(cen.spp) <- colnames(cn.onc[[1]])
-summary(aov(value ~ X2, data = melt(cen.spp)))
-TukeyHSD(aov(value ~ X2, data = melt(cen.spp)))
-apply(cen.spp, 2, sd) / sqrt(nrow(cen.spp))
-
                                         # Community data
 onc.com <- do.call(rbind,lapply(onc.q,function(x) apply(x,2,sum)))
 onc.R <- apply(sign(onc.com),1,sum)
@@ -338,13 +332,13 @@ if (!file.exists("../data/lcn/onc_nmds.csv")){
 }else{nms.onc <- read.csv("../data/lcn/onc_nmds.csv")}
                                         # Network ordination
 if (!(file.exists("../data/lcn/conet_nmds.csv"))){
-    cn.nmds.stats.onc <- capture.output(
-      cn.nms.onc <- nmds.min(nmds(cn.d.onc, 2, 2)))
-    write.csv(cn.nms.onc, "../data/lcn/conet_nmds.csv", 
-              row.names = FALSE)
-    write.table(cn.nmds.stats.onc, 
-                "../data/lcn/conet_nmds_info.txt", 
-                col.names = FALSE, row.names = FALSE)
+  cn.nmds.stats.onc <- capture.output(
+    cn.nms.onc <- nmds.min(nmds(cn.d.onc, 2, 2)))
+  write.csv(cn.nms.onc, "../data/lcn/conet_nmds.csv", 
+            row.names = FALSE)
+  write.table(cn.nmds.stats.onc, 
+              "../data/lcn/conet_nmds_info.txt", 
+              col.names = FALSE, row.names = FALSE)
 }else{cn.nms.onc <- read.csv("../data/lcn/conet_nmds.csv")}
                                         # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != 'ds'], 
@@ -421,6 +415,9 @@ pw.onc <- pw.onc[order(apply(pw.onc, 1, sum), decreasing = TRUE),
                  order(apply(pw.onc, 2, sum), decreasing = TRUE)]
 rownames(pw.onc) <- onc.geno
 col.pal <- RColorBrewer::brewer.pal((max(unlist(mods.onc))), "Paired")
+                                        # Network list NA removed
+cn.d.onc.na <- distNet(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id], 
+                       method = "euclidean")
                                         # Figure ordinations
                                         # Communities
 if (file.exists("../data/lcn/nms_com_onc.rda")){
@@ -435,19 +432,21 @@ if (file.exists("../data/lcn/nms_cn_onc.rda")){
     nms.cn <- dget(file = "../data/lcn/nms_cn_onc.rda")    
 }else{
     set.seed(12345)
-    nms.cn <- nmds(cn.d.onc, 1, 2)
+    nms.cn <- nmds(cn.d.onc.na, 1, 2)
     dput(nms.cn, file = "../data/lcn/nms_cn_onc.rda")
 }
 ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
                                         # Vectors for plotting
                                         # Composition
-vec.env <- onc.dat[, c("BR", "SR", "Cen")]
-vec.com <- envfit(ord.com, env = vec.env, perm = 10000, 
-                  choices = c(1,2))
+vec.com <- envfit(ord.com, env = onc.dat[, c("CT", "SR", "SE", "Cen"),],
+                  perm = 10000, 
+                  choices = c(1,2), na.rm = TRUE)
                                         # Network similarity
-vec.cn <- envfit(ord.cn, env = vec.env, perm = 10000, 
-                  choices = c(1,2))
+vec.cn <- envfit(ord.cn, 
+                 env = na.omit(onc.dat)[, c("CT", "SR", "SE", "Cen")], 
+                 perm = 10000, 
+                 choices = c(1,2))
                                         # onc
 if (!("mod_obsval_onc.csv" %in% dir("../data/lcn"))){
   mod.onc <- slot(bipartite::computeModules(rel(onc.com[, -ncol(onc.com)]), 
@@ -872,7 +871,7 @@ cn.L.cen.perm <- adonis2(cn.d.onc ~ L + Cen, data = onc.dat, mrank = TRUE)
 
 ## So, are there patterns in the centrality of individual lichen species?
 sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x)
-    lme4::lmer(I(x^(1/2)) ~ (1 | geno), data = onc.dat, REML = TRUE))
+    lme4::lmer(I(x^(1/2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE))
 sppcen.pval <- lapply(sppcen.test, RLRsim::exactRLRT)
 sppcen.tab <- do.call(rbind, lapply(sppcen.pval, function(x)
     c(x[["statistic"]], x[["p.value"]])))
@@ -881,45 +880,10 @@ sppcen.h2
 
 ## Mean centrality of species
 sort(apply(cen.spp, 2, mean), decreasing = TRUE)
+summary(aov(value ~ X2, data = melt(cen.spp)))
+TukeyHSD(aov(value ~ X2, data = melt(cen.spp)))
+apply(cen.spp, 2, sd) / sqrt(nrow(cen.spp))
 
-## Ordinations
-### nits = 10, 
-### iconf = random
-### epsilon = 1e-12 = acceptable change in stress
-### maxit = 500 = maximum number of iterations
-ord.com <- nmds.min(nms.com, 3)
-## Minimum stress for given dimensionality:  0.1008923 
-## r^2 for minimum stress configuration:  0.9357192 
-ord.cn <- nmds.min(nms.cn, 2)
-## Minimum stress for given dimensionality:  0.01065177 
-## r^2 for minimum stress configuration:  0.9993026 
-## checking variance explained by ordinations
-ord1.cn.reml <- lme4::lmer(I(ord.cn[, 1]^(1/1)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
-ord2.cn.reml <- lme4::lmer(I(ord.cn[, 2]^(1/1)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
-ord1.cn.reml.pval <- RLRsim::exactRLRT(ord1.cn.reml)
-ord2.cn.reml.pval <- RLRsim::exactRLRT(ord2.cn.reml)
-ord1.cn.reml.pval
-ord2.cn.reml.pval
-fligner.test(ord.cn[, 1]^(1/1), onc.dat$geno)
-fligner.test(ord.cn[, 2]^(1/1), onc.dat$geno)
-
-ord1.com.reml <- lme4::lmer(I(ord.com[, 1]^(1/1)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
-ord2.com.reml <- lme4::lmer(I(ord.com[, 2]^(1/1)) ~ (1 | geno), 
-                       data = onc.dat, REML = TRUE)
-ord1.com.reml.pval <- RLRsim::exactRLRT(ord1.com.reml)
-ord2.com.reml.pval <- RLRsim::exactRLRT(ord2.com.reml)
-ord1.com.reml.pval
-ord2.com.reml.pval
-fligner.test(ord.com[, 1]^(1/1), onc.dat$geno)
-fligner.test(ord.com[, 2]^(1/1), onc.dat$geno)
-fligner.test(ord.com[, 3]^(1/1), onc.dat$geno)
-summary(lm(ord.cn[, 1] ~ SR + PC, data = onc.dat))
-summary(lm(ord.cn[, 2] ~ SR + PC, data = onc.dat))
-summary(lm(ord.com[, 1] ~ SR + PC, data = onc.dat))
-summary(lm(ord.com[, 2] ~ SR + PC, data = onc.dat))
 
 
 ## Lichen size distribution
@@ -927,10 +891,12 @@ summary(lm(ord.com[, 2] ~ SR + PC, data = onc.dat))
 ## with an average median size of 0.12 +/- 0.001 cm^2
 ## and, size does not vary significantly with genotype.
 xgs.reml <- lme4::lmer(I(mean.thallus) ~ (1 | geno), 
-                       data = xgs.data[xgs.data$geno %in% names(which(table(xgs.data$geno) > 2)), ],
+                       data = xgs.data[xgs.data$geno %in% 
+                                       names(which(table(xgs.data$geno) > 2)), ],
                        REML = TRUE)
 xgs.median.reml <- lme4::lmer(median.thallus ~ (1 | geno), 
-                       data = xgs.data[xgs.data$geno %in% names(which(table(xgs.data$geno) > 2)), ],
+                       data = xgs.data[xgs.data$geno %in% 
+                                       names(which(table(xgs.data$geno) > 2)), ],
                        REML = TRUE)
 RLRsim::exactRLRT(xgs.reml)
 RLRsim::exactRLRT(xgs.median.reml)
@@ -1246,11 +1212,11 @@ for (i in 1:length(cn.mu.plot)){
 
 par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
 chp.coord <- ch.plot(cn.nms.onc, onc.geno, 
-                     cex = 3, lwd = 2.5, mu.pch = 19, 
+                     cex = 2.65, lwd = 2.5, mu.pch = 15, 
                      pt.col = "white", 
                      bar.col = "darkgrey")
 text(chp.coord, labels = rownames(chp.coord), cex = 0.65)
-plot(vec.cn, col = "black")
+plot(vec.cn, col = "black", lwd = 5)
 
 ```
 
