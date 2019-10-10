@@ -1,7 +1,7 @@
 ### Loading data objects
 
 ### Data notes:
-## Trees were removed from the analysis genotype RL6 and N1.31
+## Trees were removed from the analysis genotype RL6 and N1.31                
 ## No physciods
 ## Lecanoras merged
                                         # Loading data
@@ -27,11 +27,11 @@ if (!(all(table(onc[,1]) == 100))){for (i in 1:1000){
                                         # onc
 colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)],1,2)
 onc.q <- split(onc,paste(onc[,1],onc[,2]))
-onc.q <- lapply(onc.q,function(x) x[,7:ncol(x)])
+onc.q <- lapply(onc.q, function(x) x[,7:ncol(x)])
                                         # pit
 colnames(pit)[7:ncol(pit)] <- substr(colnames(pit)[7:ncol(pit)],1,2)
 pit.q <- split(pit,paste(pit[,1],pit[,2]))
-pit.q <- lapply(pit.q,function(x) x[,7:ncol(x)])
+pit.q <- lapply(pit.q, function(x) x[,7:ncol(x)])
                                         # Get genotype
 onc.geno <- unlist(sapply(names(onc.q),
                           function(x) strsplit(x,split=' ')[[1]][2]))
@@ -233,49 +233,6 @@ if (!(all(c(all(rownames(as.matrix(rflp.d)) ==
     print("Distance matrices good to go!")
 }
 
-                                        # Bipartite analysis
-nperm <- 20
-if (!(file.exists("../data/lcn/nest_rel_onc.rda"))){
-    nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"], 
-                           n.nulls = 999)
-    dput(nest.onc, "../data/lcn/nest_rel_onc.rda")
-}else{
-  nest.onc <- dget("../data/lcn/nest_rel_onc.rda")
-}
-if (!(file.exists("../data/lcn/null_mod_onc.csv"))){
-    obs.mod.onc <- bipartite::computeModules(
-                                onc.com.rel[, colnames(onc.com.rel) != "ds"])
-    mods.onc <- tail(apply(slot(obs.mod.onc, "modules"), 2, 
-                           function(x) sum(sign(x[2:length(x)]) *
-                                               (1:(length(x) - 1)))),
-                     sum(dim(onc.com[, colnames(onc.com) != "ds"])))
-    mods.onc <- list(sp = tail(mods.onc, 
-                               ncol(onc.com[, colnames(onc.com) != "ds"])), 
-                     tree = head(mods.onc, nrow(onc.com)))
-    sim.onc <- lapply(1:nperm, sim.com, x = onc.q)
-    sim.onc <- lapply(sim.onc, function(x) x / max(x))
-    nul.mod.onc <- lapply(sim.onc, function(x) bipartite::computeModules(x))
-    nul.mod.onc <- unlist(lapply(nul.mod.onc, slot, "likelihood"))
-    dput(mods.onc, "../data/lcn/mod_list_onc.rda")
-    write.csv(slot(obs.mod.onc, "likelihood"), 
-              "../data/lcn/obs_mod_onc.csv", 
-              row.names = FALSE)
-    write.csv(nul.mod.onc, 
-              "../data/lcn/null_mod_onc.csv", 
-              row.names = FALSE)
-}else{
-    obs.mod.onc <- read.csv("../data/lcn/obs_mod_onc.csv")[1]
-    nul.mod.onc <- read.csv("../data/lcn/null_mod_onc.csv")[,1]
-    z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
-    mods.onc <- dget("../data/lcn/mod_list_onc.rda")
-}
-pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) / 
-  length(nul.mod.onc)
-if (pval.mod.onc == 0){pval.mod.onc <- 1/nperm}
-z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
-bp.mod.onc <- round(unlist(c(nperm = nperm, obs = obs.mod.onc, 
-                mu.sim = mean(nul.mod.onc), sd.sim = sd(nul.mod.onc), 
-                z = z.mod.onc, p.value = pval.mod.onc)), 5)
 
 ## NMDS ordinations
                                         # community ordination
