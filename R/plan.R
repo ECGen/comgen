@@ -1,13 +1,14 @@
 plan <- drake_plan(
 
     ## Load data
-
+    
     ## Data wrangling
 
     ## Analyses
-    fit = lm(Sepal.Width ~ Petal.Width + Species, data),
                                         # 1. network~geno+ permanova
+    
                                         # 2. species centrality anova
+    
                                         # 3. REMLs: cen, etc.
                                         # 4. Cen ~ SR, SE, CT
                                         # 5. Net ~ traits

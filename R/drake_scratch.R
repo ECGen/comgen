@@ -7,7 +7,7 @@
                                         # Loading data
 xgal.size <- read.csv("../data/lcn/ONC_Xgal_SizeData_May2011.csv")
 garden.data <- read.csv("../data/lcn/LCO_data_ONC_PIT.csv")
-                                        # remove genotype RL6 and N1.31
+                                        # rm genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno!='RL6',]
 garden.data <- garden.data[garden.data$Tree!='N1.31',]
                                         #separate onc
@@ -18,8 +18,10 @@ onc <- garden.data[g1 == 'onc',]
 colnames(onc)[which(colnames(onc) == "Ls")] <- "Lh"
 pit <- garden.data[g1 == 'P',]
 					#tree overlap between years
-unique(onc$Tree[onc$Year == '2010']) %in% unique(onc$Tree[onc$Year == '2011'])
-unique(onc$Tree[onc$Year == '2011']) %in% unique(onc$Tree[onc$Year == '2010'])
+unique(onc$Tree[onc$Year == '2010']) %in% 
+    unique(onc$Tree[onc$Year == '2011'])
+unique(onc$Tree[onc$Year == '2011']) %in% 
+    unique(onc$Tree[onc$Year == '2010'])
                                         # Checking the data
 if (!(all(table(onc[,1]) == 100))){for (i in 1:1000){
                                      print('Warning: check input data!!!')}}

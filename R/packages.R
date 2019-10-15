@@ -1,21 +1,30 @@
 ## Check for supporting packages
-pkg.list <- c("drake", "magrittr", "devtools", "xtable", "reshape",
+cran.pkgs <- c("magrittr", "devtools", 
+              "xtable", "reshape",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
               "bipartite", "RColorBrewer", "enaR"
               )
+gh.pkgs <- c("ROpenSci/drake", "r-lib/styler",
+             "ECGen/ComGenR", "ECGen/conetto")
+gh.pkgs.names <- do.call(rbind, 
+                         strsplit(gh.pkgs, 
+                                  split = "/"))[, 2]
 ## install packages that are not installed
-if (any(!(pkg.list %in% installed.packages()[, 1]))){
-    sapply(pkg.list[which(!(pkg.list %in% installed.packages()[, 1]))], 
-           install.packages, dependencies = TRUE, 
+## CRAN
+if (any(!(cran.pkgs %in% installed.packages()[, 1]))){
+    sapply(cran.pkgs[which(!(cran.pkgs %in% 
+                             installed.packages()[, 1]))], 
+           install.packages, 
+           dependencies = TRUE, 
            repos = 'http://cran.us.r-project.org')
 }
-## Check non-CRAN packages
-if (!("ComGenR" %in% installed.packages()[, 1])){
-    devtools::install_github("ECGen/ComGenR")
-}
-if (!("conetto" %in% installed.packages()[, 1])){
-    devtools::install_github("ECGen/conetto")
+## github 
+if (any(!(gh.pkgs.names %in% installed.packages()[, 1]))){
+    sapply(gh.pkgs[which(!(gh.pkgs.names %in% 
+                           installed.packages()[, 1]))], 
+           devtools::install_github,
+           dependencies = TRUE)
 }
 ## Load libraries
-sapply(c(pkg.list, "ComGenR", "conetto"), 
+sapply(c(cran.pkgs, gh.pkgs.names), 
        library, quietly = TRUE, character.only = TRUE)
