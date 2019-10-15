@@ -344,10 +344,6 @@ cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != "ds"],
   A = ptc.onc
 ))
 
-# get araujo coordinates
-coord <- read.csv("../data/lcn/lcn_coord_onc.csv")
-rownames(coord) <- coord[, 1]
-coord <- coord[, -1]
 # packing into a dataframe
 tree <- onc.geno
 for (i in 1:length(unique(onc.geno))) {
