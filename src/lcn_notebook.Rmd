@@ -4,17 +4,17 @@ author: MK Lau
 ---
 
 <!-- 
-rmarkdown::render("lcn_notebook.Rmd", 
+rmarkdown::render("./src/lcn_notebook.Rmd", 
 	output_format = "pdf_document", 
-	output_dir = "../results") 
+	output_dir = "./results") 
 
-rmarkdown::render("lcn_notebook.Rmd", 
+rmarkdown::render("./src/lcn_notebook.Rmd", 
 	output_format = "md_document", 
-	output_dir = "../results") 
+	output_dir = "./results") 
 -->
 
 
-```{r }
+```{r load_data, eval = TRUE, cache = TRUE}
 
 ### Loading data objects
 ### Data notes:
@@ -22,8 +22,8 @@ rmarkdown::render("lcn_notebook.Rmd",
 ## No physciods
 ## Lecanoras merged
 # Loading data
-xgal.size <- read.csv("./data/lcn/ONC_Xgal_SizeData_May2011.csv")
-garden.data <- read.csv("./data/lcn/LCO_data_ONC_PIT.csv")
+xgal.size <- read.csv("../data/lcn/ONC_Xgal_SizeData_May2011.csv")
+garden.data <- read.csv("../data/lcn/LCO_data_ONC_PIT.csv")
 # rm genotype RL6 and N1.31
 garden.data <- garden.data[garden.data$Geno != "RL6", ]
 garden.data <- garden.data[garden.data$Tree != "N1.31", ]
@@ -112,7 +112,7 @@ xgs.data <- xgs.data[apply(
   function(x) !(all(is.na(x)))
 ), ]
 # Roughness in the Garden
-rough <- read.csv("./data/lcn/ONC_raw_roughness.csv")
+rough <- read.csv("../data/lcn/ONC_raw_roughness.csv")
 # Isolate roughness
 rough <- rough[, 1:5]
 # Isolate north quadrats
@@ -124,7 +124,7 @@ r.tree <- sub("-", "\\.", r.tree)
 r.tree <- sub("\\.0", "\\.", r.tree)
 names(avg.rough) <- r.tree
 # match roughness to to ses values
-load("./data/lcn/lcn_onc_ses.rda")
+load("../data/lcn/lcn_onc_ses.rda")
 onc.ses <- unlist(os[, 1])
 onc.ses[is.na(onc.ses)] <- 0
 names(onc.ses) <- rownames(os)
@@ -286,15 +286,15 @@ if (!(all(rownames(as.matrix(prb.mu.d)) ==
 
 # Bipartite analysis
 nperm <- 20
-if (!(file.exists("./data/lcn/nest_rel_onc.rda"))) {
+if (!(file.exists("../data/lcn/nest_rel_onc.rda"))) {
   nest.onc <- nestedness(onc.com.rel[, colnames(onc.com.rel) != "ds"],
     n.nulls = 999
   )
-  dput(nest.onc, "./data/lcn/nest_rel_onc.rda")
+  dput(nest.onc, "../data/lcn/nest_rel_onc.rda")
 } else {
-  nest.onc <- dget("./data/lcn/nest_rel_onc.rda")
+  nest.onc <- dget("../data/lcn/nest_rel_onc.rda")
 }
-if (!(file.exists("./data/lcn/null_mod_onc.csv"))) {
+if (!(file.exists("../data/lcn/null_mod_onc.csv"))) {
   obs.mod.onc <- bipartite::computeModules(
     onc.com.rel[, colnames(onc.com.rel) != "ds"]
   )
@@ -319,20 +319,20 @@ if (!(file.exists("./data/lcn/null_mod_onc.csv"))) {
   sim.onc <- lapply(sim.onc, function(x) x / max(x))
   nul.mod.onc <- lapply(sim.onc, function(x) bipartite::computeModules(x))
   nul.mod.onc <- unlist(lapply(nul.mod.onc, slot, "likelihood"))
-  dput(mods.onc, "./data/lcn/mod_list_onc.rda")
+  dput(mods.onc, "../data/lcn/mod_list_onc.rda")
   write.csv(slot(obs.mod.onc, "likelihood"),
-    "./data/lcn/obs_mod_onc.csv",
+    "../data/lcn/obs_mod_onc.csv",
     row.names = FALSE
   )
   write.csv(nul.mod.onc,
-    "./data/lcn/null_mod_onc.csv",
+    "../data/lcn/null_mod_onc.csv",
     row.names = FALSE
   )
 } else {
-  obs.mod.onc <- read.csv("./data/lcn/obs_mod_onc.csv")[1]
-  nul.mod.onc <- read.csv("./data/lcn/null_mod_onc.csv")[, 1]
+  obs.mod.onc <- read.csv("../data/lcn/obs_mod_onc.csv")[1]
+  nul.mod.onc <- read.csv("../data/lcn/null_mod_onc.csv")[, 1]
   z.mod.onc <- (obs.mod.onc - mean(nul.mod.onc)) / sd(nul.mod.onc)
-  mods.onc <- dget("./data/lcn/mod_list_onc.rda")
+  mods.onc <- dget("../data/lcn/mod_list_onc.rda")
 }
 pval.mod.onc <- length(nul.mod.onc[nul.mod.onc >= obs.mod.onc]) /
   length(nul.mod.onc)
@@ -348,34 +348,34 @@ bp.mod.onc <- round(unlist(c(
 
 ## NMDS ordinations
 # community ordination
-if (!file.exists("./data/lcn/onc_nmds.csv")) {
+if (!file.exists("../data/lcn/onc_nmds.csv")) {
   nms.info.onc <- capture.output(nms.onc <- nmds.min(nmds(
     vegdist(onc.com.rel), 2, 2
   )))
-  write.csv(nms.onc, "./data/lcn/onc_nmds.csv",
+  write.csv(nms.onc, "../data/lcn/onc_nmds.csv",
     row.names = FALSE
   )
   write.table(nms.info.onc,
-    "./data/lcn/onc_nmds_info.txt",
+    "../data/lcn/onc_nmds_info.txt",
     col.names = FALSE, row.names = FALSE
   )
 } else {
-  nms.onc <- read.csv("./data/lcn/onc_nmds.csv")
+  nms.onc <- read.csv("../data/lcn/onc_nmds.csv")
 }
 # Network ordination
-if (!(file.exists("./data/lcn/conet_nmds.csv"))) {
+if (!(file.exists("../data/lcn/conet_nmds.csv"))) {
   cn.nmds.stats.onc <- capture.output(
     cn.nms.onc <- nmds.min(nmds(cn.d.onc, 2, 2))
   )
-  write.csv(cn.nms.onc, "./data/lcn/conet_nmds.csv",
+  write.csv(cn.nms.onc, "../data/lcn/conet_nmds.csv",
     row.names = FALSE
   )
   write.table(cn.nmds.stats.onc,
-    "./data/lcn/conet_nmds_info.txt",
+    "../data/lcn/conet_nmds_info.txt",
     col.names = FALSE, row.names = FALSE
   )
 } else {
-  cn.nms.onc <- read.csv("./data/lcn/conet_nmds.csv")
+  cn.nms.onc <- read.csv("../data/lcn/conet_nmds.csv")
 }
 # Vector fitting
 nv.onc <- envfit(cn.nms.onc, data.frame(onc.com[, colnames(onc.com) != "ds"],
@@ -390,7 +390,7 @@ cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != "ds"],
 ))
 
 # get araujo coordinates
-coord <- read.csv("./data/lcn/lcn_coord_onc.csv")
+coord <- read.csv("../data/lcn/lcn_coord_onc.csv")
 rownames(coord) <- coord[, 1]
 coord <- coord[, -1]
 # packing into a dataframe
@@ -402,8 +402,8 @@ for (i in 1:length(unique(onc.geno))) {
 tree <- factor(tree)
 tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
 # add chemistry data
-onc.nc <- read.csv("./data/lcn/ONC_phytochem_NC.csv")
-onc.tan <- read.csv("./data/lcn/ONC_phytochem_tannin.csv")
+onc.nc <- read.csv("../data/lcn/ONC_phytochem_NC.csv")
+onc.tan <- read.csv("../data/lcn/ONC_phytochem_tannin.csv")
 onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
 onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
 # rename headers
@@ -414,7 +414,7 @@ colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
 # add C:N ratio
 onc.nc$rCN <- onc.nc$N / onc.nc$C
 # pH data
-onc.ph <- read.csv("./data/lcn/ONC_Bark_lichen_pH_data.csv")
+onc.ph <- read.csv("../data/lcn/ONC_Bark_lichen_pH_data.csv")
 onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
 onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
 # N7.16 is possibly N7.10
@@ -466,20 +466,20 @@ cn.d.onc.na <- distNet(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
 )
 # Figure ordinations
 # Communities
-if (file.exists("./data/lcn/nms_com_onc.rda")) {
-  nms.com <- dget(file = "./data/lcn/nms_com_onc.rda")
+if (file.exists("../data/lcn/nms_com_onc.rda")) {
+  nms.com <- dget(file = "../data/lcn/nms_com_onc.rda")
 } else {
   set.seed(12345)
   nms.com <- nmds(vegdist(onc.com.rel), 2, 3)
-  dput(nms.com, file = "./data/lcn/nms_com_onc.rda")
+  dput(nms.com, file = "../data/lcn/nms_com_onc.rda")
 }
 # Networks
-if (file.exists("./data/lcn/nms_cn_onc.rda")) {
-  nms.cn <- dget(file = "./data/lcn/nms_cn_onc.rda")
+if (file.exists("../data/lcn/nms_cn_onc.rda")) {
+  nms.cn <- dget(file = "../data/lcn/nms_cn_onc.rda")
 } else {
   set.seed(12345)
   nms.cn <- nmds(cn.d.onc.na, 1, 2)
-  dput(nms.cn, file = "./data/lcn/nms_cn_onc.rda")
+  dput(nms.cn, file = "../data/lcn/nms_cn_onc.rda")
 }
 ord.com <- nmds.min(nms.com, 3)
 ord.cn <- nmds.min(nms.cn, 2)
@@ -497,18 +497,18 @@ vec.cn <- envfit(ord.cn,
   choices = c(1, 2)
 )
 # onc
-if (!("mod_obsval_onc.csv" %in% dir("./data/lcn"))) {
+if (!("mod_obsval_onc.csv" %in% dir("../data/lcn"))) {
   mod.onc <- slot(
     bipartite::computeModules(rel(onc.com[, -ncol(onc.com)]),
       deep = FALSE
     ),
     "likelihood"
   )
-  write.csv(mod.onc, file = "./data/lcn/mod_obsval_onc.csv", row.names = FALSE)
+  write.csv(mod.onc, file = "../data/lcn/mod_obsval_onc.csv", row.names = FALSE)
 } else {
-  mod.onc <- read.csv(file = "./data/lcn/mod_obsval_onc.csv")[, 1]
+  mod.onc <- read.csv(file = "../data/lcn/mod_obsval_onc.csv")[, 1]
 }
-if (!("mod_simvals_onc.csv" %in% dir("./data/lcn"))) {
+if (!("mod_simvals_onc.csv" %in% dir("../data/lcn"))) {
   onc.sweb <- simulate(vegan::nullmodel(onc.com[, -ncol(onc.com)],
     method = "swsh_samp_c"
   ), 99)
@@ -518,32 +518,32 @@ if (!("mod_simvals_onc.csv" %in% dir("./data/lcn"))) {
   onc.smod <- apply(onc.sweb, 3, bipartite::computeModules)
   mods.onc.sweb <- unlist(lapply(onc.smod, slot, name = "likelihood"))
   write.csv(mods.onc.sweb,
-    file = "./data/lcn/mod_simvals_onc.csv",
+    file = "../data/lcn/mod_simvals_onc.csv",
     row.names = FALSE
   )
   # nest.onc <- bipartite::nestedness(onc.com.rel)
 } else {
   mods.onc.sweb <- read.csv(
-    file = "./data/lcn/mod_simvals_onc.csv"
+    file = "../data/lcn/mod_simvals_onc.csv"
   )[, 1]
 }
 
 # pit
-if (!("mod_obsval_pit.csv" %in% dir("./data/lcn"))) {
+if (!("mod_obsval_pit.csv" %in% dir("../data/lcn"))) {
   mod.pit <- slot(
     bipartite::computeModules(rel(pit.com), deep = FALSE),
     "likelihood"
   )
   write.csv(mod.pit,
-    file = "./data/lcn/mod_obsval_pit.csv",
+    file = "../data/lcn/mod_obsval_pit.csv",
     row.names = FALSE
   )
 } else {
   mod.pit <- read.csv(
-    file = "./data/lcn/mod_obsval_pit.csv"
+    file = "../data/lcn/mod_obsval_pit.csv"
   )[, 1]
 }
-if (!("mod_simvals_pit.csv" %in% dir("./data/lcn"))) {
+if (!("mod_simvals_pit.csv" %in% dir("../data/lcn"))) {
   pit.sweb <- simulate(vegan::nullmodel(pit.com, method = "swsh_samp_c"), 99)
   for (i in 1:dim(pit.sweb)[3]) {
     pit.sweb[, , i] <- rel(pit.sweb[, , i])
@@ -551,20 +551,20 @@ if (!("mod_simvals_pit.csv" %in% dir("./data/lcn"))) {
   pit.smod <- apply(pit.sweb, 3, bipartite::computeModules)
   mods.pit.sweb <- unlist(lapply(pit.smod, slot, name = "likelihood"))
   write.csv(mods.pit.sweb,
-    file = "./data/lcn/mod_simvals_pit.csv",
+    file = "../data/lcn/mod_simvals_pit.csv",
     row.names = FALSE
   )
   # nest.pit <- bipartite::nestedness(pit.com.rel)
 } else {
   mods.pit.sweb <- read.csv(
-    file = "./data/lcn/mod_simvals_pit.csv"
+    file = "../data/lcn/mod_simvals_pit.csv"
   )[, 1]
 }
 
 ### Wild data
 ###
 ###
-x <- read.csv("./data/lcn/lco_Apr2012.csv")
+x <- read.csv("../data/lcn/lco_Apr2012.csv")
 # remove notes
 x <- x[, colnames(x) != "NOTES."]
 x <- x[, colnames(x) != "dead"]
@@ -598,7 +598,7 @@ wild.com.rel <- apply(wild.com, 2, function(x) x / max(x))
 wild.com.rel[is.na(wild.com.rel)] <- 0
 wild.q <- lapply(split(x, x$tree), function(x) x[, -1:-4])
 # data from lamit
-env <- read.csv("./data/lcn/Uinta2012_all_data_from_Lamit.csv")
+env <- read.csv("../data/lcn/Uinta2012_all_data_from_Lamit.csv")
 env <- env[is.na(env$Pct.Roughness) == FALSE, ]
 env[, 1] <- sub(
   "\\?", "",
@@ -636,7 +636,8 @@ env.split <- as.character(env$Tree.ID)
 # percent rough bark
 prb.wild <- tapply(env$Pct.Roughness, env.split, mean)
 # age
-age <- read.csv("./data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
+age <- read.csv(
+  "../data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
 dbh <- age$DBH.cm_01
 age.final <- age$AgeFinal.U
 age <- data.frame(tree.id = age[, 1], age.final = age$AgeFinal.U)
@@ -690,6 +691,7 @@ wild.dat <- data.frame(
   PC = pc.wild, SR = sr.wild,
   L = ns.wild[, "L"], Cen = dcen.wild
 )
+
 ```
 
 
@@ -824,9 +826,6 @@ set.seed(2)
 com.perm <- vegan::adonis2(onc.com^(1 / 1) ~ geno + BR + PC + SR,
   data = onc.dat, perm = 10000, mrank = TRUE
 )
-rcom.ng.perm
-rcom.perm
-
 h2.tab[4, "p-value"] <- unlist(rcom.perm)["Pr(>F)1"]
 h2.tab[4, "H2"] <- H2(rcom.perm, g = onc.dat$geno)
 h2.tab[4, "R2"] <- R2(rcom.perm)
@@ -838,7 +837,8 @@ spr.d <- dist(onc.dat$SR)
 ptc.d <- dist(onc.dat$PC)
 prb.d <- dist(onc.dat$BR)
 ### rough -> cover -> rich -> net
-ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel) + spr.d + ptc.d + prb.d, mrank = TRUE)
+ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel) + 
+                  spr.d + ptc.d + prb.d, mrank = TRUE)
 
 ## Mantels
 ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
@@ -863,7 +863,9 @@ h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm = 10000)
 h2.tab[5, "R2"] <- R2(cn.perm)
 h2.tab[5, "Response"] <- "Lichen Network"
 # db rda for network similarity
-dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ geno, data = onc.dat, distance = "bray")
+dbr.cn.geno <- vegan::dbrda(cn.d.onc ~ geno, 
+                            data = onc.dat, 
+                            distance = "bray")
 anova(dbr.cn.geno, permutations = 5000)
 H2(dbr.cn.geno)
 
@@ -958,12 +960,17 @@ shapiro.test(residuals(cen.aov))
 L.d <- dist(onc.dat$L)
 cen.d <- dist(onc.dat$Cen)
 mod.d <- dist(cn.mod.onc)
-cn.L.cen.perm <- adonis2(cn.d.onc ~ L + Cen, data = onc.dat, mrank = TRUE)
+cn.L.cen.perm <- adonis2(cn.d.onc ~ L + Cen, 
+                         data = onc.dat, 
+                         mrank = TRUE)
 
-## So, are there patterns in the centrality of individual lichen species?
-sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, function(x) {
-  lme4::lmer(I(x^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
-})
+## Are there patterns in the centrality of individual lichen species?
+sppcen.test <- apply(cen.spp[, apply(cen.spp, 2, sum) >= 2], 2, 
+                     function(x) {
+                       lme4::lmer(I(x^(1 / 2)) ~ (1 | geno), 
+                                  data = na.omit(onc.dat), 
+                                  REML = TRUE)
+                     })
 sppcen.pval <- lapply(sppcen.test, RLRsim::exactRLRT)
 sppcen.tab <- do.call(rbind, lapply(sppcen.pval, function(x) {
   c(x[["statistic"]], x[["p.value"]])
@@ -1022,8 +1029,10 @@ if (!exists("cn.nms.all")) {
   cn.nms.all <- nmds.min(nmds(cn.d.all, 2, 2))
   vec.all <- envfit(cn.nms.all, all.dat)
   # jitter identical points
-  cn.nms.all[cn.nms.geno == "H10", ] <- cn.nms.all[cn.nms.geno == "H10", ] - 0.2
+  cn.nms.all[cn.nms.geno == "H10", ] <- cn.nms.all[
+    cn.nms.geno == "H10", ] - 0.2
 }
+
 ```
 
 
@@ -1033,7 +1042,8 @@ if (!exists("cn.nms.all")) {
 
 h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
 h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
-h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
+h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), 
+                             digits = 5)
 h2.tab <- h2.tab[order(h2.tab[, "H2"], decreasing = TRUE), ]
 h2.xtab <- xtable::xtable(h2.tab,
   caption =
@@ -1045,6 +1055,7 @@ print(h2.xtab,
   include.rownames = FALSE,
   include.colnames = TRUE
 )
+
 ```
 
 ```{r write_h2_table, results = "hide", echo = FALSE}
@@ -1063,7 +1074,7 @@ print(h2.xtab,
 # community permanova
 rcom.ng.perm.xtab <- xtable::xtable(rcom.ng.perm,
   caption =
-    "PerMANOVA Pseudo-F Table showing the predictors of community similarity.",
+    "PerMANOVA Pseudo-F Table: predictors of community similarity.",
   label = "tab:com_ng_perm"
 )
 print(rcom.ng.perm.xtab,
@@ -1087,7 +1098,7 @@ print(rcom.ng.perm.xtab,
 
 rcom.perm.xtab <- xtable::xtable(rcom.perm,
   caption =
-    "PerMANOVA Pseudo-F Table showing the predictors of community similarity.",
+    "PerMANOVA Pseudo-F Table: predictors of community similarity.",
   label = "tab:rcom_perm"
 )
 print(rcom.perm.xtab,
@@ -1112,7 +1123,7 @@ print(rcom.perm.xtab,
 # network permanova
 cn.perm.ng.xtab <- xtable::xtable(cn.perm.ng,
   caption =
-    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.",
+    "PerMANOVA Pseudo-F Table: predictors of network similarity.",
   label = "tab:cn_perm_ng"
 )
 print(cn.perm.ng.xtab,
@@ -1136,7 +1147,7 @@ print(cn.perm.ng.xtab,
 
 cn.perm.xtab <- xtable::xtable(cn.perm,
   caption =
-    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.",
+    "PerMANOVA Pseudo-F Table: predictors of network similarity.",
   label = "tab:cn_perm"
 )
 print(cn.perm.xtab,
@@ -1161,7 +1172,7 @@ print(cn.perm.xtab,
 # network metrics anova
 L.aov.xtab <- xtable::xtable(L.aov,
   caption =
-    "ANOVA F Table showing the predictors of the number of network links.",
+    "ANOVA F Table: predictors of the number of network links.",
   label = "tab:L_aov"
 )
 print(L.aov.xtab,
@@ -1211,7 +1222,7 @@ print(cen.aov.xtab,
 # permanova
 cn.L.cen.perm.xtab <- xtable::xtable(cn.L.cen.perm,
   caption =
-    "PerMANOVA Pseudo-F Table showing the predictors of network similarity.",
+    "PerMANOVA Pseudo-F Table: predictors of network similarity.",
   label = "tab:cn_L_cen_perm"
 )
 print(cn.L.cen.perm.xtab,
@@ -1317,13 +1328,20 @@ plot(vec.cn, col = "black", lwd = 5)
 mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
   ylim = c(-1, 1.75),
   xlab = "Tree Genotype", ylab = "Standardized Metric",
-  ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE)
+  ord = order(tapply(onc.dat[, "L"], 
+                     onc.dat[, "geno"], mean), 
+              decreasing = TRUE)
 )
 mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"],
   add = TRUE, pch = 1,
-  ord = order(tapply(onc.dat[, "L"], onc.dat[, "geno"], mean), decreasing = TRUE)
+  ord = order(tapply(onc.dat[, "L"], 
+                     onc.dat[, "geno"], mean), 
+              decreasing = TRUE)
 )
-legend("topright", legend = c("Links", "Centralization"), pch = c(19, 1), bty = "none")
+legend("topright", 
+       legend = c("Links", "Centralization"), 
+       pch = c(19, 1), bty = "none")
+
 ```
 
 
@@ -1384,7 +1402,10 @@ ch.plot(nms.onc, onc.geno)
 g.order <- tapply(ns.onc[, "C"], onc.geno, mean)
 g.order <- names(g.order)[order(g.order, decreasing = TRUE)]
 onc.g <- factor(onc.geno, levels = g.order)
-plot(ns.onc[, "C"] ~ onc.g, xlab = "Tree Genotype", ylab = "Lichen Network Connectance (C)")
+plot(ns.onc[, "C"] ~ onc.g, 
+     xlab = "Tree Genotype", 
+     ylab = "Lichen Network Connectance (C)")
+
 ```
 
 ## Which wild uintah trees are similar to garden trees?
@@ -1421,7 +1442,9 @@ if (exists("manuscript.dir")) {
     tab.fig.update,
     dir("../docs", full.names = TRUE)[dir("../docs") %in% tabs.figs]
   )
-  sapply(tab.fig.update, file.copy, to = manuscript.dir, overwrite = TRUE)
+  sapply(tab.fig.update, 
+         file.copy, 
+         to = manuscript.dir, overwrite = TRUE)
   # supplementary figures
   si.dir <- paste0(manuscript.dir, "/supplement")
   si <- dir(si.dir)
@@ -1430,7 +1453,9 @@ if (exists("manuscript.dir")) {
   )[
     dir("../results/lcn_notebook_files/figure-latex/") %in% si
   ]
-  si.update <- c(si.update, dir("../docs", full.names = TRUE)[dir("../docs") %in% si])
+  si.update <- c(si.update, 
+                 dir("../docs", 
+                     full.names = TRUE)[dir("../docs") %in% si])
   sapply(si.update, file.copy,
     to = si.dir,
     overwrite = TRUE
