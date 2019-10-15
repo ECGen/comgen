@@ -668,7 +668,9 @@ pc.wild <- unlist(lapply(
   }
 ))
 # richness
-sr.wild <- unlist(lapply(wild.q, function(x) sum(sign(apply(x, 2, sum)))))
+sr.wild <- unlist(lapply(
+  wild.q, function(x) sum(sign(apply(x, 2, sum))))
+  )
 # networks
 cn.wild <- lapply(wild.q, coNet)
 cn.mu.wild <- meanNet(cn.wild)
@@ -695,15 +697,9 @@ wild.dat <- data.frame(
 
 ```{r results, cache = TRUE}
 
-
 ### REML
-
-### We know from Lamit's dissertation work that lichen communities are
-### heritable, largely driven by bark roughness
-### Do we find similar patterns?
-
 ## Create a list to generate a results table
-h2.tab <- matrix("", 10, 4)
+h2.tab <- matrix("", 1, 4)
 colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
 
 ## Total cover ~ genotype
@@ -711,14 +707,15 @@ ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
-ptc.reml.pval
 fligner.test(onc.dat$PC^(1 / 2), onc.dat$geno)
 shapiro.test(residuals(ptc.reml))
-h2.tab[1, "p-value"] <- ptc.reml.pval$"p.value"
-h2.tab[1, "H2"] <- H2(ptc.reml, g = onc.dat$geno)
-h2.tab[1, "R2"] <- R2(ptc.reml)
-R2(ptc.reml)
-h2.tab[1, "Response"] <- "Percent Lichen Cover"
+ptc.reml.result <- c(
+  "Percent Lichen Cover",
+  H2(ptc.reml, g = onc.dat$geno),
+  R2(ptc.reml),
+  ptc.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, ptc.reml.result)
 
 ## Species richness ~ genotype
 spr.reml <- lme4::lmer(I(SR^(1 / 2)) ~ (1 | geno),
@@ -728,86 +725,75 @@ spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
 spr.reml.pval
 shapiro.test(residuals(spr.reml))
 fligner.test(onc.dat$SR^(1 / 2), onc.dat$geno)
-h2.tab[2, "p-value"] <- spr.reml.pval$"p.value"
-h2.tab[2, "H2"] <- H2(spr.reml, g = onc.dat$geno)
-h2.tab[2, "R2"] <- R2(spr.reml)
-R2(spr.reml)
-h2.tab[2, "Response"] <- "Lichen Species Richness"
-
+spr.reml.result <- c(
+  "Lichen Species Richness",
+  H2(spr.reml, g = onc.dat$geno),
+  R2(spr.reml),
+  spr.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, spr.reml.result)
 
 ## Bark roughness REML
 prb.reml <- lme4::lmer(I(BR^(1 / 2)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
-prb.reml.pval
 fligner.test(onc.dat$BR^(1 / 2), onc.dat$geno)
 shapiro.test(residuals(prb.reml))
-h2.tab[3, "p-value"] <- prb.reml.pval$"p.value"
-h2.tab[3, "H2"] <- H2(prb.reml, g = onc.dat$geno)
-h2.tab[3, "R2"] <- R2(prb.reml)
-R2(prb.reml)
-h2.tab[3, "Response"] <- "Percent Rough Bark"
+prb.reml.result <- c(
+  "Percent Rough Bark",
+  H2(prb.reml, g = onc.dat$geno),
+  R2(prb.reml),
+  prb.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, prb.reml.result)
 
 ## pH ~ genotype
 ph.reml <- lme4::lmer(I(pH^(1 / 2)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
-ph.reml.pval
 fligner.test(log(onc.dat$pH), onc.dat$geno)
 shapiro.test(residuals(ph.reml))
-# h2.tab[1, "p-value"] <- ph.reml.pval$"p.value"
-# h2.tab[1, "H2"] <- H2(ph.reml, g = onc.dat$geno)
-# h2.tab[1, "R2"] <- R2(ph.reml)
-R2(ph.reml)
-# h2.tab[1, "Response"] <- "Percent Lichen Cover"
+ph.reml.result <- c(
+  "pH",
+  H2(ph.reml, g = onc.dat$geno),
+  R2(ph.reml),
+  ph.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, ph.reml.result)
 
 ## condensed tannins  REML
 ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 ct.reml.pval <- RLRsim::exactRLRT(ct.reml)
-ct.reml.pval
 fligner.test(onc.dat$CT^(1 / 4), onc.dat$geno)
 shapiro.test(residuals(ct.reml))
-
+ct.reml.result <- c(
+  "Condensed Tannins (CT)",
+  H2(ct.reml, g = onc.dat$geno),
+  R2(ct.reml),
+  ct.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, ct.reml.result)
 
 ## CN ratio REML
 cnr.reml <- lme4::lmer(I(CN^(1)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
-cnr.reml.pval
 fligner.test(onc.dat$CN^(1 / 1), onc.dat$geno)
 shapiro.test(residuals(cnr.reml))
-
-
-## Bark roughness PCA
-
-####### This is a rough draft of chem data analysis with new pH #######
-pca.onc <- princomp(na.omit(onc.dat[, c("pH", "CT", "CN")]))
-cumsum(pca.onc[["sdev"]] / sum(pca.onc[["sdev"]]))
-tpc.onc <- pca.onc[["scores"]][, 1:2]
-onc.dat.test <- cbind(
-  onc.dat,
-  tpc.onc[match(rownames(onc.dat), rownames(tpc.onc)), ]
+cnr.reml.result <- c(
+  "Carbon-Nitrogen (CN) Ratio",
+  H2(cnr.reml, g = onc.dat$geno),
+  R2(cnr.reml),
+  cnr.reml.pval$"p.value"
 )
+h2.tab <- rbind(h2.tab, cnr.reml.result)
 
-pc1.reml <- lme4::lmer(I(Comp.1^(1 / 1)) ~ (1 | geno),
-  data = onc.dat.test, REML = TRUE
-)
-RLRsim::exactRLRT(pc1.reml)
-pc2.reml <- lme4::lmer(I(Comp.2^(1 / 1)) ~ (1 | geno),
-  data = onc.dat.test, REML = TRUE
-)
-RLRsim::exactRLRT(pc2.reml)
-cn.d.onc.test <- distNet(cn.onc[as.character(onc.dat.test[!is.na(onc.dat.test[, "Comp.1"]), "tree.id"])])
-adonis2(cn.d.onc.test ~ Comp.1 * Comp.2, data = onc.dat.test)
-mantel(cn.d.onc.test ~ dist(na.omit(onc.dat[, c("pH", "CN", "CT")])))
-
-
-## Is species richness correlated with percent cover?
+## Correlations among metrics
 cor.test(onc.dat[, "SR"], onc.dat[, "PC"], data = onc.dat)
 
 ## Were these correlated with bark roughness?
@@ -888,41 +874,45 @@ link.reml <- lme4::lmer(I(log(L + 0.00000001)) ~ (1 | geno),
   data = onc.dat, REML = TRUE
 )
 link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
-link.reml.pval
 fligner.test(log(onc.dat$L + 0.0000001), onc.dat$geno)
 shapiro.test(residuals(link.reml))
-h2.tab[6, "p-value"] <- link.reml.pval$"p.value"
-h2.tab[6, "H2"] <- H2(link.reml, g = onc.dat$geno)
-h2.tab[6, "R2"] <- R2(link.reml)
-R2(link.reml)
-h2.tab[6, "Response"] <- "Number of Network Links"
+link.reml.result <- c(
+ "Number of Network Links",
+ H2(link.reml, g = onc.dat$geno),
+ R2(link.reml),
+ link.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, link.reml.result)
 
 # network centrality
 cen.reml <- lme4::lmer(I(Cen^(1 / 2)) ~ (1 | geno),
   data = onc.dat, REML = TRUE
 )
 cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
-cen.reml.pval
 fligner.test(onc.dat$L^(1 / 1), onc.dat$geno)
 shapiro.test(residuals(cen.reml))
-h2.tab[7, "p-value"] <- cen.reml.pval$"p.value"
-h2.tab[7, "H2"] <- H2(cen.reml, g = onc.dat$geno)
-h2.tab[7, "R2"] <- R2(cen.reml)
-R2(cen.reml)
-h2.tab[7, "Response"] <- "Network Centrality"
+cen.reml.result <- c(
+ "Network Centrality",
+ H2(cen.reml, g = onc.dat$geno),
+ R2(cen.reml),
+ cen.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, cen.reml.result)
 
 # network modularity
 mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1 / 4)) ~ (1 | geno),
   data = onc.dat, REML = TRUE
 )
 mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
-mod.reml.pval
 fligner.test(onc.ns[, "mod.lik"]^(1 / 4), onc.dat$geno)
 shapiro.test(residuals(mod.reml))
-h2.tab[8, "p-value"] <- mod.reml.pval$"p.value"
-h2.tab[8, "H2"] <- H2(mod.reml, g = onc.dat$geno)
-h2.tab[8, "R2"] <- R2(mod.reml)
-h2.tab[8, "Response"] <- "Network Modularity"
+mod.reml.result <- c(
+ "Network Modularity",
+ H2(mod.reml, g = onc.dat$geno),
+ R2(mod.reml),
+ mod.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, mod.reml.result)
 
 ## Added diversity and evenness
 
@@ -931,28 +921,30 @@ spd.reml <- lme4::lmer(I(SD^(1 / 2)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
-spd.reml.pval
 shapiro.test(residuals(spd.reml))
 fligner.test(onc.dat$SD^(1 / 2), onc.dat$geno)
-h2.tab[9, "p-value"] <- spd.reml.pval$"p.value"
-h2.tab[9, "H2"] <- H2(spd.reml, g = onc.dat$geno)
-h2.tab[9, "R2"] <- R2(spd.reml)
-R2(spd.reml)
-h2.tab[9, "Response"] <- "Lichen Species Diversity"
+spd.reml.result <- c(
+ "Lichen Species Diversity",
+ H2(spd.reml, g = onc.dat$geno),
+ R2(spd.reml),
+ spd.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, spd.reml.result)
 
 ## Species diversity ~ genotype
 spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~ (1 | geno),
   data = na.omit(onc.dat), REML = TRUE
 )
 spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
-spe.reml.pval
 shapiro.test(residuals(spe.reml))
 fligner.test(onc.dat$SD^(1 / 2), onc.dat$geno)
-h2.tab[10, "p-value"] <- spe.reml.pval$"p.value"
-h2.tab[10, "H2"] <- H2(spe.reml, g = onc.dat$geno)
-h2.tab[10, "R2"] <- R2(spe.reml)
-R2(spe.reml)
-h2.tab[10, "Response"] <- "Lichen Species Evenness"
+spe.reml.result <- c(
+ "Lichen Species Evenness",
+ H2(spe.reml, g = onc.dat$geno),
+ R2(spe.reml),
+ spe.reml.pval$"p.value"
+)
+h2.tab <- rbind(h2.tab, spe.reml.result)
 
 # network stats in relation to other variables
 L.aov <- aov(I(log(L + 0.000001)) ~ BR + PC + SR, data = onc.dat)
@@ -961,12 +953,6 @@ shapiro.test(residuals(L.aov))
 cen.aov <- aov(I(Cen^(1 / 2)) ~ BR + PC + SR, data = onc.dat)
 summary(cen.aov)
 shapiro.test(residuals(cen.aov))
-mod.aov <- aov(I(onc.ns[, "mod.lik"]^(1 / 4)) ~ BR + PC + SR, data = onc.dat)
-summary(mod.aov)
-shapiro.test(residuals((mod.aov)))
-
-##
-cor.test(onc.ns[, "L"], onc.ns[, "Cen"])
 
 # are these metrics correlated with network similarity
 L.d <- dist(onc.dat$L)
@@ -1040,25 +1026,6 @@ if (!exists("cn.nms.all")) {
 }
 ```
 
-```{r bp_mod, eval = FALSE, echo = FALSE}
-
-### What is the structure of the bipartite networks?
-# test for modularity
-# modularity p-values
-p.mod <- c(
-  wild = length(mods.wild.sweb[mods.wild.sweb <= mod.wild]) / length(mods.wild.sweb),
-  onc = length(mods.onc.sweb[mods.onc.sweb <= mod.onc]) / length(mods.onc.sweb),
-  pit = length(mods.pit.sweb[mods.pit.sweb <= mod.pit]) / length(mods.pit.sweb)
-)
-# ses modularity
-ses.mod <- c(
-  wild = (mod.wild - mean(mods.wild.sweb)) / sd(mods.wild.sweb),
-  onc = (mod.onc - mean(mods.onc.sweb)) / sd(mods.onc.sweb),
-  pit = (mod.pit - mean(mods.pit.sweb)) / sd(mods.pit.sweb)
-)
-# nest.pit <- bipartite::nestedness(pit.com.gm.rel)
-sna::gplot(sp.up, gmode = "graph", displaylabels = TRUE, lwd = sp.up)
-```
 
 # Tables
 
