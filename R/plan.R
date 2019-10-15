@@ -1,8 +1,21 @@
 plan <- drake_plan(
 
     ## Load data
-    
+    ## Trees were removed from the analysis genotype RL6 and N1.31
+    ## No physciods
+    ## Lecanoras merged
+
+    xgal.size <- read.csv("../data/lcn/ONC_Xgal_SizeData_May2011.csv"),
+    garden.data <- read.csv("../data/lcn/LCO_data_ONC_PIT.csv"),
+    rough <- read.csv("../data/lcn/ONC_raw_roughness.csv"),
+
     ## Data wrangling
+                                        # rm genotype RL6 and N1.31
+    garden.data <- garden.data[garden.data$Geno != "RL6", ],
+    garden.data <- garden.data[garden.data$Tree != "N1.31", ],
+
+    
+
 
     ## Analyses
                                         # 1. network~geno+ permanova
