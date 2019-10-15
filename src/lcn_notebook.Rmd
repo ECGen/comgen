@@ -139,31 +139,7 @@ onc.rough <- avg.rough[match(ses.tree, r.tree)]
 if (!(all(ses.tree == names(onc.rough)))) {
   print("Holy Crap!")
 }
-## RFLP distance values from Zink from Martinsen
-rflp.d <- readLines("./data/lcn/rflp_queller_goodnight.txt")
-rflp.d <- lapply(rflp.d, strsplit, split = "\t")
-rflp.d <- lapply(rflp.d, function(x) x[[1]])
-rflp.d[[61]] <- c(rflp.d[[61]], "")
-rflp.d <- do.call(rbind, rflp.d)
-rflp.n <- rflp.d[1, -1]
-rflp.d <- rflp.d[-1, -1]
-diag(rflp.d) <- 1
-rflp.d <- matrix(as.numeric(rflp.d), nrow = nrow(rflp.d))
-rownames(rflp.d) <- colnames(rflp.d) <- rflp.n
-rflp.d <- rflp.d[
-  rownames(rflp.d) %in% unique(onc.geno),
-  colnames(rflp.d) %in% unique(onc.geno)
-]
-rflp.d <- rflp.d[
-  match(unique(onc.geno), rownames(rflp.d)),
-  match(unique(onc.geno), rownames(rflp.d))
-]
-if (!(all(rownames(rflp.d) == unique(onc.geno)))) {
-  print("Holy crap, rflp.d names match error")
-}
 
-# Coerce to distance matrices
-rflp.d <- as.dist(rflp.d)
 # Lichen Network Models
 # onc
 cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet,
@@ -287,12 +263,8 @@ spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
 # Evenness
 spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
 spe.onc[is.na(spe.onc)] <- 0
-# Vectors for network similarity
-## ns.vec.onc <- envfit(ord,
-##        data.frame(onc.ns[, c("L", "Cen")],
-##                   R = onc.rough, Cov = ptc.onc))
-## Creating distance matrices that match rflp
-## this is for the "mean" distance matrices
+
+## "mean" distance matrices
 cn.mu.d <- as.matrix(cn.mu.d.onc)
 prb.mu.d <- as.matrix(prb.mu.d.onc)
 prb.mu.d <- prb.mu.d[
@@ -304,20 +276,13 @@ onc.com.mu <- apply(onc.com[, -ncol(onc.com)], 2,
   function(x, g) tapply(x, g, mean),
   g = onc.geno
 )
-onc.com.mu <- onc.com.mu[match(rownames(cn.mu.d), rownames(onc.com.mu)), ]
+onc.com.mu <- onc.com.mu[match(rownames(cn.mu.d), 
+                               rownames(onc.com.mu)), ]
 onc.com.mu.d <- vegdist(onc.com.mu)
-if (!(all(c(
-  all(rownames(as.matrix(rflp.d)) ==
-    rownames(as.matrix(cn.mu.d.onc))),
-  all(rownames(as.matrix(rflp.d)) ==
-    rownames(as.matrix(prb.mu.d))),
-  all(rownames(as.matrix(rflp.d)) ==
-    rownames(as.matrix(onc.com.mu.d)))
-)))) {
-  warning("Warning: distance matrices are not aligned.")
-} else {
-  print("Distance matrices good to go!")
-}
+if (!(all(rownames(as.matrix(prb.mu.d)) == 
+          rownames(as.matrix(cn.mu.d.onc))))) {
+  warning("Warning: distance matrices are not aligned!")
+} 
 
 # Bipartite analysis
 nperm <- 20
@@ -423,16 +388,7 @@ cv.onc <- envfit(nms.onc, data.frame(onc.com[, colnames(onc.com) != "ds"],
   C = onc.ns[, c("C")],
   A = ptc.onc
 ))
-# genotype means
-omu <- apply(onc.com[, colnames(onc.com) != "ds"], 2,
-  function(x, g) tapply(x, g, mean),
-  g = onc.geno
-)
-oms <- tapply(onc.ses, onc.geno, mean)
-oms.d <- dist(oms[match(rownames(as.matrix(rflp.d)), names(oms))])
-# bark roughness means
-oprbmu <- tapply(onc.rough, onc.geno, mean)
-oprbmu <- oprbmu[match(rownames(as.matrix(rflp.d)), names(oprbmu))]
+
 # get araujo coordinates
 coord <- read.csv("./data/lcn/lcn_coord_onc.csv")
 rownames(coord) <- coord[, 1]
@@ -898,9 +854,7 @@ prb.d <- dist(onc.dat$BR)
 ### rough -> cover -> rich -> net
 ecodist::mantel(cn.d.onc ~ vegdist(onc.com.rel) + spr.d + ptc.d + prb.d, mrank = TRUE)
 
-## Partial Mantels using RFLP distance
-ecodist::mantel(cn.mu.d.onc ~ rflp.d)
-ecodist::mantel(onc.com.mu.d ~ rflp.d)
+## Mantels
 ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
 ## Was lichen network similarity determined by genotype?
