@@ -2,9 +2,224 @@
 ### Data notes:
 # Loading data
 # separate onc
-garden.data[, 1] <- as.character(garden.data[, 1])
-g1 <- substr(garden.data[, 1], 2, 2)
-g1[g1 != "P"] <- "onc"
+xgal.size.in = read.csv("../data/lcn/ONC_Xgal_SizeData_May2011.csv")
+garden.data.in = read.csv("../data/lcn/LCO_data_ONC_PIT.csv")
+rough.in = read.csv("../data/lcn/ONC_raw_roughness.csv")
+onc.nc.in = read.csv("../data/lcn/ONC_phytochem_NC.csv")
+onc.tan.in = read.csv("../data/lcn/ONC_phytochem_tannin.csv")
+onc.ph.in = read.csv("../data/lcn/ONC_Bark_lichen_pH_data.csv")
+wild.dat.in = read.csv("../data/lcn/lco_Apr2012.csv")
+env.in = read.csv("../data/lcn/Uinta2012_all_data_from_Lamit.csv")
+age.in = read.csv(
+    "../data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
+
+
+proc_garden_data <- function(garden.data) {
+                                        # rm genotype RL6 and N1.31
+    garden.data <- garden.data[garden.data$Geno != "RL6", ]
+    garden.data <- garden.data[garden.data$Tree != "N1.31", ]
+    garden.data[, 1] <- as.character(garden.data[, 1])
+    return(garden.data)
+
+}
+
+
+proc_pit <- function(garden.data) {
+
+    g1 <- substr(garden.data[, 1], 2, 2)
+    g1[g1 != "P"] <- "onc"
+    pit <- garden.data[g1 == "P", ]
+    colnames(pit)[7:ncol(pit)] <- substr(
+        colnames(pit)[7:ncol(pit)], 1, 2)
+    return(pit)
+
+}
+
+proc_onc <- function(garden.data) {
+
+    g1 <- substr(garden.data[, 1], 2, 2)
+    g1[g1 != "P"] <- "onc"
+    onc <- garden.data[g1 == "onc", ]
+    colnames(onc)[which(colnames(onc) == "Ls")] <- "Lh"
+    colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)], 1, 2)
+    return(onc)
+
+}
+
+proc_onc_q <- function(onc) {
+    onc.q <- split(onc, paste(onc[, 1], onc[, 2]))
+    onc.q <- lapply(onc.q, function(x) x[, 7:ncol(x)])
+    return(onc.q)
+}
+
+proc_onc_ph <- function(garden.data, rough, onc, onc.q,
+                        onc.nc, onc.tan, onc.ph) {
+
+onc.geno <- unlist(sapply(names(onc.q), function(x) strsplit(x, split = " ")[[1]][2]))
+rough <- rough[, 1:5]
+rough <- rough[grepl("North", rough[, 3]), ]
+avg.rough <- tapply(rough[, 5], rough[, 1], mean)
+r.tree <- names(avg.rough)
+r.tree <- sub("-", "\\.", r.tree)
+r.tree <- sub("\\.0", "\\.", r.tree)
+names(avg.rough) <- r.tree
+onc.ses <- unlist(os[, 1])
+onc.ses[is.na(onc.ses)] <- 0
+names(onc.ses) <- rownames(os)
+ses.tree <- as.character(sapply(names(onc.ses), function(x) unlist(strsplit(x, split = " "))[1]))
+onc.rough <- avg.rough[match(ses.tree, r.tree)]
+cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet, ci.p = 95)
+ns.onc <- lapply(lapply(cn.onc, function(x) {
+    abs(sign(x))
+}), enaR:::structure.statistics)
+ns.onc <- do.call(rbind, ns.onc)
+cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
+for (i in 1:length(cn.onc)) {
+    if (sum(sign(cn.onc[[i]])) >= 3) {
+        mod.tmp <- computeModules(cn.onc[[i]])
+        cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood")
+        cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1
+    } else {
+        cn.mod.onc[i] <- NA
+    }
+}
+cn.mod.onc[is.na(cn.mod.onc)] <- 0
+names(cn.mod.onc) <- c("mod.lik", "mod.n")
+dcen.onc <- unlist(lapply(cn.onc, function(x) {
+    sna::centralization(x, FUN = sna::degree, normalize = FALSE)
+}))
+onc.ns <- cbind(ns.onc, Cen = dcen.onc, mod.lik = cn.mod.onc[, 1], mod.n = cn.mod.onc[, 
+    2])
+onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
+onc.com <- cbind(onc.com, ds = rep(min(onc.com[onc.com != 0])/1000, nrow(onc.com)))
+ptc.onc <- unlist(lapply(onc.q, function(x) {
+    sum(apply(x, 1, function(x) sign(sum(x))))
+}))
+spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
+spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+spe.onc <- spd.onc/log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
+spe.onc[is.na(spe.onc)] <- 0
+tree <- onc.geno
+for (i in 1:length(unique(onc.geno))) {
+    tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
+}
+tree <- factor(tree)
+tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
+onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
+colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
+colnames(onc.tan)[1] <- "tree.id"
+colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
+onc.nc$rCN <- onc.nc$N/onc.nc$C
+onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
+onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
+onc.ph[onc.ph[, "tree.id"] == "N7.16", "tree.id"] <- "N7.10"
+onc.ph[!is.na(onc.ph[, "pH2"]), "pH"] <- apply(onc.ph[!is.na(onc.ph[, "pH2"]), c("pH", 
+    "pH2")], 1, mean)
+onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, SD = spd.onc, SE = spe.onc, 
+    geno = factor(onc.geno), tree = tree, BR = onc.rough, onc.ns[, c("L", "Cen")])
+onc.ph <- onc.ph[onc.ph[, "tree.id"] %in% onc.dat[, "tree.id"], ]
+onc.ph <- onc.ph[match(onc.dat[, "tree.id"], onc.ph[, "tree.id"]), ]
+return(onc.ph)
+
+}
+
+proc_onc_dat <- function(garden.data, rough, onc, onc.q,
+                         onc.nc, onc.tan, onc.ph) {
+
+onc.geno <- unlist(sapply(names(onc.q), 
+                          function(x) 
+                              strsplit(x, split = " ")[[1]][2]))
+rough <- rough[, 1:5]
+rough <- rough[grepl("North", rough[, 3]), ]
+avg.rough <- tapply(rough[, 5], rough[, 1], mean)
+r.tree <- names(avg.rough)
+r.tree <- sub("-", "\\.", r.tree)
+r.tree <- sub("\\.0", "\\.", r.tree)
+names(avg.rough) <- r.tree
+onc.ses <- unlist(os[, 1])
+onc.ses[is.na(onc.ses)] <- 0
+names(onc.ses) <- rownames(os)
+ses.tree <- as.character(sapply(
+    names(onc.ses), function(x) 
+        unlist(strsplit(x, split = " "))[1]))
+onc.rough <- avg.rough[match(ses.tree, r.tree)]
+cn.onc <- lapply(split(onc[, -1:-6], 
+                       onc[, "Tree"]), coNet, ci.p = 95)
+ns.onc <- lapply(lapply(cn.onc, function(x) {
+    abs(sign(x))
+}), enaR:::structure.statistics)
+ns.onc <- do.call(rbind, ns.onc)
+cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
+for (i in 1:length(cn.onc)) {
+    if (sum(sign(cn.onc[[i]])) >= 3) {
+        mod.tmp <- computeModules(cn.onc[[i]])
+        cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood")
+        cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1
+    } else {
+        cn.mod.onc[i] <- NA
+    }
+}
+cn.mod.onc[is.na(cn.mod.onc)] <- 0
+names(cn.mod.onc) <- c("mod.lik", "mod.n")
+dcen.onc <- unlist(lapply(cn.onc, function(x) {
+    sna::centralization(x, FUN = sna::degree, normalize = FALSE)
+}))
+onc.ns <- cbind(ns.onc, 
+                Cen = dcen.onc, mod.lik = cn.mod.onc[, 1], 
+                mod.n = cn.mod.onc[, 
+    2])
+onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
+onc.com <- cbind(onc.com, 
+                 ds = rep(min(onc.com[onc.com != 0])/1000, 
+                          nrow(onc.com)))
+ptc.onc <- unlist(lapply(onc.q, function(x) {
+    sum(apply(x, 1, function(x) sign(sum(x))))
+}))
+spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, 
+                 function(x) sum(sign(x)))
+spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+spe.onc <- spd.onc/log(
+                       specnumber(
+                           onc.com[, colnames(onc.com) != "ds"]))
+spe.onc[is.na(spe.onc)] <- 0
+tree <- onc.geno
+for (i in 1:length(unique(onc.geno))) {
+    tree[onc.geno == 
+         unique(onc.geno)[i]] <- 1:length(tree[onc.geno == 
+                                               unique(onc.geno)[i]])
+}
+tree <- factor(tree)
+tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
+onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
+colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
+colnames(onc.tan)[1] <- "tree.id"
+colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
+onc.nc$rCN <- onc.nc$N/onc.nc$C
+onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, SD = spd.onc, SE = spe.onc, 
+    geno = factor(onc.geno), tree = tree, BR = onc.rough, onc.ns[, c("L", "Cen")])
+onc.dat <- data.frame(onc.dat, C = onc.nc[match(onc.dat[, "tree.id"], onc.nc[, "tree.id"]), 
+    "C"], N = onc.nc[match(onc.dat[, "tree.id"], onc.nc[, "tree.id"]), "N"], CN = onc.nc[match(onc.dat[, 
+    "tree.id"], onc.nc[, "tree.id"]), "rCN"], CT = onc.tan[match(onc.dat[, "tree.id"], 
+    onc.tan[, "tree.id"]), "CT"], pH = onc.ph[, "pH"])
+return(onc.dat)
+
+}
+
+garden.data <- proc_garden_data(garden.data)
+pit <- proc_pit(garden.data.in)
+onc <- proc_onc(garden.data.in)
+onc.q <- proc_onc_q(onc)
+onc.ph <- proc_onc_ph(garden.data.in, 
+                      rough.in, onc, onc.q, 
+                      onc.nc.in, onc.tan.in, onc.ph.in)
+onc.dat <- proc_onc_dat(garden.data.in, 
+                        rough.in, onc, onc.q, 
+                        onc.nc.in, onc.tan.in, onc.ph)
+
+
+
 onc <- garden.data[g1 == "onc", ]
 colnames(onc)[which(colnames(onc) == "Ls")] <- "Lh"
 pit <- garden.data[g1 == "P", ]
@@ -23,7 +238,7 @@ if (!(all(table(onc[, 1]) == 100))) {
 # onc
 colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)], 1, 2)
 onc.q <- split(onc, paste(onc[, 1], onc[, 2]))
-onc.q <- lapply(onc.q, function(x) x[, 7:ncol(x)])
+onc.q <- lapply(onc.q, function(wild.dat) x[, 7:ncol(x)])
 # pit
 colnames(pit)[7:ncol(pit)] <- substr(colnames(pit)[7:ncol(pit)], 1, 2)
 pit.q <- split(pit, paste(pit[, 1], pit[, 2]))
@@ -352,9 +567,8 @@ for (i in 1:length(unique(onc.geno))) {
 }
 tree <- factor(tree)
 tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+
 # add chemistry data
-onc.nc <- read.csv("../data/lcn/ONC_phytochem_NC.csv")
-onc.tan <- read.csv("../data/lcn/ONC_phytochem_tannin.csv")
 onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
 onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
 # rename headers
@@ -365,7 +579,6 @@ colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
 # add C:N ratio
 onc.nc$rCN <- onc.nc$N / onc.nc$C
 # pH data
-onc.ph <- read.csv("../data/lcn/ONC_Bark_lichen_pH_data.csv")
 onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
 onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
 # N7.16 is possibly N7.10
@@ -520,43 +733,45 @@ if (!("mod_simvals_pit.csv" %in% dir("../data/lcn"))) {
 }
 
 ### Wild data
-###
-###
-x <- read.csv("../data/lcn/lco_Apr2012.csv")
+
 # remove notes
-x <- x[, colnames(x) != "NOTES."]
-x <- x[, colnames(x) != "dead"]
+wild.dat <- wild.dat[, colnames(wild.dat) != "NOTES."]
+wild.dat <- wild.dat[, colnames(wild.dat) != "dead"]
 #
-x <- na.omit(x)
+wild.dat <- na.omit(wild.dat)
 # remove gnu.44 = FREMONT
-x <- x[x$tree != "gnu.44", ]
+wild.dat <- wild.dat[wild.dat$tree != "gnu.44", ]
 # rm ll.6, tree with super smooth bark
-x <- x[x$tree != "ll.6", ]
-x$tree <- factor(as.character(x$tree))
+wild.dat <- wild.dat[wild.dat$tree != "ll.6", ]
+wild.dat$tree <- factor(as.character(wild.dat$tree))
 # condense species
 # lecanora, there can be only one!
-lec.sp <- apply(x[, c(6, 8, 10, 18)], 1, function(x) sign(any(x != 0)))
+lec.sp <- apply(wild.dat[, c(6, 8, 10, 18)], 1, 
+                function(x) sign(any(x != 0)))
 # no physcioids!
 # phy.spp <- apply(x[,c(13,14,15,16)],
 # 1,function(x) sign(any(x!=0)))
-x <- cbind(x, lec = lec.sp)
-x <- x[, -c(6, 8, 10, 18)]
-x <- x[, colnames(x) != "physcioid"]
+wild.dat <- cbind(wild.dat, lec = lec.sp)
+wild.dat <- wild.dat[, -c(6, 8, 10, 18)]
+wild.dat <- wild.dat[, colnames(wild.dat) != "physcioid"]
 # break into quadrat list (x.q)
-quads <- paste(x$tree, x$quadrat)
-colnames(x)[5:ncol(x)] <- c(
+quads <- paste(wild.dat$tree, wild.dat$quadrat)
+colnames(wild.dat)[5:ncol(wild.dat)] <- c(
   "Xg", "Cs", "Xm", "fgb", "Rs",
   "Pm", "Pa", "Pu", "Ch", "Ls"
 )
-x <- x[colnames(x) != "fgb"]
-x.q <- split(x, quads)
-wild.com <- split(x, x$tree)
-wild.com <- do.call(rbind, lapply(wild.com, function(x) apply(x[, -1:-4], 2, sum)))
+wild.dat <- wild.dat[colnames(wild.dat) != "fgb"]
+wild.dat.q <- split(wild.dat, quads)
+wild.com <- split(wild.dat, wild.dat$tree)
+wild.com <- do.call(rbind, lapply(wild.com, function(x) 
+    apply(x[, -1:-4], 2, sum)))
 wild.com.rel <- apply(wild.com, 2, function(x) x / max(x))
 wild.com.rel[is.na(wild.com.rel)] <- 0
-wild.q <- lapply(split(x, x$tree), function(x) x[, -1:-4])
+wild.q <- lapply(split(wild.dat, wild.dat$tree), 
+                 function(x) x[, -1:-4])
+
 # data from lamit
-env <- read.csv("../data/lcn/Uinta2012_all_data_from_Lamit.csv")
+
 env <- env[is.na(env$Pct.Roughness) == FALSE, ]
 env[, 1] <- sub(
   "\\?", "",
@@ -582,20 +797,20 @@ env$Quad.Loc <- paste("n", env$Quad.Loc, sep = "")
 env <- env[env$Aspect != "South", ]
 env.tid <- paste(env$Tree.ID, env$Quad.Loc)
 # check that the datasets are compatible
-all(names(x.q) %in% env.tid)
+all(names(wild.dat.q) %in% env.tid)
 # match observations
-all(env.tid[match(names(x.q), env.tid)] == names(x.q))
+all(env.tid[match(names(wild.dat.q), env.tid)] == names(x.q))
 # delimit co-occurrence and match
-env <- env[match(names(x.q), env.tid), ]
-x.split <- paste(x$tree, x$quadrat, sep = "_")
+env <- env[match(names(wild.dat.q), env.tid), ]
+wild.dat.split <- paste(wild.dat$tree, wild.dat$quadrat, 
+                        sep = "_")
 env.split <- paste(env$Tree.ID, env$Quad.Loc)
-x.split <- as.character(x$tree)
+wild.dat.split <- as.character(wild.dat$tree)
 env.split <- as.character(env$Tree.ID)
 # percent rough bark
 prb.wild <- tapply(env$Pct.Roughness, env.split, mean)
+
 # age
-age <- read.csv(
-  "../data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
 dbh <- age$DBH.cm_01
 age.final <- age$AgeFinal.U
 age <- data.frame(tree.id = age[, 1], age.final = age$AgeFinal.U)
@@ -650,6 +865,4 @@ wild.dat <- data.frame(
   L = ns.wild[, "L"], Cen = dcen.wild
 )
 
-lcn_data <- function(data){
-    
-}
+
