@@ -13,7 +13,6 @@ env.in = read.csv("../data/lcn/Uinta2012_all_data_from_Lamit.csv")
 age.in = read.csv(
     "../data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
 
-
 proc_garden_data <- function(garden.data) {
                                         # rm genotype RL6 and N1.31
     garden.data <- garden.data[garden.data$Geno != "RL6", ]
@@ -52,23 +51,27 @@ proc_onc_q <- function(onc) {
     return(onc.q)
 }
 
-proc_onc_ph <- function(garden.data, rough, onc, onc.q,
+proc_onc_ph <- function(garden.data, rough.in, onc, onc.q,
                         onc.nc, onc.tan, onc.ph) {
 
-onc.geno <- unlist(sapply(names(onc.q), function(x) strsplit(x, split = " ")[[1]][2]))
-rough <- rough[, 1:5]
+onc.geno <- unlist(
+    sapply(names(onc.q), 
+           function(x) strsplit(x, split = " ")[[1]][2])
+)
+onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
+                                        # roughness
+rough <- rough.in[, 1:5]
 rough <- rough[grepl("North", rough[, 3]), ]
 avg.rough <- tapply(rough[, 5], rough[, 1], mean)
 r.tree <- names(avg.rough)
 r.tree <- sub("-", "\\.", r.tree)
 r.tree <- sub("\\.0", "\\.", r.tree)
 names(avg.rough) <- r.tree
-onc.ses <- unlist(os[, 1])
-onc.ses[is.na(onc.ses)] <- 0
-names(onc.ses) <- rownames(os)
-ses.tree <- as.character(sapply(names(onc.ses), function(x) unlist(strsplit(x, split = " "))[1]))
-onc.rough <- avg.rough[match(ses.tree, r.tree)]
-cn.onc <- lapply(split(onc[, -1:-6], onc[, "Tree"]), coNet, ci.p = 95)
+onc.rough <- avg.rough[match(onc.tree, r.tree)]
+                                        # network models
+onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
+cn.onc <- lapply(onc.split, coNet, ci.p = 95)
+                                        # modularity
 ns.onc <- lapply(lapply(cn.onc, function(x) {
     abs(sign(x))
 }), enaR:::structure.statistics)
@@ -85,6 +88,7 @@ for (i in 1:length(cn.onc)) {
 }
 cn.mod.onc[is.na(cn.mod.onc)] <- 0
 names(cn.mod.onc) <- c("mod.lik", "mod.n")
+                                        # centrality
 dcen.onc <- unlist(lapply(cn.onc, function(x) {
     sna::centralization(x, FUN = sna::degree, normalize = FALSE)
 }))
@@ -127,25 +131,24 @@ return(onc.ph)
 proc_onc_dat <- function(garden.data, rough, onc, onc.q,
                          onc.nc, onc.tan, onc.ph) {
 
-onc.geno <- unlist(sapply(names(onc.q), 
-                          function(x) 
-                              strsplit(x, split = " ")[[1]][2]))
-rough <- rough[, 1:5]
+onc.geno <- unlist(
+    sapply(names(onc.q), 
+           function(x) strsplit(x, split = " ")[[1]][2])
+)
+onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
+                                        # roughness
+rough <- rough.in[, 1:5]
 rough <- rough[grepl("North", rough[, 3]), ]
 avg.rough <- tapply(rough[, 5], rough[, 1], mean)
 r.tree <- names(avg.rough)
 r.tree <- sub("-", "\\.", r.tree)
 r.tree <- sub("\\.0", "\\.", r.tree)
 names(avg.rough) <- r.tree
-onc.ses <- unlist(os[, 1])
-onc.ses[is.na(onc.ses)] <- 0
-names(onc.ses) <- rownames(os)
-ses.tree <- as.character(sapply(
-    names(onc.ses), function(x) 
-        unlist(strsplit(x, split = " "))[1]))
-onc.rough <- avg.rough[match(ses.tree, r.tree)]
-cn.onc <- lapply(split(onc[, -1:-6], 
-                       onc[, "Tree"]), coNet, ci.p = 95)
+onc.rough <- avg.rough[match(onc.tree, r.tree)]
+                                        # network models
+onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
+cn.onc <- lapply(onc.split, coNet, ci.p = 95)
+                                        # modularity
 ns.onc <- lapply(lapply(cn.onc, function(x) {
     abs(sign(x))
 }), enaR:::structure.statistics)
@@ -162,12 +165,11 @@ for (i in 1:length(cn.onc)) {
 }
 cn.mod.onc[is.na(cn.mod.onc)] <- 0
 names(cn.mod.onc) <- c("mod.lik", "mod.n")
+                                        # centrality
 dcen.onc <- unlist(lapply(cn.onc, function(x) {
     sna::centralization(x, FUN = sna::degree, normalize = FALSE)
 }))
-onc.ns <- cbind(ns.onc, 
-                Cen = dcen.onc, mod.lik = cn.mod.onc[, 1], 
-                mod.n = cn.mod.onc[, 
+onc.ns <- cbind(ns.onc, Cen = dcen.onc, mod.lik = cn.mod.onc[, 1], mod.n = cn.mod.onc[, 
     2])
 onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
 onc.com <- cbind(onc.com, 
@@ -207,7 +209,7 @@ return(onc.dat)
 
 }
 
-garden.data <- proc_garden_data(garden.data)
+garden.data <- proc_garden_data(garden.data.in)
 pit <- proc_pit(garden.data.in)
 onc <- proc_onc(garden.data.in)
 onc.q <- proc_onc_q(onc)
@@ -347,7 +349,6 @@ cn.sign.pit <- lapply(
 )
 cn.d.pit <- distNet(cn.pit, method = "bc")
 # genotype means and mean distances
-onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
 cn.mu.onc <- list()
 for (i in 1:length(unique(onc.geno))) {
   cn.mu.onc[[i]] <- meanNet(cn.onc[onc.geno == unique(onc.geno)[i]])

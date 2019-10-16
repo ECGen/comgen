@@ -171,13 +171,11 @@ ecodist::mantel(cn.mu.d.onc ~ onc.com.mu.d)
 
 ## Was lichen network similarity determined by genotype?
 set.seed(1234)
-cn.perm <- vegan::adonis2(cn.d.onc.na ~ geno +
-  BR + pH + CN + CT +
-  PC + SR + SE,
-by = "term",
-data = na.omit(onc.dat),
-permutations = 10000, mrank = FALSE
-)
+cn.perm <- vegan::adonis(cn.d.onc.na ~ geno + BR + pH + CN + CT + PC + SR + SE,
+                          by = "term",
+                          data = na.omit(onc.dat),
+                          permutations = 10000
+                          )
 
 cn.perm.ng <- vegan::adonis2(cn.d.onc ~ BR + PC + SR,
   data = onc.dat, permutations = 10000, mrank = TRUE
