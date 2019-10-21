@@ -18,15 +18,21 @@ plan <- drake_plan(
     ## Data wrangling
     garden.data = proc_garden_data(garden.data.in),
     pit = proc_pit(garden.data.in),
-    onc = proc_onc(garden.data.in),
-    onc.q = proc_onc_q(onc)
-    onc.ph = proc_onc_ph(garden.data.in, 
-                         rough.in, onc, onc.q, 
+    onc = proc_onc(garden.data),
+    onc.q = proc_onc_q(onc),
+    onc.ph = proc_onc_ph(garden.data, 
+                         rough.in, 
+                         onc, onc.q, 
                          onc.nc.in, onc.tan.in, onc.ph.in),
-    onc.dat = proc_onc_dat(garden.data.in, 
-                         rough.in, onc, onc.q, 
-                         onc.nc.in, onc.tan.in, onc.ph),
-
+    onc.dat = proc_onc_dat(garden.data, rough.in, 
+                           onc, onc.q, 
+                           onc.nc.in, onc.tan.in, 
+                           onc.ph),
+    cn.onc = proc_cn_onc(onc),
+    onc.ns = proc_onc_ns(cn.onc),
+    cn.d.onc.na = proc_cn_d_onc(cn.onc, onc.dat, rm.na = TRUE),
+    onc.com = proc_onc_com(garden.data, onc, onc.q),
+    onc.com.rel = proc_onc_com_rel(onc.com),
     ## Analyses
                                         # 1. network~geno+ permanova
                                         # 2. species centrality anova
@@ -40,12 +46,14 @@ plan <- drake_plan(
     ## Tables
                                         # table:onc_d_Ftable
                                         # H2 table all
+    h2.tab = table_h2(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel),
     ## Generate a report
-    report = rmarkdown::render(
-         knitr_in("R/report_lcn.Rmd"),
-         output_file = file_out("results/report_lcn.html"),
-         quiet = TRUE
- )
+    ## report = rmarkdown::render(
+    ##                         knitr_in("R/report_lcn.Rmd"),
+    ##                         output_file = file_out("../results/report_lcn.html"),
+    ##                         quiet = TRUE
+    ##                     )
+    print("DONE!")
 )
 
 

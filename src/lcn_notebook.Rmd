@@ -15,8 +15,8 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 
 
 ```{r load_data, eval = TRUE, cache = TRUE}
-source("../R/packages.R")
-source("../R/functions.R")
+source("./R/packages.R")
+source("./R/functions.R")
 
 ```
 
