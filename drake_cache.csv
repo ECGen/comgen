@@ -6,15 +6,16 @@ c7d7a813cdbe5811,target,cn.d.onc.na
 81295f4a0090a083,target,env.in
 bb3f9d65750b6e5f,target,garden.data
 7e9ad9c47b76167a,target,garden.data.in
-8a8c79b65fa948d3,target,h2.tab
+3ea8d2dc9b9879ac,import,h2.tab
+3cc75e2ec7e7845c,import,make_tables
 dbef2b3308e6183a,import,RLRsim::exactRLRT
 6cc828d6836182bf,import,enaR:::structure.statistics
 553870b79bbe47de,import,lme4::lmer
 6ae6e94150f946d2,import,rmarkdown::render
 c9014437434c9cc6,import,sna::centralization
 9a87bb6ad2c3304f,import,sna::degree
-452f98a4e9b3a12d,import,vegan::adonis
 271d0f1af255660c,import,vegan::adonis2
+b435d37261ea2823,import,xtable::xtable
 0b8d120c95cdd012,target,onc
 e9ad9603ec5bd4c1,target,onc.com
 8a29fc3633ae2d15,target,onc.com.rel
@@ -25,7 +26,9 @@ a78c8ed33a1efbc4,target,onc.ph
 39c9412b236bd0b9,target,onc.ph.in
 07ce960f16d2a00b,target,onc.q
 effd6a46c1ba949c,target,onc.tan.in
-183001df30dec4ce,import,file R/report_lcn.Rmd
+3fce634f8de37351,import,file R/report_lcn.Rmd
+3ea8d2dc9b9879ac,import,file report_lcn.Rmd
+27b72fb98f6c76ba,target,file results/
 096470d6b48ec01a,target,pit
 84a4e6a43a4d8477,import,proc_cn_d_onc
 6a9e347c53a70c0b,import,proc_cn_onc
@@ -38,7 +41,12 @@ effd6a46c1ba949c,target,onc.tan.in
 b9593f8a38e32d4b,import,proc_onc_ph
 2c0808c9c45567cf,import,proc_onc_q
 bfc30d090e10a084,import,proc_pit
+e6466d584be15f4c,import,report
+3a7ac450777dd5ee,target,report.html
+e6466d584be15f4c,target,report.md
+117d8664df6b81c5,target,report.pdf
 ad49b16c1e21ecaa,target,rough.in
-0f3e3a9bff627a79,import,table_h2
+ed03dde97a75dc82,import,table_h2
+7d7e13802d28df66,target,tabs
 5c6ccedc7b6953ad,target,wild.dat.in
 2e3f85a02ff02fd7,target,xgal.size.in

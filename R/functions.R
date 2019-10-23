@@ -314,7 +314,7 @@ return(onc.ns)
 
 }
 
-table_h2 <- function(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel){
+make_tables <- function(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel){
     h2.tab <- matrix("", 1, 4)
     colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
     ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
@@ -380,6 +380,23 @@ table_h2 <- function(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel){
     h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
     h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
     h2.tab <- h2.tab[order(h2.tab[, "H2"], decreasing = TRUE), ]
-    return(h2.tab)
+    h2.tab <- na.omit(h2.tab)
+    ## Create the latex
+    tab.h2 <- xtable::xtable(h2.tab,
+       caption = "Genotypic effects on the associated lichen community.",
+       label = "tab:h2_table",
+       type = "latex",
+       include.rownames = FALSE,
+       include.colnames = TRUE
+       )
+    tab.cn.perm <- xtable::xtable(cn.perm,
+       caption = "Pseudo-F Table of lichen network similarity PERMANOVA.",
+       label = "tab:cn_perm_table",
+       type = "latex",
+       include.rownames = FALSE,
+       include.colnames = TRUE
+       )
+    out <- list(h2_reml = tab.h2, cn_perm = tab.cn.perm)
+    return(out)
 }
 

@@ -14,32 +14,28 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 -->
 
 
+```{r content, echo = FALSE, results = "hide"}
+
+library(drake)
+loadd(tabs)
+
+```
+
 # Results 
 
 ## Tables
 
-```{r h2_table, results = "asis"}
+```{r cn_perm, echo = FALSE}
 
-h2.xtab <- xtable::xtable(h2.tab,
-  caption =
-    "Genotypic effects of cottonwood trees on the associated lichen community.",
-  label = "tab:h2_table"
-)
-print(h2.xtab,
-  type = "latex",
-  include.rownames = FALSE,
-  include.colnames = TRUE
-)
+knitr::kable(tabs[["cn_perm"]])
 
 ```
 
-```{r write_h2_table, results = "hide", echo = FALSE}
 
-print(h2.xtab,
-  type = "latex",
-#  file = "../results/h2_table.tex",
-  include.rownames = FALSE,
-  include.colnames = TRUE
-)
+```{r h2_reml, echo = FALSE}
+
+knitr::kable(tabs[["h2_reml"]])
+
 ```
+
 
