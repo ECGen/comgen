@@ -17,7 +17,7 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 ```{r content, echo = FALSE, results = "hide"}
 
 library(drake)
-loadd(tabs)
+loadd(tables)
 
 ```
 
@@ -25,17 +25,25 @@ loadd(tabs)
 
 ## Tables
 
-```{r cn_perm, echo = FALSE}
-
-knitr::kable(tabs[["cn_perm"]])
-
-```
-
 
 ```{r h2_reml, echo = FALSE}
 
 knitr::kable(tabs[["h2_reml"]])
 
 ```
+
+```{r cn_perm, echo = FALSE}
+
+knitr::kable(tables[["cn"]])
+
+```
+
+```{r com_perm, echo = FALSE}
+
+knitr::kable(tables[["com"]])
+
+```
+
+
 
 

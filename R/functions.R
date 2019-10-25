@@ -3,40 +3,6 @@
 # Loading data
 # separate onc
 
-if (100 < 1){
-
-    xgal.size.in = read.csv("./data/lcn/ONC_Xgal_SizeData_May2011.csv")
-    garden.data.in = read.csv("./data/lcn/LCO_data_ONC_PIT.csv")
-    rough.in = read.csv("./data/lcn/ONC_raw_roughness.csv")
-    onc.nc.in = read.csv("./data/lcn/ONC_phytochem_NC.csv")
-    onc.tan.in = read.csv("./data/lcn/ONC_phytochem_tannin.csv")
-    onc.ph.in = read.csv("./data/lcn/ONC_Bark_lichen_pH_data.csv")
-    wild.dat.in = read.csv("./data/lcn/lco_Apr2012.csv")
-    env.in = read.csv("./data/lcn/Uinta2012_all_data_from_Lamit.csv")
-    age.in = read.csv(
-    "./data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv")
-    garden.data = proc_garden_data(garden.data.in)
-    pit = proc_pit(garden.data.in)
-    onc = proc_onc(garden.data)
-    onc.q = proc_onc_q(onc)
-    onc.ph = proc_onc_ph(garden.data, 
-                         rough.in, 
-                         onc, onc.q, 
-                         onc.nc.in, onc.tan.in, onc.ph.in)
-    onc.dat = proc_onc_dat(garden.data, rough.in, 
-                           onc, onc.q, 
-                           onc.nc.in, onc.tan.in, 
-                           onc.ph)
-    cn.onc = proc_cn_onc(onc)
-    onc.ns = proc_onc_ns(cn.onc)
-    cn.d.onc.na = proc_cn_d_onc(cn.onc, onc.dat, rm.na = TRUE)
-    onc.com = proc_onc_com(garden.data, onc, onc.q)
-    onc.com.rel = proc_onc_com_rel(onc.com)
-
-    h2.tab <- table_h2(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel)
-}
-
-
 proc_garden_data <- function(garden.data) {
                                         # rm genotype RL6 and N1.31
     garden.data <- garden.data[garden.data$Geno != "RL6", ]
@@ -45,7 +11,6 @@ proc_garden_data <- function(garden.data) {
     return(garden.data)
 
 }
-
 
 proc_pit <- function(garden.data) {
 
@@ -75,92 +40,17 @@ proc_onc_q <- function(onc) {
     return(onc.q)
 }
 
-proc_onc_ph <- function(garden.data, rough.in, onc, onc.q,
-                        onc.nc, onc.tan, onc.ph) {
-
-onc.geno <- unlist(
-    sapply(names(onc.q), 
-           function(x) strsplit(x, split = " ")[[1]][2])
-)
-onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
-                                        # roughness
-rough <- rough.in[, 1:5]
-rough <- rough[grepl("North", rough[, 3]), ]
-avg.rough <- tapply(rough[, 5], rough[, 1], mean)
-r.tree <- names(avg.rough)
-r.tree <- sub("-", "\\.", r.tree)
-r.tree <- sub("\\.0", "\\.", r.tree)
-names(avg.rough) <- r.tree
-onc.rough <- avg.rough[match(onc.tree, r.tree)]
-                                        # network models
-onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
-cn.onc <- lapply(onc.split, coNet, ci.p = 95)
-                                        # modularity
-ns.onc <- lapply(lapply(cn.onc, function(x) {
-    abs(sign(x))
-}), enaR:::structure.statistics)
-ns.onc <- do.call(rbind, ns.onc)
-cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
-for (i in 1:length(cn.onc)) {
-    if (sum(sign(cn.onc[[i]])) >= 3) {
-        mod.tmp <- computeModules(cn.onc[[i]])
-        cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood")
-        cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1
-    } else {
-        cn.mod.onc[i] <- NA
-    }
-}
-cn.mod.onc[is.na(cn.mod.onc)] <- 0
-names(cn.mod.onc) <- c("mod.lik", "mod.n")
-                                        # centrality
-dcen.onc <- unlist(lapply(cn.onc, function(x) {
-    sna::centralization(x, FUN = sna::degree, normalize = FALSE)
-}))
-onc.ns <- cbind(ns.onc, Cen = dcen.onc, mod.lik = cn.mod.onc[, 1], mod.n = cn.mod.onc[, 
-    2])
-onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
-onc.com <- cbind(onc.com, ds = rep(min(onc.com[onc.com != 0])/1000, nrow(onc.com)))
-ptc.onc <- unlist(lapply(onc.q, function(x) {
-    sum(apply(x, 1, function(x) sign(sum(x))))
-}))
-spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, function(x) sum(sign(x)))
-spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
-spe.onc <- spd.onc/log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
-spe.onc[is.na(spe.onc)] <- 0
-tree <- onc.geno
-for (i in 1:length(unique(onc.geno))) {
-    tree[onc.geno == unique(onc.geno)[i]] <- 1:length(tree[onc.geno == unique(onc.geno)[i]])
-}
-tree <- factor(tree)
-tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
-onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
-onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
-colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
-colnames(onc.tan)[1] <- "tree.id"
-colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
-onc.nc$rCN <- onc.nc$N/onc.nc$C
-onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
-onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
-onc.ph[onc.ph[, "tree.id"] == "N7.16", "tree.id"] <- "N7.10"
-onc.ph[!is.na(onc.ph[, "pH2"]), "pH"] <- apply(onc.ph[!is.na(onc.ph[, "pH2"]), c("pH", 
-    "pH2")], 1, mean)
-onc.dat <- data.frame(tree.id, PC = ptc.onc, SR = spr.onc, SD = spd.onc, SE = spe.onc, 
-    geno = factor(onc.geno), tree = tree, BR = onc.rough, onc.ns[, c("L", "Cen")])
-onc.ph <- onc.ph[onc.ph[, "tree.id"] %in% onc.dat[, "tree.id"], ]
-onc.ph <- onc.ph[match(onc.dat[, "tree.id"], onc.ph[, "tree.id"]), ]
-return(onc.ph)
-
-}
 
 proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
-                         onc.nc, onc.tan, onc.ph) {
-
-    onc.geno <- unlist(
-        sapply(names(onc.q), 
-               function(x) strsplit(x, split = " ")[[1]][2])
-    )
-    onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
-                                        # roughness
+                         onc.nc.in, onc.tan.in, onc.ph.in, rm.na = TRUE) {
+    ## Genotype and Tree vectors
+    onc.geno <- unlist(sapply(
+        names(onc.q), 
+        function(x) 
+            strsplit(x, split = " ")[[1]][2]))
+    onc.tree <- do.call(rbind, 
+                        strsplit(names(onc.geno), " "))[, 1]
+    ## Roughness data
     rough <- rough.in[, 1:5]
     rough <- rough[grepl("North", rough[, 3]), ]
     avg.rough <- tapply(rough[, 5], rough[, 1], mean)
@@ -169,10 +59,9 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
     r.tree <- sub("\\.0", "\\.", r.tree)
     names(avg.rough) <- r.tree
     onc.rough <- avg.rough[match(onc.tree, r.tree)]
-                                        # network models
     onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
+    ## Network data and metrics
     cn.onc <- lapply(onc.split, coNet, ci.p = 95)
-                                        # modularity
     ns.onc <- lapply(lapply(cn.onc, function(x) {
         abs(sign(x))
     }), enaR:::structure.statistics)
@@ -183,77 +72,179 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
             mod.tmp <- computeModules(cn.onc[[i]])
             cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood")
             cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1
-        } else {
+        }
+        else {
             cn.mod.onc[i] <- NA
         }
     }
     cn.mod.onc[is.na(cn.mod.onc)] <- 0
     names(cn.mod.onc) <- c("mod.lik", "mod.n")
-                                        # centrality
     dcen.onc <- unlist(lapply(cn.onc, function(x) {
         sna::centralization(x, FUN = sna::degree, normalize = FALSE)
     }))
-    onc.ns <- cbind(ns.onc, Cen = dcen.onc, mod.lik = cn.mod.onc[, 1],
+    onc.ns <- cbind(ns.onc, 
+                    Cen = dcen.onc, 
+                    mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
     onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
     onc.com <- cbind(onc.com, 
-                     ds = rep(min(onc.com[onc.com != 0])/1000, 
+                     ds = rep(min(onc.com[onc.com != 0]) / 1000, 
                               nrow(onc.com)))
     ptc.onc <- unlist(lapply(onc.q, function(x) {
         sum(apply(x, 1, function(x) sign(sum(x))))
     }))
-    spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 1, 
+    spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 
+                     1, 
                      function(x) sum(sign(x)))
     spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
-    spe.onc <- spd.onc/log(
-                           specnumber(
-                               onc.com[, colnames(onc.com) != "ds"]))
+    spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
     spe.onc[is.na(spe.onc)] <- 0
     tree <- onc.geno
-    for (i in 1:length(unique(onc.geno))) {
-        tree[onc.geno == 
-             unique(onc.geno)[i]] <- 1:length(tree[onc.geno == 
-                                                   unique(onc.geno)[i]])
+    for (i in seq_along(unique(onc.geno))) {
+        tree[onc.geno == unique(onc.geno)[i]] <- seq_along(
+            tree[onc.geno == unique(onc.geno)[i]])
     }
     tree <- factor(tree)
     tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+    ## Chemistry Data: C:N, tannins and pH
+    onc.nc <- onc.nc.in
+    onc.tan <- onc.tan.in
+    onc.ph <- onc.ph.in
     onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
     onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
     colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
     colnames(onc.tan)[1] <- "tree.id"
     colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
-    onc.nc$rCN <- onc.nc$N/onc.nc$C
-    onc.dat <- data.frame(tree.id, 
-                          PC = ptc.onc, SR = spr.onc, SD = spd.onc, SE = spe.onc, 
-                          geno = factor(onc.geno), tree = tree, 
-                          BR = onc.rough, onc.ns[, c("L", "Cen")])
-    onc.dat <- data.frame(onc.dat, 
-                          C = onc.nc[match(onc.dat[, "tree.id"], 
-                                           onc.nc[, "tree.id"]), "C"], 
-                          N = onc.nc[match(onc.dat[, "tree.id"], 
-                                           onc.nc[, "tree.id"]), "N"], 
-                          CN = onc.nc[match(onc.dat[,"tree.id"], 
-                                            onc.nc[, "tree.id"]), "rCN"], 
-                          CT = onc.tan[match(onc.dat[, "tree.id"], 
-                                             onc.tan[, "tree.id"]), "CT"], 
-                          pH = onc.ph[, "pH"])
+    onc.nc$rCN <- onc.nc$N / onc.nc$C
+    onc.ph[, "tree.id"] <- gsub("-", ".", onc.ph[, "tree.id"])
+    onc.ph[, "tree.id"] <- gsub("\\.0", "\\.", onc.ph[, "tree.id"])
+    onc.ph[onc.ph[, "tree.id"] == "N7.16", "tree.id"] <- "N7.10"
+    onc.ph[!is.na(onc.ph[, "pH2"]), "pH"] <- apply(
+        onc.ph[!is.na(onc.ph[, "pH2"]), c("pH", "pH2")], 1, mean)
+    ## Create a data frame for export
+    onc.dat <- data.frame(
+        tree.id, 
+        PC = ptc.onc, 
+        SR = spr.onc, 
+        SD = spd.onc, 
+        SE = spe.onc, 
+        geno = factor(onc.geno), 
+        tree = tree, 
+        BR = onc.rough, 
+        onc.ns[, c("L", "Cen")])
+    onc.ph <- onc.ph[onc.ph[, "tree.id"] %in% onc.dat[, "tree.id"], ]
+    onc.ph <- onc.ph[match(onc.dat[, "tree.id"], onc.ph[, "tree.id"]), ]
+    onc.geno <- unlist(sapply(
+        names(onc.q), function(x) 
+            strsplit(x, split = " ")[[1]][2]))
+    onc.tree <- do.call(rbind, strsplit(names(onc.geno), " "))[, 1]
+    rough <- rough.in[, 1:5]
+    rough <- rough[grepl("North", rough[, 3]), ]
+    avg.rough <- tapply(rough[, 5], rough[, 1], mean)
+    r.tree <- names(avg.rough)
+    r.tree <- sub("-", "\\.", r.tree)
+    r.tree <- sub("\\.0", "\\.", r.tree)
+    names(avg.rough) <- r.tree
+    onc.rough <- avg.rough[match(onc.tree, r.tree)]
+    onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
+    cn.onc <- lapply(onc.split, coNet, ci.p = 95)
+    ns.onc <- lapply(lapply(cn.onc, function(x) {
+        abs(sign(x))
+    }), enaR:::structure.statistics)
+    ns.onc <- do.call(rbind, ns.onc)
+    cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
+    for (i in 1:length(cn.onc)) {
+        if (sum(sign(cn.onc[[i]])) >= 3) {
+            mod.tmp <- computeModules(cn.onc[[i]])
+            cn.mod.onc[i, 1] <- slot(mod.tmp, "likelihood")
+            cn.mod.onc[i, 2] <- nrow(slot(mod.tmp, "modules")) - 1
+        }
+        else {
+            cn.mod.onc[i] <- NA
+        }
+    }
+    cn.mod.onc[is.na(cn.mod.onc)] <- 0
+    names(cn.mod.onc) <- c("mod.lik", "mod.n")
+    dcen.onc <- unlist(lapply(cn.onc, function(x) {
+        sna::centralization(x, FUN = sna::degree, normalize = FALSE)
+    }))
+    onc.ns <- cbind(ns.onc, 
+                    Cen = dcen.onc, 
+                    mod.lik = cn.mod.onc[, 1], 
+                    mod.n = cn.mod.onc[, 2])
+    onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
+    onc.com <- cbind(onc.com, 
+                     ds = rep(min(onc.com[onc.com != 0]) / 1000, 
+                              nrow(onc.com)))
+    ptc.onc <- unlist(lapply(onc.q, function(x) {
+        sum(apply(x, 1, function(x) sign(sum(x))))
+    }))
+    spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 
+                     1, 
+                     function(x) sum(sign(x)))
+    spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+    spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
+    spe.onc[is.na(spe.onc)] <- 0
+    tree <- onc.geno
+    for (i in seq_along(unique(onc.geno))) {
+        tree[onc.geno == unique(onc.geno)[i]] <- seq_along(
+            tree[onc.geno == unique(onc.geno)[i]])
+    }
+    tree <- factor(tree)
+    tree.id <- do.call(rbind, strsplit(names(ptc.onc), split = " "))[, 1]
+    onc.dat <- data.frame(
+        tree.id, 
+        PC = ptc.onc, 
+        SR = spr.onc, 
+        SD = spd.onc, 
+        SE = spe.onc, 
+        geno = factor(onc.geno), 
+        tree = tree, 
+        BR = onc.rough, 
+        onc.ns[, c("L", "Cen", "mod.lik")],
+        C = onc.nc[match(onc.dat[, "tree.id"], 
+                         onc.nc[, "tree.id"]), "C"], 
+        N = onc.nc[match(onc.dat[, "tree.id"], 
+                         onc.nc[, "tree.id"]), "N"], 
+        CN = onc.nc[match(onc.dat[, "tree.id"], 
+                          onc.nc[, "tree.id"]), "rCN"], 
+        CT = onc.tan[match(onc.dat[, "tree.id"], 
+                           onc.tan[, "tree.id"]), "CT"], 
+        pH = onc.ph[, "pH"]
+    )
+    if (rm.na){onc.dat <- na.omit(onc.dat)}
     return(onc.dat)
 }
 
-proc_onc_com <- function(garden.data, onc, onc.q) {
+proc_onc_com <- function(garden.data, onc, onc.q, onc.dat, rm.na = TRUE) {
     g1 <- substr(garden.data[, 1], 2, 2)
     g1[g1 != "P"] <- "onc"
     onc <- garden.data[g1 == "onc", ]
     onc.q <- split(onc, paste(onc[, 1], onc[, 2]))
     onc.q <- lapply(onc.q, function(x) x[, -1:-6])
-    onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
-    onc.com <- cbind(onc.com, 
-                     ds = rep(min(onc.com[onc.com != 0]) / 1000, nrow(onc.com)))
+    onc.com <- do.call(
+        rbind, 
+        lapply(onc.q, 
+               function(x) apply(x, 2, sum))
+    )
+    onc.com <- cbind(
+        onc.com, 
+        ds = rep(
+            min(onc.com[onc.com != 0]) / 1000, nrow(onc.com))
+    )
+    if (rm.na){
+        onc.com <- onc.com[match(
+            rownames(onc.dat), rownames(onc.com)), ]
+    }
     return(onc.com)
 }
 
 
-proc_onc_com_rel <- function(onc.com) {
+proc_onc_com_rel <- function(onc.com, onc.dat, rm.na = TRUE) {
+    if (rm.na){
+        onc.com <- onc.com[match(
+            rownames(onc.dat), rownames(onc.com)), ]
+    }
     if (any(tolower(colnames(onc.com)) == "ds")){
         onc.com <- onc.com[, tolower(colnames(onc.com)) != "ds"]
     }
@@ -272,12 +263,14 @@ proc_cn_onc <- function(onc, ci.p = 95) {
 
 proc_cn_d_onc <- function(cn.onc, onc.dat, rm.na = TRUE){
     if (rm.na){
-        cn.d.onc.na <- distNet(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id], 
-                               method = "euclidean")
+        cn.d.onc <- distNet(
+            cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id], 
+            method = "euclidean"
+        )
     }else{
-        cn.d.onc.na <- distNet(cn.onc, method = "euclidean")
+        cn.d.onc <- distNet(cn.onc, method = "euclidean")
     }
-    return(cn.d.onc.na)
+    return(cn.d.onc)
 }
 
 proc_onc_ns <- function(cn.onc) {
@@ -310,93 +303,166 @@ proc_onc_ns <- function(cn.onc) {
                     Cen = dcen.onc, 
                     mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
-return(onc.ns)
+    return(onc.ns)
 
 }
 
-make_tables <- function(onc.dat, cn.d.onc.na, onc.ns, onc.com.rel){
-    h2.tab <- matrix("", 1, 4)
-    colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
-    ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
-    ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
-    ptc.reml.result <- c("Percent Lichen Cover", H2(ptc.reml, g = onc.dat$geno), R2(ptc.reml), ptc.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, ptc.reml.result)
-    spr.reml <- lme4::lmer(I(SR^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
-    spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
-    spr.reml.result <- c("Lichen Species Richness", H2(spr.reml, g = onc.dat$geno), R2(spr.reml), spr.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, spr.reml.result)
-    prb.reml <- lme4::lmer(I(BR^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+run_reml <- function(onc.dat, rm.na = TRUE){
+    if (rm.na){onc.dat <- na.omit(onc.dat)}
+    ## tree traits
+    prb.reml <- lme4::lmer(I(BR^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
     prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
-    prb.reml.result <- c("Percent Rough Bark", H2(prb.reml, g = onc.dat$geno), R2(prb.reml), prb.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, prb.reml.result)
-    ph.reml <- lme4::lmer(I(pH^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+    prb.reml.result <- c("Percent Rough Bark", 
+                         H2(prb.reml, g = onc.dat$geno), 
+                         R2(prb.reml), prb.reml.pval$p.value)
+    ph.reml <- lme4::lmer(I(pH^(1 / 2)) ~ (1 | geno), 
+                          data = onc.dat, REML = TRUE)
     ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
-    ph.reml.result <- c("pH", H2(ph.reml, g = onc.dat$geno), R2(ph.reml), ph.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, ph.reml.result)
-    ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+    ph.reml.result <- c("pH", H2(ph.reml, g = onc.dat$geno), 
+                        R2(ph.reml), ph.reml.pval$p.value)
+    ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), 
+                          data = onc.dat, REML = TRUE)
     ct.reml.pval <- RLRsim::exactRLRT(ct.reml)
-    ct.reml.result <- c("Condensed Tannins (CT)", H2(ct.reml, g = onc.dat$geno), R2(ct.reml), ct.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, ct.reml.result)
-    cnr.reml <- lme4::lmer(I(CN^(1)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+    ct.reml.result <- c("Condensed Tannins (CT)", 
+                        H2(ct.reml, g = onc.dat$geno), 
+                        R2(ct.reml), ct.reml.pval$p.value)
+    cnr.reml <- lme4::lmer(I(CN^(1)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
     cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
-    cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), cnr.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, cnr.reml.result)
-    rcom.perm <- vegan::adonis2(onc.com.rel^(1 / 1) ~ geno + BR + PC + SR, data = onc.dat, perm = 10000, mrank = TRUE)
-    h2.tab[4, "p-value"] <- unlist(rcom.perm)["Pr(>F)1"]
-    h2.tab[4, "H2"] <- H2(rcom.perm, g = onc.dat$geno)
-    h2.tab[4, "R2"] <- R2(rcom.perm)
-    h2.tab[4, "Response"] <- "Lichen Community Composition"
-    cn.perm <- vegan::adonis2(
-                          cn.d.onc.na ~ geno + 
-                              BR + 
-                              pH + CN + CT + 
-                              PC + SR + SE, by = "term", 
-                          data = na.omit(onc.dat), permutations = 10000)
-    h2.tab[5, "p-value"] <- as.matrix(cn.perm)[1, "Pr(>F)"]
-    h2.tab[5, "H2"] <- H2(cn.perm, g = onc.dat[, "geno"], perm = 10000)
-    h2.tab[5, "R2"] <- R2(cn.perm)
-    h2.tab[5, "Response"] <- "Lichen Network"
-    link.reml <- lme4::lmer(I(log(L + 1e-08)) ~ (1 | geno), data = onc.dat, REML = TRUE)
-    link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
-    link.reml.result <- c("Number of Network Links", H2(link.reml, g = onc.dat$geno), R2(link.reml), link.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, link.reml.result)
-    cen.reml <- lme4::lmer(I(Cen^(1 / 2)) ~ (1 | geno), data = onc.dat, REML = TRUE)
-    cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
-    cen.reml.result <- c("Network Centrality", H2(cen.reml, g = onc.dat$geno), R2(cen.reml), cen.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, cen.reml.result)
-    mod.reml <- lme4::lmer(I(onc.ns[, "mod.lik"]^(1 / 4)) ~ (1 | geno), data = onc.dat, REML = TRUE)
-    mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
-    mod.reml.result <- c("Network Modularity", H2(mod.reml, g = onc.dat$geno), R2(mod.reml), mod.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, mod.reml.result)
-    spd.reml <- lme4::lmer(I(SD^(1 / 2)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+    cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
+                         H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), 
+                         cnr.reml.pval$p.value)
+    ## lichen community metrics
+    ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
+    ptc.reml.result <- c("Percent Lichen Cover", 
+                         H2(ptc.reml, g = onc.dat$geno), 
+                         R2(ptc.reml), ptc.reml.pval$p.value)
+    spr.reml <- lme4::lmer(I(SR^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
+    spr.reml.result <- c("Lichen Species Richness", 
+                         H2(spr.reml, g = onc.dat$geno), 
+                         R2(spr.reml), spr.reml.pval$p.value)
+    spd.reml <- lme4::lmer(I(SD^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
     spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
-    spd.reml.result <- c("Lichen Species Diversity", H2(spd.reml, g = onc.dat$geno), R2(spd.reml), spd.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, spd.reml.result)
-    spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~ (1 | geno), data = na.omit(onc.dat), REML = TRUE)
+    spd.reml.result <- c("Lichen Species Diversity", 
+                         H2(spd.reml, g = onc.dat$geno), 
+                         R2(spd.reml), spd.reml.pval$p.value)
+    spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
     spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
-    spe.reml.result <- c("Lichen Species Evenness", H2(spe.reml, g = onc.dat$geno), R2(spe.reml), spe.reml.pval$p.value)
-    h2.tab <- rbind(h2.tab, spe.reml.result)
-    h2.tab[, "H2"] <- round(as.numeric(h2.tab[, "H2"]), digits = 5)
-    h2.tab[, "R2"] <- round(as.numeric(h2.tab[, "R2"]), digits = 5)
-    h2.tab[, "p-value"] <- round(as.numeric(h2.tab[, "p-value"]), digits = 5)
-    h2.tab <- h2.tab[order(h2.tab[, "H2"], decreasing = TRUE), ]
+    spe.reml.result <- c("Lichen Species Evenness", 
+                         H2(spe.reml, g = onc.dat$geno), 
+                         R2(spe.reml), spe.reml.pval$p.value)
+                                        # Lichen network metrics
+    link.reml <- lme4::lmer(I(log(L + 1e-08)) ~ (1 | geno), 
+                            data = onc.dat, REML = TRUE)
+    link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
+    link.reml.result <- c("Number of Network Links", 
+                          H2(link.reml, g = onc.dat$geno), 
+                          R2(link.reml), link.reml.pval$p.value)
+    cen.reml <- lme4::lmer(I(Cen^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
+    cen.reml.result <- c("Network Centrality", 
+                         H2(cen.reml, g = onc.dat$geno), 
+                         R2(cen.reml), cen.reml.pval$p.value)
+    mod.reml <- lme4::lmer(I(mod.lik^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
+    mod.reml.result <- c("Network Modularity", 
+                         H2(mod.reml, g = onc.dat$geno), 
+                         R2(mod.reml), mod.reml.pval$p.value)
+    out <- rbind(prb.reml.result, 
+                 ph.reml.result,
+                 ct.reml.result,    
+                 cnr.reml.result,
+                 ptc.reml.result,
+                 spr.reml.result,
+                 spe.reml.result,
+                 spd.reml.result,
+                 link.reml.result,
+                 mod.reml.result,
+                 cen.reml.result)
+    return(out)
+}
+
+run_perm <- function(onc.dat, onc.com, cn.d.onc){
+    com.perm <- vegan::adonis2(onc.com ~ geno + 
+                                   BR + pH + CN + CT + 
+                                   PC + SR + SE,
+                               data = onc.dat, 
+                               perm = 10000, mrank = TRUE)
+    cn.perm <- vegan::adonis2(cn.d.onc ~ geno + 
+                                  BR + 
+                                  pH + CN + CT + 
+                                  PC + SR + SE, by = "term", 
+                              data = onc.dat, 
+                              permutations = 10000)
+    out <- list(com = com.perm, 
+                cn = cn.perm)
+    return(out)
+}
+
+
+make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
+    ## Heritability table
+    h2.tab <- reml.results
+    colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
+    ## Add PERMANOVA results
+    com.perm.h2 <- c("Community Composition", 
+                     H2(perm.results[["com"]], g = onc.dat[["geno"]]),
+                     R2(perm.results[["com"]]),
+                     unlist(perm.results[["com"]])["Pr(>F)1"]
+                     )
+    cn.perm.h2 <- c("Lichen Network", 
+                    H2(perm.results[["cn"]], g = onc.dat[, "geno"], perm = 10000),
+                    R2(perm.results[["cn"]]),
+                    unlist(perm.results[["cn"]])["Pr(>F)1"]
+                    )
+    h2.tab <- rbind(h2.tab, 
+                    cn.perm.h2,
+                    com.perm.h2)
+    ## Format Heritability Table
+    h2.tab[, c("H2", "R2", "p-value")] <- apply(
+        h2.tab[, c("H2", "R2", "p-value")], 
+        2, 
+        function(x, digits) round(as.numeric(x), digits = digits), 
+        digits = digits
+    )
     h2.tab <- na.omit(h2.tab)
     ## Create the latex
-    tab.h2 <- xtable::xtable(h2.tab,
+    tab.h2 <- xtable::xtable(
+       h2.tab,
        caption = "Genotypic effects on the associated lichen community.",
        label = "tab:h2_table",
        type = "latex",
        include.rownames = FALSE,
        include.colnames = TRUE
        )
-    tab.cn.perm <- xtable::xtable(cn.perm,
+    tab.cn.perm <- xtable::xtable(
+       perm.results[["cn"]],
        caption = "Pseudo-F Table of lichen network similarity PERMANOVA.",
        label = "tab:cn_perm_table",
-       type = "latex",
-       include.rownames = FALSE,
+       type = "latex", 
+       include.rownames = TRUE,
        include.colnames = TRUE
        )
-    out <- list(h2_reml = tab.h2, cn_perm = tab.cn.perm)
+    tab.com.perm <- xtable::xtable(
+       perm.results[["com"]],
+       caption = "Pseudo-F Table of lichen community similarity PERMANOVA.",
+       label = "tab:com_perm_table",
+       type = "latex", 
+       include.rownames = TRUE,
+       include.colnames = TRUE
+       )
+    out <- list(h2_reml = tab.h2, 
+                cn = tab.cn.perm, 
+                com = tab.com.perm)
     return(out)
 }
 
