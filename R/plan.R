@@ -9,12 +9,16 @@ plan <- drake_plan(
     onc.nc.in = read.csv("./data/lcn/ONC_phytochem_NC.csv"), 
     onc.tan.in = read.csv("./data/lcn/ONC_phytochem_tannin.csv"),
     onc.ph.in = read.csv("./data/lcn/ONC_Bark_lichen_pH_data.csv"),
+    rm.geno = c("RL6", "T6", "1007"),
+    rm.tree = c("N1.31"),
     ## wild.dat.in = read.csv("./data/lcn/lco_Apr2012.csv"),
     ## env.in = read.csv("./data/lcn/Uinta2012_all_data_from_Lamit.csv"), 
     ## age.in = read.csv(
     ##     "./data/lcn/UintaMaster_LichenHeritNL_FallSpring_2012_ForLau.csv"),
     ## Data wrangling
-    garden.data = proc_garden_data(garden.data.in),
+    garden.data = proc_garden_data(garden.data.in, 
+                                   rm.geno,
+                                   rm.tree),
     ## pit = proc_pit(garden.data.in),
     onc = proc_onc(garden.data),
     onc.q = proc_onc_q(onc),
@@ -30,12 +34,16 @@ plan <- drake_plan(
     reml.results = run_reml(onc.dat),
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
     ## Plots
-                                        # fig: cn_onc
-                                        # fig: cn:nms
-                                        # fig: cen by geno
+    ## Fig: Significant genotype variables
+    ## fig: cn_onc
+    ## fig: cn:nms
+    ## fig:cn_chplot
+
     ## Tables
-                                        # table:onc_d_Ftable
-                                        # H2 table all
+    ## tab:h2_table = Heritability table 
+    ## tab:cn_perm_table = network similarity PERMANOVA
+    ## tab:com_perm_table = community similarity PERMANOVA
+    ## H2 table all
     tables = make_tables(onc.dat, reml.results, perm.results, digits = 3),
     ## Update lichen manuscript tables and figures
     print(xtable(tables[["h2_reml"]], type = "latex"), 

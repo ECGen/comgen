@@ -3,13 +3,12 @@
 # Loading data
 # separate onc
 
-proc_garden_data <- function(garden.data) {
+proc_garden_data <- function(garden.data, rm.geno, rm.tree) {
                                         # rm genotype RL6 and N1.31
-    garden.data <- garden.data[garden.data$Geno != "RL6", ]
-    garden.data <- garden.data[garden.data$Tree != "N1.31", ]
+    garden.data <- garden.data[!(garden.data$Geno %in% rm.geno), ]
+    garden.data <- garden.data[!(garden.data$Geno %in% rm.tree), ]
     garden.data[, 1] <- as.character(garden.data[, 1])
     return(garden.data)
-
 }
 
 proc_pit <- function(garden.data) {
