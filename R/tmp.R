@@ -1,3 +1,6 @@
+library(enaR)
+library(sna)
+
     onc.geno <- unlist(
         sapply(names(onc.q), 
                function(x) strsplit(x, split = " ")[[1]][2])

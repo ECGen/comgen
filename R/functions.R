@@ -306,7 +306,18 @@ proc_onc_ns <- function(cn.onc) {
 
 }
 
-run_reml <- function(onc.dat, rm.na = TRUE){
+check_reml <- function(reml.results){
+    reml.resids <- lapply(reml.results, residuals)
+    reml.shapiros <- lapply(reml.resids, shapiro.test)
+    reml.forms <- lapply(reml.results, formula)
+    reml.forms <- lapply(reml.forms, as.character)
+    reml.forms <- lapply(reml.forms, paste0, collapse = "")
+    out <- cbind(formula = unlist(reml.forms), 
+                 do.call(rbind, reml.shapiros))
+    return(out)
+}
+
+run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     if (rm.na){onc.dat <- na.omit(onc.dat)}
     ## tree traits
     prb.reml <- lme4::lmer(I(BR^(1 / 2)) ~ (1 | geno), 
@@ -376,17 +387,32 @@ run_reml <- function(onc.dat, rm.na = TRUE){
     mod.reml.result <- c("Network Modularity", 
                          H2(mod.reml, g = onc.dat$geno), 
                          R2(mod.reml), mod.reml.pval$p.value)
-    out <- rbind(prb.reml.result, 
-                 ph.reml.result,
-                 ct.reml.result,    
-                 cnr.reml.result,
-                 ptc.reml.result,
-                 spr.reml.result,
-                 spe.reml.result,
-                 spd.reml.result,
-                 link.reml.result,
-                 mod.reml.result,
-                 cen.reml.result)
+    if (raw.reml){
+        out <- list(prb.reml, 
+                     ph.reml,
+                     ct.reml,    
+                     cnr.reml,
+                     ptc.reml,
+                     spr.reml,
+                     spe.reml,
+                     spd.reml,
+                     link.reml,
+                     mod.reml,
+                     cen.reml)
+    }else{
+        out <- rbind(prb.reml.result, 
+                     ph.reml.result,
+                     ct.reml.result,    
+                     cnr.reml.result,
+                     ptc.reml.result,
+                     spr.reml.result,
+                     spe.reml.result,
+                     spd.reml.result,
+                     link.reml.result,
+                     mod.reml.result,
+                     cen.reml.result)
+
+    }
     return(out)
 }
 
