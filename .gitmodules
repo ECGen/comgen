@@ -4,3 +4,6 @@
 [submodule "docs/lcn_paper"]
 	path = docs/lcn_paper
 	url = git@github.com:ecofw/lcn_manuscript.git
+[submodule "docs/lcn_manuscript"]
+	path = docs/lcn_manuscript
+	url = https://github.com/ecofw/lcn_manuscript.git
