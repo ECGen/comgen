@@ -1,15 +1,20 @@
 hash,type,name
 5213ff44291b70d4,target,age.in
-ab1203df6233f366,import,check_reml
+0be49940e24a81ca,import,check_fligner
+a6e95da344eb0636,import,check_reml
+a6e95da344eb0636,import,check_shapiro
+662775d5fba12123,target,check.fligner
+cc9e4d88a7cbcbb5,target,check.shapiro
 b441a2a0e4262e3f,target,cn.d.onc
 973ca013e8f3db5d,target,cn.d.onc.na
 256ef3063db507fe,target,cn.onc
 0d2f42bf3d961251,import,cnr.reml.result
 5ef79acb6bc3243d,import,ct.reml.result
-a8c19165cc7e08f2,target,drake_target_1
-275c4c43f276c533,target,drake_target_2
-c2bb5b52442fda26,target,drake_target_3
+67960ba7df745abf,target,drake_target_1
+cba984bd79d5eb48,target,drake_target_2
+78fe53bcdbe5e654,target,drake_target_3
 81295f4a0090a083,target,env.in
+7e1f6d71f2352edd,import,formula
 a6371d582b0eb6ac,target,garden.data
 7e9ad9c47b76167a,target,garden.data.in
 6b308197ef786493,import,h2.tab
@@ -32,9 +37,9 @@ a78c8ed33a1efbc4,import,onc.ph
 39c9412b236bd0b9,target,onc.ph.in
 2e7ab4deead9c884,target,onc.q
 effd6a46c1ba949c,target,onc.tan.in
-aa108c8da42a95dc,import,file R/report_lcn.Rmd
+b5aba70d4297d02a,import,file R/report_lcn.Rmd
 3ea8d2dc9b9879ac,import,file report_lcn.Rmd
-bb1cdc6db8112aff,target,file results/
+a3912d4045769f53,target,file results/
 7412233d722279b8,target,perm.results
 b5437b1d508959f5,import,ph.reml.result
 096470d6b48ec01a,target,pit
@@ -52,20 +57,21 @@ b9593f8a38e32d4b,import,proc_onc_ph
 bfc30d090e10a084,import,proc_pit
 4d79e25e80ab433f,import,ptc.reml.result
 aa99ab0316928744,import,rcom.perm
-705fbd416da05f4c,target,reml.check
-5ae263e112939e01,target,reml.results
+26a6011008709127,target,reml.check
+d17c3d0225b0d159,target,reml.reml
+9122c31894a531c4,target,reml.results
 e6466d584be15f4c,import,report
-3a7ac450777dd5ee,target,report.html
-e6466d584be15f4c,target,report.md
-117d8664df6b81c5,target,report.pdf
+f745e37491c03aaa,target,report.html
+efc93f84083846a4,target,report.md
+39df8361107010ba,target,report.pdf
 56f76908224d36c3,target,rm.geno
 df90c1d087dbbc39,target,rm.tree
 ad49b16c1e21ecaa,target,rough.in
 1d226363f3822828,import,run_perm
-529b31ee72f0c1c4,import,run_reml
+901949935f964921,import,run_reml
 4775d0b5f0db933f,import,spr.reml.result
 ed03dde97a75dc82,import,table_h2
-7a87af38b6149b08,target,tables
+2b1dbbbd423bc9e7,target,tables
 b1bb6e119d13ae1b,import,tabs
 5c6ccedc7b6953ad,target,wild.dat.in
 2e3f85a02ff02fd7,target,xgal.size.in

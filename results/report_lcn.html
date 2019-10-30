@@ -381,6 +381,8 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 <h1>Results</h1>
 <div id="tables" class="section level2">
 <h2>Tables</h2>
+<div id="heritability-values" class="section level3">
+<h3>Heritability Values</h3>
 <table>
 <thead>
 <tr class="header">
@@ -395,96 +397,99 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 <tr class="odd">
 <td>prb.reml.result</td>
 <td align="left">Percent Rough Bark</td>
-<td align="left">0.396</td>
-<td align="left">0.396</td>
-<td align="left">0.001</td>
+<td align="left">0.385</td>
+<td align="left">0.385</td>
+<td align="left">0</td>
 </tr>
 <tr class="even">
 <td>ph.reml.result</td>
 <td align="left">pH</td>
-<td align="left">0.14</td>
-<td align="left">0.14</td>
-<td align="left">0.21</td>
+<td align="left">0.054</td>
+<td align="left">0.054</td>
+<td align="left">0.294</td>
 </tr>
 <tr class="odd">
 <td>ct.reml.result</td>
 <td align="left">Condensed Tannins (CT)</td>
-<td align="left">0.256</td>
-<td align="left">0.256</td>
-<td align="left">0.021</td>
+<td align="left">0.28</td>
+<td align="left">0.28</td>
+<td align="left">0.014</td>
 </tr>
 <tr class="even">
 <td>cnr.reml.result</td>
 <td align="left">Carbon-Nitrogen (CN) Ratio</td>
 <td align="left">0</td>
 <td align="left">0</td>
-<td align="left">0.459</td>
+<td align="left">0.448</td>
 </tr>
 <tr class="odd">
 <td>ptc.reml.result</td>
 <td align="left">Percent Lichen Cover</td>
-<td align="left">0.137</td>
-<td align="left">0.137</td>
-<td align="left">0.085</td>
+<td align="left">0.079</td>
+<td align="left">0.079</td>
+<td align="left">0.172</td>
 </tr>
 <tr class="even">
 <td>spr.reml.result</td>
 <td align="left">Lichen Species Richness</td>
-<td align="left">0.028</td>
-<td align="left">0.028</td>
-<td align="left">0.348</td>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">1</td>
 </tr>
 <tr class="odd">
 <td>spe.reml.result</td>
 <td align="left">Lichen Species Evenness</td>
-<td align="left">0.057</td>
-<td align="left">0.057</td>
-<td align="left">0.24</td>
+<td align="left">0.015</td>
+<td align="left">0.015</td>
+<td align="left">0.388</td>
 </tr>
 <tr class="even">
 <td>spd.reml.result</td>
 <td align="left">Lichen Species Diversity</td>
-<td align="left">0.029</td>
-<td align="left">0.029</td>
-<td align="left">0.358</td>
+<td align="left">0.01</td>
+<td align="left">0.01</td>
+<td align="left">0.417</td>
 </tr>
 <tr class="odd">
 <td>link.reml.result</td>
 <td align="left">Number of Network Links</td>
-<td align="left">0.124</td>
-<td align="left">0.124</td>
-<td align="left">0.124</td>
+<td align="left">0.07</td>
+<td align="left">0.07</td>
+<td align="left">0.238</td>
 </tr>
 <tr class="even">
 <td>mod.reml.result</td>
 <td align="left">Network Modularity</td>
-<td align="left">0.005</td>
-<td align="left">0.005</td>
-<td align="left">0.444</td>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">1</td>
 </tr>
 <tr class="odd">
 <td>cen.reml.result</td>
 <td align="left">Network Centrality</td>
-<td align="left">0.128</td>
-<td align="left">0.128</td>
-<td align="left">0.116</td>
+<td align="left">0.085</td>
+<td align="left">0.085</td>
+<td align="left">0.199</td>
 </tr>
 <tr class="even">
-<td>com.perm.h2</td>
-<td align="left">Community Composition</td>
-<td align="left">0.161</td>
-<td align="left">0.236</td>
-<td align="left">0.011</td>
-</tr>
-<tr class="odd">
 <td>cn.perm.h2</td>
 <td align="left">Lichen Network</td>
-<td align="left">0.069</td>
-<td align="left">0.269</td>
-<td align="left">0.03</td>
+<td align="left">0.16</td>
+<td align="left">0.233</td>
+<td align="left">0.025</td>
+</tr>
+<tr class="odd">
+<td>com.perm.h2</td>
+<td align="left">Community Composition</td>
+<td align="left">0.052</td>
+<td align="left">0.173</td>
+<td align="left">0.102</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="predictors-of-lichen-network-similarity" class="section level3">
+<h3>Predictors of Lichen Network Similarity</h3>
 <table>
 <thead>
 <tr class="header">
@@ -579,6 +584,9 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 </tr>
 </tbody>
 </table>
+</div>
+<div id="predictors-of-lichen-community-similarity" class="section level3">
+<h3>Predictors of Lichen Community Similarity</h3>
 <table>
 <thead>
 <tr class="header">
@@ -673,6 +681,3034 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div id="statistical-assumption-checks" class="section level2">
+<h2>Statistical Assumption Checks</h2>
+<div id="shapiro-wilks-tests-for-normality-of-residuals" class="section level3">
+<h3>Shapiro-Wilks Tests for Normality of Residuals</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">formula</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="left">method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">~I(BR^(1/4))(1 | geno)</td>
+<td align="right">0.98621</td>
+<td align="right">0.81358</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td align="left">~I(pH^(1/4))(1 | geno)</td>
+<td align="right">0.91192</td>
+<td align="right">0.00108</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td align="left">~I(CT^(1/4))(1 | geno)</td>
+<td align="right">0.74548</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td align="left">~I(CN^(1/4))(1 | geno)</td>
+<td align="right">0.95939</td>
+<td align="right">0.07855</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td align="left">~I(PC^(1/4))(1 | geno)</td>
+<td align="right">0.78751</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td align="left">~I(SR^(1/4))(1 | geno)</td>
+<td align="right">0.71653</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td align="left">~I(SE^(1/4))(1 | geno)</td>
+<td align="right">0.65134</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td align="left">~I(SD^(1/4))(1 | geno)</td>
+<td align="right">0.73027</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td align="left">~I(L^(1/4))(1 | geno)</td>
+<td align="right">0.82941</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="even">
+<td align="left">~I(mod.lik^(1/4))(1 | geno)</td>
+<td align="right">0.42655</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+<tr class="odd">
+<td align="left">~I(Cen^(1/4))(1 | geno)</td>
+<td align="right">0.80978</td>
+<td align="right">0.00000</td>
+<td align="left">Shapiro-Wilk normality test</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fligner-tests-for-homogeneity-of-variance" class="section level3">
+<h3>Fligner Tests for Homogeneity of Variance</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">transformation</th>
+<th align="left">X1</th>
+<th align="left">X2</th>
+<th align="right">value.statistic</th>
+<th align="left">value.parameter</th>
+<th align="right">value.p.value</th>
+<th align="left">value.method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">PC</td>
+<td align="left">statistic</td>
+<td align="right">6.60001</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.76259</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SR</td>
+<td align="left">statistic</td>
+<td align="right">6.13714</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.80361</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SD</td>
+<td align="left">statistic</td>
+<td align="right">8.33549</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59610</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SE</td>
+<td align="left">statistic</td>
+<td align="right">6.35292</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.78479</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">BR</td>
+<td align="left">statistic</td>
+<td align="right">8.82097</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54917</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">L</td>
+<td align="left">statistic</td>
+<td align="right">12.22552</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.27025</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">Cen</td>
+<td align="left">statistic</td>
+<td align="right">11.86070</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.29449</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">mod.lik</td>
+<td align="left">statistic</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">C</td>
+<td align="left">statistic</td>
+<td align="right">7.55860</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67186</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">N</td>
+<td align="left">statistic</td>
+<td align="right">8.37451</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59231</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">CN</td>
+<td align="left">statistic</td>
+<td align="right">6.47349</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.77404</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">CT</td>
+<td align="left">statistic</td>
+<td align="right">8.65884</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56476</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">pH</td>
+<td align="left">statistic</td>
+<td align="right">10.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38987</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">PC</td>
+<td align="left">parameter</td>
+<td align="right">6.60001</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.76259</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SR</td>
+<td align="left">parameter</td>
+<td align="right">6.13714</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.80361</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SD</td>
+<td align="left">parameter</td>
+<td align="right">8.33549</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59610</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SE</td>
+<td align="left">parameter</td>
+<td align="right">6.35292</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.78479</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">BR</td>
+<td align="left">parameter</td>
+<td align="right">8.82097</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54917</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">L</td>
+<td align="left">parameter</td>
+<td align="right">12.22552</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.27025</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">Cen</td>
+<td align="left">parameter</td>
+<td align="right">11.86070</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.29449</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">mod.lik</td>
+<td align="left">parameter</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">C</td>
+<td align="left">parameter</td>
+<td align="right">7.55860</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67186</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">N</td>
+<td align="left">parameter</td>
+<td align="right">8.37451</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59231</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">CN</td>
+<td align="left">parameter</td>
+<td align="right">6.47349</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.77404</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">CT</td>
+<td align="left">parameter</td>
+<td align="right">8.65884</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56476</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">pH</td>
+<td align="left">parameter</td>
+<td align="right">10.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38987</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">PC</td>
+<td align="left">p.value</td>
+<td align="right">6.60001</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.76259</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SR</td>
+<td align="left">p.value</td>
+<td align="right">6.13714</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.80361</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SD</td>
+<td align="left">p.value</td>
+<td align="right">8.33549</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59610</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SE</td>
+<td align="left">p.value</td>
+<td align="right">6.35292</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.78479</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">BR</td>
+<td align="left">p.value</td>
+<td align="right">8.82097</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54917</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">L</td>
+<td align="left">p.value</td>
+<td align="right">12.22552</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.27025</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">Cen</td>
+<td align="left">p.value</td>
+<td align="right">11.86070</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.29449</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">mod.lik</td>
+<td align="left">p.value</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">C</td>
+<td align="left">p.value</td>
+<td align="right">7.55860</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67186</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">N</td>
+<td align="left">p.value</td>
+<td align="right">8.37451</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59231</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">CN</td>
+<td align="left">p.value</td>
+<td align="right">6.47349</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.77404</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">CT</td>
+<td align="left">p.value</td>
+<td align="right">8.65884</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56476</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">pH</td>
+<td align="left">p.value</td>
+<td align="right">10.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38987</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">PC</td>
+<td align="left">method</td>
+<td align="right">6.60001</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.76259</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SR</td>
+<td align="left">method</td>
+<td align="right">6.13714</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.80361</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SD</td>
+<td align="left">method</td>
+<td align="right">8.33549</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59610</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SE</td>
+<td align="left">method</td>
+<td align="right">6.35292</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.78479</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">BR</td>
+<td align="left">method</td>
+<td align="right">8.82097</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54917</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">L</td>
+<td align="left">method</td>
+<td align="right">12.22552</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.27025</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">Cen</td>
+<td align="left">method</td>
+<td align="right">11.86070</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.29449</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">mod.lik</td>
+<td align="left">method</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">C</td>
+<td align="left">method</td>
+<td align="right">7.55860</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67186</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">N</td>
+<td align="left">method</td>
+<td align="right">8.37451</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59231</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">CN</td>
+<td align="left">method</td>
+<td align="right">6.47349</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.77404</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">CT</td>
+<td align="left">method</td>
+<td align="right">8.65884</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56476</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">pH</td>
+<td align="left">method</td>
+<td align="right">10.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38987</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">PC</td>
+<td align="left">data.name</td>
+<td align="right">6.60001</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.76259</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SR</td>
+<td align="left">data.name</td>
+<td align="right">6.13714</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.80361</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">SD</td>
+<td align="left">data.name</td>
+<td align="right">8.33549</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59610</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">SE</td>
+<td align="left">data.name</td>
+<td align="right">6.35292</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.78479</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">BR</td>
+<td align="left">data.name</td>
+<td align="right">8.82097</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54917</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">L</td>
+<td align="left">data.name</td>
+<td align="right">12.22552</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.27025</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">Cen</td>
+<td align="left">data.name</td>
+<td align="right">11.86070</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.29449</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">mod.lik</td>
+<td align="left">data.name</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">C</td>
+<td align="left">data.name</td>
+<td align="right">7.55860</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67186</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">N</td>
+<td align="left">data.name</td>
+<td align="right">8.37451</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59231</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">CN</td>
+<td align="left">data.name</td>
+<td align="right">6.47349</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.77404</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y</td>
+<td align="left">CT</td>
+<td align="left">data.name</td>
+<td align="right">8.65884</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56476</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y</td>
+<td align="left">pH</td>
+<td align="left">data.name</td>
+<td align="right">10.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38987</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">PC</td>
+<td align="left">statistic</td>
+<td align="right">4.18740</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.93850</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SR</td>
+<td align="left">statistic</td>
+<td align="right">3.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.96375</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SD</td>
+<td align="left">statistic</td>
+<td align="right">8.69799</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56099</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SE</td>
+<td align="left">statistic</td>
+<td align="right">10.07641</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43382</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">BR</td>
+<td align="left">statistic</td>
+<td align="right">15.38571</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.11862</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">L</td>
+<td align="left">statistic</td>
+<td align="right">14.43681</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.15398</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">Cen</td>
+<td align="left">statistic</td>
+<td align="right">17.89448</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.05677</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">mod.lik</td>
+<td align="left">statistic</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">C</td>
+<td align="left">statistic</td>
+<td align="right">7.82940</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64550</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">N</td>
+<td align="left">statistic</td>
+<td align="right">9.85431</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45337</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">CN</td>
+<td align="left">statistic</td>
+<td align="right">7.89526</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.63907</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">CT</td>
+<td align="left">statistic</td>
+<td align="right">13.60700</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.19168</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">pH</td>
+<td align="left">statistic</td>
+<td align="right">11.67367</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.30749</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">PC</td>
+<td align="left">parameter</td>
+<td align="right">4.18740</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.93850</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SR</td>
+<td align="left">parameter</td>
+<td align="right">3.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.96375</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SD</td>
+<td align="left">parameter</td>
+<td align="right">8.69799</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56099</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SE</td>
+<td align="left">parameter</td>
+<td align="right">10.07641</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43382</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">BR</td>
+<td align="left">parameter</td>
+<td align="right">15.38571</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.11862</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">L</td>
+<td align="left">parameter</td>
+<td align="right">14.43681</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.15398</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">Cen</td>
+<td align="left">parameter</td>
+<td align="right">17.89448</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.05677</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">mod.lik</td>
+<td align="left">parameter</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">C</td>
+<td align="left">parameter</td>
+<td align="right">7.82940</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64550</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">N</td>
+<td align="left">parameter</td>
+<td align="right">9.85431</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45337</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">CN</td>
+<td align="left">parameter</td>
+<td align="right">7.89526</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.63907</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">CT</td>
+<td align="left">parameter</td>
+<td align="right">13.60700</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.19168</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">pH</td>
+<td align="left">parameter</td>
+<td align="right">11.67367</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.30749</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">PC</td>
+<td align="left">p.value</td>
+<td align="right">4.18740</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.93850</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SR</td>
+<td align="left">p.value</td>
+<td align="right">3.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.96375</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SD</td>
+<td align="left">p.value</td>
+<td align="right">8.69799</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56099</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SE</td>
+<td align="left">p.value</td>
+<td align="right">10.07641</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43382</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">BR</td>
+<td align="left">p.value</td>
+<td align="right">15.38571</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.11862</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">L</td>
+<td align="left">p.value</td>
+<td align="right">14.43681</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.15398</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">Cen</td>
+<td align="left">p.value</td>
+<td align="right">17.89448</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.05677</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">mod.lik</td>
+<td align="left">p.value</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">C</td>
+<td align="left">p.value</td>
+<td align="right">7.82940</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64550</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">N</td>
+<td align="left">p.value</td>
+<td align="right">9.85431</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45337</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">CN</td>
+<td align="left">p.value</td>
+<td align="right">7.89526</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.63907</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">CT</td>
+<td align="left">p.value</td>
+<td align="right">13.60700</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.19168</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">pH</td>
+<td align="left">p.value</td>
+<td align="right">11.67367</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.30749</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">PC</td>
+<td align="left">method</td>
+<td align="right">4.18740</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.93850</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SR</td>
+<td align="left">method</td>
+<td align="right">3.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.96375</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SD</td>
+<td align="left">method</td>
+<td align="right">8.69799</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56099</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SE</td>
+<td align="left">method</td>
+<td align="right">10.07641</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43382</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">BR</td>
+<td align="left">method</td>
+<td align="right">15.38571</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.11862</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">L</td>
+<td align="left">method</td>
+<td align="right">14.43681</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.15398</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">Cen</td>
+<td align="left">method</td>
+<td align="right">17.89448</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.05677</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">mod.lik</td>
+<td align="left">method</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">C</td>
+<td align="left">method</td>
+<td align="right">7.82940</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64550</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">N</td>
+<td align="left">method</td>
+<td align="right">9.85431</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45337</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">CN</td>
+<td align="left">method</td>
+<td align="right">7.89526</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.63907</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">CT</td>
+<td align="left">method</td>
+<td align="right">13.60700</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.19168</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">pH</td>
+<td align="left">method</td>
+<td align="right">11.67367</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.30749</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">PC</td>
+<td align="left">data.name</td>
+<td align="right">4.18740</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.93850</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SR</td>
+<td align="left">data.name</td>
+<td align="right">3.59576</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.96375</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">SD</td>
+<td align="left">data.name</td>
+<td align="right">8.69799</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56099</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">SE</td>
+<td align="left">data.name</td>
+<td align="right">10.07641</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43382</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">BR</td>
+<td align="left">data.name</td>
+<td align="right">15.38571</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.11862</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">L</td>
+<td align="left">data.name</td>
+<td align="right">14.43681</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.15398</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">Cen</td>
+<td align="left">data.name</td>
+<td align="right">17.89448</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.05677</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">mod.lik</td>
+<td align="left">data.name</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">C</td>
+<td align="left">data.name</td>
+<td align="right">7.82940</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64550</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">N</td>
+<td align="left">data.name</td>
+<td align="right">9.85431</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45337</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">CN</td>
+<td align="left">data.name</td>
+<td align="right">7.89526</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.63907</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">y2</td>
+<td align="left">CT</td>
+<td align="left">data.name</td>
+<td align="right">13.60700</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.19168</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">y2</td>
+<td align="left">pH</td>
+<td align="left">data.name</td>
+<td align="right">11.67367</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.30749</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">PC</td>
+<td align="left">statistic</td>
+<td align="right">9.55162</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.48067</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SR</td>
+<td align="left">statistic</td>
+<td align="right">8.83365</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54796</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SD</td>
+<td align="left">statistic</td>
+<td align="right">10.66680</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38406</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SE</td>
+<td align="left">statistic</td>
+<td align="right">5.65092</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.84369</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">BR</td>
+<td align="left">statistic</td>
+<td align="right">5.70093</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83973</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">L</td>
+<td align="left">statistic</td>
+<td align="right">8.68311</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56242</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">Cen</td>
+<td align="left">statistic</td>
+<td align="right">8.81387</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54985</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">mod.lik</td>
+<td align="left">statistic</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">C</td>
+<td align="left">statistic</td>
+<td align="right">7.53952</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67372</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">N</td>
+<td align="left">statistic</td>
+<td align="right">8.09015</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62003</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">CN</td>
+<td align="left">statistic</td>
+<td align="right">5.79771</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83196</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">CT</td>
+<td align="left">statistic</td>
+<td align="right">8.03537</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62538</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">pH</td>
+<td align="left">statistic</td>
+<td align="right">10.25274</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41861</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">PC</td>
+<td align="left">parameter</td>
+<td align="right">9.55162</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.48067</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SR</td>
+<td align="left">parameter</td>
+<td align="right">8.83365</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54796</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SD</td>
+<td align="left">parameter</td>
+<td align="right">10.66680</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38406</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SE</td>
+<td align="left">parameter</td>
+<td align="right">5.65092</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.84369</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">BR</td>
+<td align="left">parameter</td>
+<td align="right">5.70093</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83973</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">L</td>
+<td align="left">parameter</td>
+<td align="right">8.68311</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56242</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">Cen</td>
+<td align="left">parameter</td>
+<td align="right">8.81387</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54985</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">mod.lik</td>
+<td align="left">parameter</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">C</td>
+<td align="left">parameter</td>
+<td align="right">7.53952</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67372</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">N</td>
+<td align="left">parameter</td>
+<td align="right">8.09015</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62003</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">CN</td>
+<td align="left">parameter</td>
+<td align="right">5.79771</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83196</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">CT</td>
+<td align="left">parameter</td>
+<td align="right">8.03537</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62538</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">pH</td>
+<td align="left">parameter</td>
+<td align="right">10.25274</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41861</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">PC</td>
+<td align="left">p.value</td>
+<td align="right">9.55162</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.48067</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SR</td>
+<td align="left">p.value</td>
+<td align="right">8.83365</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54796</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SD</td>
+<td align="left">p.value</td>
+<td align="right">10.66680</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38406</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SE</td>
+<td align="left">p.value</td>
+<td align="right">5.65092</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.84369</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">BR</td>
+<td align="left">p.value</td>
+<td align="right">5.70093</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83973</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">L</td>
+<td align="left">p.value</td>
+<td align="right">8.68311</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56242</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">Cen</td>
+<td align="left">p.value</td>
+<td align="right">8.81387</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54985</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">mod.lik</td>
+<td align="left">p.value</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">C</td>
+<td align="left">p.value</td>
+<td align="right">7.53952</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67372</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">N</td>
+<td align="left">p.value</td>
+<td align="right">8.09015</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62003</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">CN</td>
+<td align="left">p.value</td>
+<td align="right">5.79771</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83196</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">CT</td>
+<td align="left">p.value</td>
+<td align="right">8.03537</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62538</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">pH</td>
+<td align="left">p.value</td>
+<td align="right">10.25274</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41861</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">PC</td>
+<td align="left">method</td>
+<td align="right">9.55162</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.48067</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SR</td>
+<td align="left">method</td>
+<td align="right">8.83365</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54796</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SD</td>
+<td align="left">method</td>
+<td align="right">10.66680</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38406</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SE</td>
+<td align="left">method</td>
+<td align="right">5.65092</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.84369</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">BR</td>
+<td align="left">method</td>
+<td align="right">5.70093</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83973</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">L</td>
+<td align="left">method</td>
+<td align="right">8.68311</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56242</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">Cen</td>
+<td align="left">method</td>
+<td align="right">8.81387</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54985</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">mod.lik</td>
+<td align="left">method</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">C</td>
+<td align="left">method</td>
+<td align="right">7.53952</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67372</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">N</td>
+<td align="left">method</td>
+<td align="right">8.09015</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62003</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">CN</td>
+<td align="left">method</td>
+<td align="right">5.79771</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83196</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">CT</td>
+<td align="left">method</td>
+<td align="right">8.03537</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62538</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">pH</td>
+<td align="left">method</td>
+<td align="right">10.25274</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41861</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">PC</td>
+<td align="left">data.name</td>
+<td align="right">9.55162</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.48067</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SR</td>
+<td align="left">data.name</td>
+<td align="right">8.83365</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54796</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">SD</td>
+<td align="left">data.name</td>
+<td align="right">10.66680</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.38406</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">SE</td>
+<td align="left">data.name</td>
+<td align="right">5.65092</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.84369</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">BR</td>
+<td align="left">data.name</td>
+<td align="right">5.70093</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83973</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">L</td>
+<td align="left">data.name</td>
+<td align="right">8.68311</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.56242</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">Cen</td>
+<td align="left">data.name</td>
+<td align="right">8.81387</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54985</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">mod.lik</td>
+<td align="left">data.name</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">C</td>
+<td align="left">data.name</td>
+<td align="right">7.53952</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67372</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">N</td>
+<td align="left">data.name</td>
+<td align="right">8.09015</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62003</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">CN</td>
+<td align="left">data.name</td>
+<td align="right">5.79771</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.83196</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r2y</td>
+<td align="left">CT</td>
+<td align="left">data.name</td>
+<td align="right">8.03537</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.62538</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r2y</td>
+<td align="left">pH</td>
+<td align="left">data.name</td>
+<td align="right">10.25274</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41861</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">PC</td>
+<td align="left">statistic</td>
+<td align="right">11.50535</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.31952</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SR</td>
+<td align="left">statistic</td>
+<td align="right">9.59483</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.47673</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SD</td>
+<td align="left">statistic</td>
+<td align="right">10.01958</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43878</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SE</td>
+<td align="left">statistic</td>
+<td align="right">5.08250</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.88560</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">BR</td>
+<td align="left">statistic</td>
+<td align="right">5.47242</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85747</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">L</td>
+<td align="left">statistic</td>
+<td align="right">8.81243</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54999</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">Cen</td>
+<td align="left">statistic</td>
+<td align="right">9.27900</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.50585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">mod.lik</td>
+<td align="left">statistic</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">C</td>
+<td align="left">statistic</td>
+<td align="right">7.53934</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">N</td>
+<td align="left">statistic</td>
+<td align="right">7.85372</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64312</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">CN</td>
+<td align="left">statistic</td>
+<td align="right">5.50477</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">CT</td>
+<td align="left">statistic</td>
+<td align="right">7.00275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.72519</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">pH</td>
+<td align="left">statistic</td>
+<td align="right">10.17797</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.42502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">PC</td>
+<td align="left">parameter</td>
+<td align="right">11.50535</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.31952</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SR</td>
+<td align="left">parameter</td>
+<td align="right">9.59483</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.47673</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SD</td>
+<td align="left">parameter</td>
+<td align="right">10.01958</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43878</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SE</td>
+<td align="left">parameter</td>
+<td align="right">5.08250</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.88560</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">BR</td>
+<td align="left">parameter</td>
+<td align="right">5.47242</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85747</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">L</td>
+<td align="left">parameter</td>
+<td align="right">8.81243</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54999</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">Cen</td>
+<td align="left">parameter</td>
+<td align="right">9.27900</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.50585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">mod.lik</td>
+<td align="left">parameter</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">C</td>
+<td align="left">parameter</td>
+<td align="right">7.53934</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">N</td>
+<td align="left">parameter</td>
+<td align="right">7.85372</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64312</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">CN</td>
+<td align="left">parameter</td>
+<td align="right">5.50477</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">CT</td>
+<td align="left">parameter</td>
+<td align="right">7.00275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.72519</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">pH</td>
+<td align="left">parameter</td>
+<td align="right">10.17797</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.42502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">PC</td>
+<td align="left">p.value</td>
+<td align="right">11.50535</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.31952</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SR</td>
+<td align="left">p.value</td>
+<td align="right">9.59483</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.47673</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SD</td>
+<td align="left">p.value</td>
+<td align="right">10.01958</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43878</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SE</td>
+<td align="left">p.value</td>
+<td align="right">5.08250</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.88560</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">BR</td>
+<td align="left">p.value</td>
+<td align="right">5.47242</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85747</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">L</td>
+<td align="left">p.value</td>
+<td align="right">8.81243</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54999</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">Cen</td>
+<td align="left">p.value</td>
+<td align="right">9.27900</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.50585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">mod.lik</td>
+<td align="left">p.value</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">C</td>
+<td align="left">p.value</td>
+<td align="right">7.53934</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">N</td>
+<td align="left">p.value</td>
+<td align="right">7.85372</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64312</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">CN</td>
+<td align="left">p.value</td>
+<td align="right">5.50477</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">CT</td>
+<td align="left">p.value</td>
+<td align="right">7.00275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.72519</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">pH</td>
+<td align="left">p.value</td>
+<td align="right">10.17797</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.42502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">PC</td>
+<td align="left">method</td>
+<td align="right">11.50535</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.31952</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SR</td>
+<td align="left">method</td>
+<td align="right">9.59483</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.47673</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SD</td>
+<td align="left">method</td>
+<td align="right">10.01958</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43878</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SE</td>
+<td align="left">method</td>
+<td align="right">5.08250</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.88560</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">BR</td>
+<td align="left">method</td>
+<td align="right">5.47242</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85747</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">L</td>
+<td align="left">method</td>
+<td align="right">8.81243</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54999</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">Cen</td>
+<td align="left">method</td>
+<td align="right">9.27900</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.50585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">mod.lik</td>
+<td align="left">method</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">C</td>
+<td align="left">method</td>
+<td align="right">7.53934</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">N</td>
+<td align="left">method</td>
+<td align="right">7.85372</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64312</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">CN</td>
+<td align="left">method</td>
+<td align="right">5.50477</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">CT</td>
+<td align="left">method</td>
+<td align="right">7.00275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.72519</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">pH</td>
+<td align="left">method</td>
+<td align="right">10.17797</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.42502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">PC</td>
+<td align="left">data.name</td>
+<td align="right">11.50535</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.31952</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SR</td>
+<td align="left">data.name</td>
+<td align="right">9.59483</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.47673</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">SD</td>
+<td align="left">data.name</td>
+<td align="right">10.01958</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.43878</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">SE</td>
+<td align="left">data.name</td>
+<td align="right">5.08250</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.88560</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">BR</td>
+<td align="left">data.name</td>
+<td align="right">5.47242</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85747</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">L</td>
+<td align="left">data.name</td>
+<td align="right">8.81243</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.54999</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">Cen</td>
+<td align="left">data.name</td>
+<td align="right">9.27900</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.50585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">mod.lik</td>
+<td align="left">data.name</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">C</td>
+<td align="left">data.name</td>
+<td align="right">7.53934</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">N</td>
+<td align="left">data.name</td>
+<td align="right">7.85372</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.64312</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">CN</td>
+<td align="left">data.name</td>
+<td align="right">5.50477</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">r4y</td>
+<td align="left">CT</td>
+<td align="left">data.name</td>
+<td align="right">7.00275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.72519</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">r4y</td>
+<td align="left">pH</td>
+<td align="left">data.name</td>
+<td align="right">10.17797</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.42502</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">PC</td>
+<td align="left">statistic</td>
+<td align="right">12.68909</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.24158</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SR</td>
+<td align="left">statistic</td>
+<td align="right">9.93983</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.44579</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SD</td>
+<td align="left">statistic</td>
+<td align="right">9.88275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45084</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SE</td>
+<td align="left">statistic</td>
+<td align="right">4.97993</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.89251</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">BR</td>
+<td align="left">statistic</td>
+<td align="right">5.96171</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.81847</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">L</td>
+<td align="left">statistic</td>
+<td align="right">9.37692</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49674</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">Cen</td>
+<td align="left">statistic</td>
+<td align="right">9.13583</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.51926</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">mod.lik</td>
+<td align="left">statistic</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">C</td>
+<td align="left">statistic</td>
+<td align="right">7.53939</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">N</td>
+<td align="left">statistic</td>
+<td align="right">8.35121</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59457</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">CN</td>
+<td align="left">statistic</td>
+<td align="right">5.49108</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85606</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">CT</td>
+<td align="left">statistic</td>
+<td align="right">7.46756</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.68069</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">pH</td>
+<td align="left">statistic</td>
+<td align="right">10.26625</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41745</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">PC</td>
+<td align="left">parameter</td>
+<td align="right">12.68909</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.24158</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SR</td>
+<td align="left">parameter</td>
+<td align="right">9.93983</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.44579</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SD</td>
+<td align="left">parameter</td>
+<td align="right">9.88275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45084</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SE</td>
+<td align="left">parameter</td>
+<td align="right">4.97993</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.89251</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">BR</td>
+<td align="left">parameter</td>
+<td align="right">5.96171</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.81847</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">L</td>
+<td align="left">parameter</td>
+<td align="right">9.37692</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49674</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">Cen</td>
+<td align="left">parameter</td>
+<td align="right">9.13583</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.51926</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">mod.lik</td>
+<td align="left">parameter</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">C</td>
+<td align="left">parameter</td>
+<td align="right">7.53939</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">N</td>
+<td align="left">parameter</td>
+<td align="right">8.35121</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59457</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">CN</td>
+<td align="left">parameter</td>
+<td align="right">5.49108</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85606</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">CT</td>
+<td align="left">parameter</td>
+<td align="right">7.46756</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.68069</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">pH</td>
+<td align="left">parameter</td>
+<td align="right">10.26625</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41745</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">PC</td>
+<td align="left">p.value</td>
+<td align="right">12.68909</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.24158</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SR</td>
+<td align="left">p.value</td>
+<td align="right">9.93983</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.44579</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SD</td>
+<td align="left">p.value</td>
+<td align="right">9.88275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45084</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SE</td>
+<td align="left">p.value</td>
+<td align="right">4.97993</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.89251</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">BR</td>
+<td align="left">p.value</td>
+<td align="right">5.96171</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.81847</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">L</td>
+<td align="left">p.value</td>
+<td align="right">9.37692</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49674</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">Cen</td>
+<td align="left">p.value</td>
+<td align="right">9.13583</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.51926</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">mod.lik</td>
+<td align="left">p.value</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">C</td>
+<td align="left">p.value</td>
+<td align="right">7.53939</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">N</td>
+<td align="left">p.value</td>
+<td align="right">8.35121</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59457</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">CN</td>
+<td align="left">p.value</td>
+<td align="right">5.49108</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85606</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">CT</td>
+<td align="left">p.value</td>
+<td align="right">7.46756</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.68069</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">pH</td>
+<td align="left">p.value</td>
+<td align="right">10.26625</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41745</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">PC</td>
+<td align="left">method</td>
+<td align="right">12.68909</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.24158</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SR</td>
+<td align="left">method</td>
+<td align="right">9.93983</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.44579</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SD</td>
+<td align="left">method</td>
+<td align="right">9.88275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45084</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SE</td>
+<td align="left">method</td>
+<td align="right">4.97993</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.89251</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">BR</td>
+<td align="left">method</td>
+<td align="right">5.96171</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.81847</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">L</td>
+<td align="left">method</td>
+<td align="right">9.37692</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49674</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">Cen</td>
+<td align="left">method</td>
+<td align="right">9.13583</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.51926</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">mod.lik</td>
+<td align="left">method</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">C</td>
+<td align="left">method</td>
+<td align="right">7.53939</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">N</td>
+<td align="left">method</td>
+<td align="right">8.35121</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59457</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">CN</td>
+<td align="left">method</td>
+<td align="right">5.49108</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85606</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">CT</td>
+<td align="left">method</td>
+<td align="right">7.46756</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.68069</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">pH</td>
+<td align="left">method</td>
+<td align="right">10.26625</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41745</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">PC</td>
+<td align="left">data.name</td>
+<td align="right">12.68909</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.24158</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SR</td>
+<td align="left">data.name</td>
+<td align="right">9.93983</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.44579</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">SD</td>
+<td align="left">data.name</td>
+<td align="right">9.88275</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.45084</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">SE</td>
+<td align="left">data.name</td>
+<td align="right">4.97993</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.89251</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">BR</td>
+<td align="left">data.name</td>
+<td align="right">5.96171</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.81847</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">L</td>
+<td align="left">data.name</td>
+<td align="right">9.37692</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49674</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">Cen</td>
+<td align="left">data.name</td>
+<td align="right">9.13583</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.51926</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">mod.lik</td>
+<td align="left">data.name</td>
+<td align="right">9.38661</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.49585</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">C</td>
+<td align="left">data.name</td>
+<td align="right">7.53939</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.67373</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">N</td>
+<td align="left">data.name</td>
+<td align="right">8.35121</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.59457</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">CN</td>
+<td align="left">data.name</td>
+<td align="right">5.49108</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.85606</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="even">
+<td align="left">logy</td>
+<td align="left">CT</td>
+<td align="left">data.name</td>
+<td align="right">7.46756</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.68069</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+<tr class="odd">
+<td align="left">logy</td>
+<td align="left">pH</td>
+<td align="left">data.name</td>
+<td align="right">10.26625</td>
+<td align="left">c(df = 10)</td>
+<td align="right">0.41745</td>
+<td align="left">Fligner-Killeen test of homogeneity of variances</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 

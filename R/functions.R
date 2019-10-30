@@ -306,27 +306,60 @@ proc_onc_ns <- function(cn.onc) {
 
 }
 
-check_reml <- function(reml.results){
-    reml.resids <- lapply(reml.results, residuals)
+check_fligner <- function(onc.dat){
+    y <- onc.dat[, c(-1, -6, -7)]
+    flig.y <- do.call(rbind, apply(y, 2, 
+                         fligner.test, 
+                         g = onc.dat[, "geno"]))
+    flig.y2 <- do.call(rbind, apply(y^(2), 2, 
+                         fligner.test, 
+                         g = onc.dat[, "geno"]))
+    flig.r2y <- do.call(rbind, apply(y^(1/2), 2, 
+                         fligner.test, 
+                         g = onc.dat[, "geno"]))
+    flig.r4y <- do.call(rbind, apply(y^(1/4), 2, 
+                         fligner.test, 
+                         g = onc.dat[, "geno"]))
+    flig.logy <- do.call(rbind, apply(log(y + 0.0001), 2, 
+                         fligner.test, 
+                         g = onc.dat[, "geno"]))
+    out <- list(y = flig.y, 
+                y2 = flig.y2,
+                r2y = flig.r2y, 
+                r4y = flig.r4y, 
+                logy = flig.logy)
+    out <- melt.list(out)
+    out <- out[, -7]
+    out <- cbind(out[, "L1"], out[, colnames(out) != "L1"])
+    colnames(out)[1] <- "transformation"
+    return(out)
+}
+
+
+check_shapiro <- function(reml.reml){
+    reml.resids <- lapply(reml.reml, residuals)
     reml.shapiros <- lapply(reml.resids, shapiro.test)
-    reml.forms <- lapply(reml.results, formula)
+    reml.forms <- lapply(reml.reml, formula)
     reml.forms <- lapply(reml.forms, as.character)
     reml.forms <- lapply(reml.forms, paste0, collapse = "")
-    out <- cbind(formula = unlist(reml.forms), 
-                 do.call(rbind, reml.shapiros))
+    formula <- unlist(reml.forms)
+    out <- do.call(rbind, reml.shapiros)
+    out <- out[, -ncol(out)]
+    out <- cbind(formula, out)
+    out <- as.data.frame(out)
     return(out)
 }
 
 run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     if (rm.na){onc.dat <- na.omit(onc.dat)}
     ## tree traits
-    prb.reml <- lme4::lmer(I(BR^(1 / 2)) ~ (1 | geno), 
+    prb.reml <- lme4::lmer(I(BR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
     prb.reml.result <- c("Percent Rough Bark", 
                          H2(prb.reml, g = onc.dat$geno), 
                          R2(prb.reml), prb.reml.pval$p.value)
-    ph.reml <- lme4::lmer(I(pH^(1 / 2)) ~ (1 | geno), 
+    ph.reml <- lme4::lmer(I(pH^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
     ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
     ph.reml.result <- c("pH", H2(ph.reml, g = onc.dat$geno), 
@@ -337,26 +370,26 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     ct.reml.result <- c("Condensed Tannins (CT)", 
                         H2(ct.reml, g = onc.dat$geno), 
                         R2(ct.reml), ct.reml.pval$p.value)
-    cnr.reml <- lme4::lmer(I(CN^(1)) ~ (1 | geno), 
+    cnr.reml <- lme4::lmer(I(CN^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
     cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
                          H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), 
                          cnr.reml.pval$p.value)
     ## lichen community metrics
-    ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), 
+    ptc.reml <- lme4::lmer(I(PC^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
     ptc.reml.result <- c("Percent Lichen Cover", 
                          H2(ptc.reml, g = onc.dat$geno), 
                          R2(ptc.reml), ptc.reml.pval$p.value)
-    spr.reml <- lme4::lmer(I(SR^(1 / 2)) ~ (1 | geno), 
+    spr.reml <- lme4::lmer(I(SR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
     spr.reml.result <- c("Lichen Species Richness", 
                          H2(spr.reml, g = onc.dat$geno), 
                          R2(spr.reml), spr.reml.pval$p.value)
-    spd.reml <- lme4::lmer(I(SD^(1 / 2)) ~ (1 | geno), 
+    spd.reml <- lme4::lmer(I(SD^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
     spd.reml.result <- c("Lichen Species Diversity", 
@@ -369,13 +402,13 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
                          H2(spe.reml, g = onc.dat$geno), 
                          R2(spe.reml), spe.reml.pval$p.value)
                                         # Lichen network metrics
-    link.reml <- lme4::lmer(I(log(L + 1e-08)) ~ (1 | geno), 
+    link.reml <- lme4::lmer(I(L^(1 / 4)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
     link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
     link.reml.result <- c("Number of Network Links", 
                           H2(link.reml, g = onc.dat$geno), 
                           R2(link.reml), link.reml.pval$p.value)
-    cen.reml <- lme4::lmer(I(Cen^(1 / 2)) ~ (1 | geno), 
+    cen.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
     cen.reml.result <- c("Network Centrality", 

@@ -32,7 +32,9 @@ plan <- drake_plan(
     onc.com.rel = proc_onc_com_rel(onc.com, onc.dat),
     ## Analyses
     reml.results = run_reml(onc.dat),
-    reml.check = check_reml(run_reml(onc.dat, raw = TRUE)),
+    reml.reml = run_reml(onc.dat, raw = TRUE),
+    check.shapiro = check_shapiro(reml.reml),
+    check.fligner = check_fligner(onc.dat),
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
     ## Plots
     ## Fig: Significant genotype variables
