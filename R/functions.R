@@ -96,7 +96,8 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
                      1, 
                      function(x) sum(sign(x)))
     spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
-    spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
+    spe.onc <- spd.onc / 
+        log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
     spe.onc[is.na(spe.onc)] <- 0
     tree <- onc.geno
     for (i in seq_along(unique(onc.geno))) {
@@ -109,8 +110,10 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
     onc.nc <- onc.nc.in
     onc.tan <- onc.tan.in
     onc.ph <- onc.ph.in
-    onc.nc[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.nc[, 1])))
-    onc.tan[, 1] <- as.character(paste0("N", gsub("-", "\\.", onc.tan[, 1])))
+    onc.nc[, 1] <- as.character(
+        paste0("N", gsub("-", "\\.", onc.nc[, 1])))
+    onc.tan[, 1] <- as.character(
+        paste0("N", gsub("-", "\\.", onc.tan[, 1])))
     colnames(onc.nc)[1:4] <- c("tree.id", "sample.mass", "N", "C")
     colnames(onc.tan)[1] <- "tree.id"
     colnames(onc.tan)[grep("X.CT", colnames(onc.tan))] <- "CT"
@@ -466,7 +469,6 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-
 make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
     ## Heritability table
     h2.tab <- reml.results
@@ -524,3 +526,44 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
     return(out)
 }
 
+run_nms <- function(d, vec.data, dim = 2, seed = 12345){
+    set.seed(seed)
+    nms <- nmds(d, dim, dim)
+    nms.out <- capture.output(nms <- nmds.min(nms))
+    vec <- envfit(nms, vec.data)
+    out <- list(nms = nms, vec = vec, report = nms.out)
+    return(out)
+}
+
+plot_netsim <- function(ord, onc.dat){
+    par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
+    chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
+                         cex = 2.65, lwd = 2.5, mu.pch = 15,
+                         pt.col = "white",
+                         bar.col = "darkgrey"
+                         )
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.65)
+    plot(ord[["vec"]], col = "black", lwd = 5)
+}
+
+plot_mdc <- function(onc.dat){
+    ## Significant Genotype and Network Effects
+
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
+             ylim = c(-1.25, 3),
+             xlab = "Tree Genotype", ylab = "Standardized Metric",
+             ord = order(tapply(onc.dat[, "CT"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE)
+             )
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
+             add = TRUE, pch = 1,
+             ord = order(tapply(onc.dat[, "CT"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE), xjit = 0.005
+             )
+    legend("topright", 
+           legend = c("Condensed Tannins", "Bark Roughness"), 
+           pch = c(19, 1), bty = "none")
+
+}

@@ -36,12 +36,14 @@ plan <- drake_plan(
     check.shapiro = check_shapiro(reml.reml),
     check.fligner = check_fligner(onc.dat),
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, c("CT", "BR", "PC", "SR")]),
     ## Plots
     ## Fig: Significant genotype variables
     ## fig: cn_onc
-    ## fig: cn:nms
     ## fig:cn_chplot
-
+    plot_netsim(cn.ord, onc.dat),
+    ## fig: heritable traits
+    plot_mdc(onc.dat),
     ## Tables
     ## tab:h2_table = Heritability table 
     ## tab:cn_perm_table = network similarity PERMANOVA

@@ -2,17 +2,20 @@ hash,type,name
 5213ff44291b70d4,target,age.in
 0be49940e24a81ca,import,check_fligner
 a6e95da344eb0636,import,check_reml
-a6e95da344eb0636,import,check_shapiro
+d308bdd7faa3ff9b,import,check_shapiro
 662775d5fba12123,target,check.fligner
 cc9e4d88a7cbcbb5,target,check.shapiro
 b441a2a0e4262e3f,target,cn.d.onc
 973ca013e8f3db5d,target,cn.d.onc.na
 256ef3063db507fe,target,cn.onc
+535fd1918c93315c,target,cn.ord
 0d2f42bf3d961251,import,cnr.reml.result
 5ef79acb6bc3243d,import,ct.reml.result
-67960ba7df745abf,target,drake_target_1
-cba984bd79d5eb48,target,drake_target_2
-78fe53bcdbe5e654,target,drake_target_3
+c85d88fc56f4e042,target,drake_target_1
+090f8696afda861d,target,drake_target_2
+db6adb5a47965194,target,drake_target_3
+cff1b7963754e1a7,target,drake_target_4
+a6f45f6eaceea342,target,drake_target_5
 81295f4a0090a083,target,env.in
 7e1f6d71f2352edd,import,formula
 a6371d582b0eb6ac,target,garden.data
@@ -39,10 +42,12 @@ a78c8ed33a1efbc4,import,onc.ph
 effd6a46c1ba949c,target,onc.tan.in
 b5aba70d4297d02a,import,file R/report_lcn.Rmd
 3ea8d2dc9b9879ac,import,file report_lcn.Rmd
-a3912d4045769f53,target,file results/
+55b6ab23e4a36d34,target,file results/
 7412233d722279b8,target,perm.results
 b5437b1d508959f5,import,ph.reml.result
 096470d6b48ec01a,target,pit
+b0f52ea84079a1c0,import,plot_mdc
+ef398ef7d34c1ed5,import,plot_netsim
 5b8478f0b0ccc322,import,prb.reml.result
 2354e095171452e2,import,proc_cn_d_onc
 6a9e347c53a70c0b,import,proc_cn_onc
@@ -67,6 +72,7 @@ efc93f84083846a4,target,report.md
 56f76908224d36c3,target,rm.geno
 df90c1d087dbbc39,target,rm.tree
 ad49b16c1e21ecaa,target,rough.in
+c31870eb9d84abbf,import,run_nms
 1d226363f3822828,import,run_perm
 901949935f964921,import,run_reml
 4775d0b5f0db933f,import,spr.reml.result

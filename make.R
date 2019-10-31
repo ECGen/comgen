@@ -10,3 +10,4 @@ make(
   verbose = 2,
   cache_log_file = TRUE
 )
+# vis_drake_graph(drake_config(plan))
