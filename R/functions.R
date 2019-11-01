@@ -258,7 +258,7 @@ proc_onc_com_rel <- function(onc.com, onc.dat, rm.na = TRUE) {
 }
 
 
-proc_cn_onc <- function(onc, ci.p = 95) {
+proc_cn_onc <- function(onc, onc.dat, ci.p = 95) {
     lapply(split(onc[, -1:-6], onc[, "Tree"]), 
            coNet, ci.p = ci.p)
 }
@@ -535,7 +535,8 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
     return(out)
 }
 
-plot_netsim <- function(ord, onc.dat){
+plot_netsim <- function(ord, onc.dat, file = "./cn_chplot.pdf"){
+    pdf(file)
     par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
                          cex = 2.65, lwd = 2.5, mu.pch = 15,
@@ -544,11 +545,12 @@ plot_netsim <- function(ord, onc.dat){
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.65)
     plot(ord[["vec"]], col = "black", lwd = 5)
+    dev.off()
 }
 
-plot_mdc <- function(onc.dat){
+plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
+    pdf(file)
     ## Significant Genotype and Network Effects
-
     mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
@@ -565,5 +567,134 @@ plot_mdc <- function(onc.dat){
     legend("topright", 
            legend = c("Condensed Tannins", "Bark Roughness"), 
            pch = c(19, 1), bty = "none")
+    dev.off()
+}
 
+## 
+plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
+    pdf(file)
+    cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
+    cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
+    par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
+    set.seed(123)
+    net.col <- sign(meanNet(cn.onc))
+    net.col[net.col == -1] <- 2
+    net.col[net.col == 1] <- 1
+    net.elwd <- (abs(meanNet(cn.onc)) * 10)^2
+    coord <- gplot(abs(meanNet(cn.onc)),
+                   gmode = "digraph",
+                   displaylabels = TRUE,
+                   edge.lwd = net.elwd,
+                   edge.col = net.col,
+                   vertex.col = "black",
+                   vertex.cex = 0.5,
+                   arrowhead.cex = 0.5,
+                   label.cex = 1,
+                   main = "All Genotypes"
+                   )
+    cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in%
+                            c("996", "WC5", "1008")]
+    cn.mu.plot <- cn.mu.plot[order(unlist(lapply(
+        cn.mu.plot, function(x) sum(abs(sign(x)))
+        )))]
+    for (i in 1:length(cn.mu.plot)) {
+        net.col <- sign(cn.mu.plot[[i]])
+        net.col[net.col == -1] <- 2
+        net.col[net.col == 1] <- 1
+        net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
+        set.seed(123)
+        gplot(abs(cn.mu.plot[[i]]),
+              gmode = "digraph",
+              displaylabels = TRUE,
+              coord = coord,
+              edge.lwd = net.elwd,
+              edge.col = net.col,
+              vertex.col = "black",
+              vertex.cex = 0.5,
+              arrowhead.cex = 0.5,
+              label.cex = 1,
+              main = names(cn.mu.plot)[i]
+              )
+    }
+    dev.off()
+}
+
+## Supplementary Figures
+proc_size <- function(xgal.size.in){
+    xgal.size <- xgal.size.in
+    xgs <- xgal.size[-1:-7, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+    xgs.cols <- xgal.size[7, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
+    colnames(xgs) <- gsub("\\#", "", as.character(unlist(xgs.cols)))
+    xgs <- xgs[, 1:13]
+    xgs <- apply(xgs, 2, gsub, pattern = "\\,", replacement = "")
+    xgs.dim <- xgs[, "Measurement"]
+    xgs.geno <- xgs[, "Genotype"]
+    xgs.tree <- xgs[, "Tree"]
+    xgs <- xgs[, grep("Thallus", colnames(xgs))]
+                                        # fix genotypes
+                                        # t6
+    xgs.geno[grep("T6", xgs.geno)] <- "T6"
+    xgs.geno[grep("H10", xgs.geno)] <- "H-10"
+                                        # Coercing to numeric
+    xgs <- apply(xgs, 2, as.numeric)
+                                        # Dealing with NA values
+    xgs.geno <- xgs.geno[grep("Dimension", xgs.dim)]
+    xgs.tree <- xgs.tree[grep("Dimension", xgs.dim)]
+    xgs <- xgs[grep("Dimension", xgs.dim), ]
+    xgs.dim <- xgs.dim[grep("Dimension", xgs.dim)]
+                                        # Convert to cm
+    xgs <- xgs * 0.1
+    xgs.ellipse <- pi * xgs[xgs.dim == "Dimension 1", ] *
+        xgs[xgs.dim == "Dimension 2", ]
+    xgs.geno <- xgs.geno[xgs.dim == "Dimension 1"]
+    xgs.tree <- xgs.tree[xgs.dim == "Dimension 1"]
+                                        # package all xgs related data
+    xgs.data <- data.frame(
+        tree = xgs.tree, geno = xgs.geno,
+        mean.thallus = apply(xgs.ellipse, 1,
+            mean,
+            na.rm = TRUE
+                             ),
+        median.thallus = apply(xgs.ellipse, 1,
+            median,
+            na.rm = TRUE
+                               ),
+        xgs.ellipse
+        )
+                                        # remove trees not done (i.e. all NA)
+    xgs.data <- xgs.data[apply(
+        xgs.data[, grep(
+            "Thallus",
+            colnames(xgs.data)
+            )], 1,
+        function(x) !(all(is.na(x)))
+        ), ]
+    return(xgs.data)
+}
+## X. galericulata size analysis
+run_xgsize <- function(xgs.data){
+    xgs.median.reml <- lme4::lmer(I(median.thallus^(1 / 4)) ~ (1 | geno),
+                                  data = xgs.data[xgs.data$geno %in%
+                                      names(which(table(xgs.data$geno) > 2)), ],
+                                  REML = TRUE
+                                  )
+    reml.results <- RLRsim::exactRLRT(xgs.median.reml)
+    check.norm <- shapiro.test(residuals(xgs.median.reml))
+    check.var <- fligner.test(xgs.data$median.thallus, xgs.data$geno)
+    out <- list(reml = reml.results, 
+                shapiro = check.norm, 
+                fligner = check.var)
+    return(out)
+}
+
+## X. galericulata size plot
+plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
+    pdf(file)
+    plot(density(xgs.data$median.thallus),
+         xlab = "Median Lichen Thallus Area (cm^2)",
+         main = ""
+         )
+    abline(v = median(xgs.data$median.thallus, 
+               na.rm = TRUE), lty = 2)
+    dev.off()
 }

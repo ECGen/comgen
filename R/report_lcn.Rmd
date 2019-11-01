@@ -24,12 +24,16 @@ loadd(check.fligner)
 
 ```
 
+# Methods
+
+- Genotypes with at least 3 replicates with observations for all variables. 
+- The pseudo-species physcioids was removed.
+- Lecanoras were merged into a single pseudo-species.
+
+
 # Results 
 
-## Tables
-
-
-### Heritability Values
+## Heritability Values
 
 ```{r h2_reml, echo = FALSE}
 
@@ -37,7 +41,7 @@ knitr::kable(tables[["h2_reml"]])
 
 ```
 
-### Predictors of Lichen Network Similarity
+## Predictors of Lichen Network Similarity
 
 ```{r cn_perm, echo = FALSE}
 
@@ -45,7 +49,7 @@ knitr::kable(tables[["cn"]])
 
 ```
 
-### Predictors of Lichen Community Similarity
+## Predictors of Lichen Community Similarity
 
 ```{r com_perm, echo = FALSE}
 

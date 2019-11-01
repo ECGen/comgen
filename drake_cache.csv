@@ -11,11 +11,13 @@ b441a2a0e4262e3f,target,cn.d.onc
 535fd1918c93315c,target,cn.ord
 0d2f42bf3d961251,import,cnr.reml.result
 5ef79acb6bc3243d,import,ct.reml.result
-c85d88fc56f4e042,target,drake_target_1
-090f8696afda861d,target,drake_target_2
-db6adb5a47965194,target,drake_target_3
-cff1b7963754e1a7,target,drake_target_4
-a6f45f6eaceea342,target,drake_target_5
+2129a49e5ced4bca,target,drake_target_1
+2129a49e5ced4bca,target,drake_target_2
+2129a49e5ced4bca,target,drake_target_3
+2129a49e5ced4bca,target,drake_target_4
+295fb9bfc215652b,target,drake_target_5
+cc299043a6b746c0,target,drake_target_6
+7097642234af18d1,target,drake_target_7
 81295f4a0090a083,target,env.in
 7e1f6d71f2352edd,import,formula
 a6371d582b0eb6ac,target,garden.data
@@ -40,17 +42,19 @@ a78c8ed33a1efbc4,import,onc.ph
 39c9412b236bd0b9,target,onc.ph.in
 2e7ab4deead9c884,target,onc.q
 effd6a46c1ba949c,target,onc.tan.in
-b5aba70d4297d02a,import,file R/report_lcn.Rmd
+e701154185760e96,import,file R/report_lcn.Rmd
 3ea8d2dc9b9879ac,import,file report_lcn.Rmd
-55b6ab23e4a36d34,target,file results/
+050df09f3cf7a452,target,file results/
 7412233d722279b8,target,perm.results
 b5437b1d508959f5,import,ph.reml.result
 096470d6b48ec01a,target,pit
-b0f52ea84079a1c0,import,plot_mdc
-ef398ef7d34c1ed5,import,plot_netsim
+0fcff87d02cad387,import,plot_mdc
+4ec7927cfaf5997a,import,plot_nets
+ad0baac207810c25,import,plot_netsim
+1957da860e21f254,import,plot_xg_size
 5b8478f0b0ccc322,import,prb.reml.result
 2354e095171452e2,import,proc_cn_d_onc
-6a9e347c53a70c0b,import,proc_cn_onc
+1f367e1b4aeefb07,import,proc_cn_onc
 ba68df65d1ba64b7,import,proc_garden_data
 4146a3b15b4065d9,import,proc_onc
 16b5917126c25bb0,import,proc_onc_com
@@ -60,6 +64,7 @@ ba68df65d1ba64b7,import,proc_garden_data
 b9593f8a38e32d4b,import,proc_onc_ph
 2c0808c9c45567cf,import,proc_onc_q
 bfc30d090e10a084,import,proc_pit
+6f014e66d2cfa125,import,proc_size
 4d79e25e80ab433f,import,ptc.reml.result
 aa99ab0316928744,import,rcom.perm
 26a6011008709127,target,reml.check
@@ -75,9 +80,12 @@ ad49b16c1e21ecaa,target,rough.in
 c31870eb9d84abbf,import,run_nms
 1d226363f3822828,import,run_perm
 901949935f964921,import,run_reml
+64b138bf81cf696c,import,run_xgsize
 4775d0b5f0db933f,import,spr.reml.result
 ed03dde97a75dc82,import,table_h2
 2b1dbbbd423bc9e7,target,tables
 b1bb6e119d13ae1b,import,tabs
 5c6ccedc7b6953ad,target,wild.dat.in
+9b5400ea7d5ace2a,target,xg.reml
 2e3f85a02ff02fd7,target,xgal.size.in
+574e876d2ce70b36,target,xgs.data

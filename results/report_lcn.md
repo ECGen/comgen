@@ -8,13 +8,19 @@ rmarkdown::render("./src/lcn_notebook.Rmd",
     output_dir = "./results") 
 -->
 
+Methods
+=======
+
+-   Genotypes with at least 3 replicates with observations for all
+    variables.
+-   The pseudo-species physcioids was removed.
+-   Lecanoras were merged into a single pseudo-species.
+
 Results
 =======
 
-Tables
-------
-
-### Heritability Values
+Heritability Values
+-------------------
 
 <table>
 <thead>
@@ -121,7 +127,8 @@ Tables
 </tbody>
 </table>
 
-### Predictors of Lichen Network Similarity
+Predictors of Lichen Network Similarity
+---------------------------------------
 
 <table>
 <thead>
@@ -218,7 +225,8 @@ Tables
 </tbody>
 </table>
 
-### Predictors of Lichen Community Similarity
+Predictors of Lichen Community Similarity
+-----------------------------------------
 
 <table>
 <thead>

@@ -677,6 +677,7 @@ plot(density(xgs.data$median.thallus),
   main = ""
 )
 abline(v = median(xgs.data$median.thallus, na.rm = TRUE), lty = 2)
+
 ```
 
 
