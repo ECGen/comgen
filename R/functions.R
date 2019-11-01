@@ -536,8 +536,8 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
 }
 
 plot_netsim <- function(ord, onc.dat, file = "./cn_chplot.pdf"){
-    pdf(file)
     par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
+    pdf(file)
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
                          cex = 2.65, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",

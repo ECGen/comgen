@@ -48,7 +48,7 @@ plan <- drake_plan(
     ## PERMANOVAs for Network and Community Similarity
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
     ## Network Ordination
-    cn.ord = run_nms(cn.d.onc, onc.dat[, c("CT", "BR", "PC", "SR")]),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, c("CT", "BR", "PC", "SR", "SE")]),
     ## Size analysis
     ## Size is square-rooted
     xg.reml = run_xgsize(xgs.data), 
