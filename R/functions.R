@@ -455,14 +455,18 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
     com.perm <- vegan::adonis2(onc.com ~ geno + 
                                    BR + pH + CN + CT + 
-                                   PC + SR + SE,
+                                       PC + SR + SE,
                                data = onc.dat, 
-                               perm = 10000, mrank = TRUE)
+                               by = "term",
+                               mrank = TRUE,
+                               perm = 10000)
     cn.perm <- vegan::adonis2(cn.d.onc ~ geno + 
-                                  BR + 
-                                  pH + CN + CT + 
-                                  PC + SR + SE, by = "term", 
+                                  BR + pH + CN + CT +
+                                      PC + SR + SE + 
+                                         L + mod.lik + Cen,
+                              by = "term", 
                               data = onc.dat, 
+                              mrank = TRUE,
                               permutations = 10000)
     out <- list(com = com.perm, 
                 cn = cn.perm)
@@ -697,4 +701,17 @@ plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
     abline(v = median(xgs.data$median.thallus, 
                na.rm = TRUE), lty = 2)
     dev.off()
+}
+
+## Updates the manuscript
+update_manuscript <- function(dir, files, man.tex = "main.tex" ){
+    if (dir.exists(dir)){
+        file.copy(
+            overwrite = TRUE, recursive = FALSE, copy.mode = TRUE,
+            from = files,
+            to = dir
+            )
+    }else{
+        print("Manuscript directory not present.")
+    }
 }

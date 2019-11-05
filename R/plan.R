@@ -48,19 +48,21 @@ plan <- drake_plan(
     ## PERMANOVAs for Network and Community Similarity
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
     ## Network Ordination
-    cn.ord = run_nms(cn.d.onc, onc.dat[, c("CT", "BR", "PC", "SR", "SE")]),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, -c(1, 6, 7)]),
     ## Size analysis
     ## Size is square-rooted
     xg.reml = run_xgsize(xgs.data), 
 ### Plots
     ## fig: cn_onc
-    plot_nets(cn.onc, onc.dat, file = "./results/cn_onc.pdf"), 
+    cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"), 
     ## fig:cn_chplot
-    plot_netsim(cn.ord, onc.dat, file = "./results/ch_plot.pdf"),
+    cn_chplot.pdf = plot_netsim(cn.ord, 
+        onc.dat, 
+        file = "results/cn_chplot.pdf"),
     ## fig: heritable traits
-    plot_mdc(onc.dat, file = "./results/cn_metrics.pdf"),
+    cn_metrics.pdf = plot_mdc(onc.dat, file = "results/cn_metrics.pdf"),
     ## SUPPLEMENTARY
-    plot_xg_size(xgs.data, file = "./results/xg_size.pdf"),
+    xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
 ### Tables
     ## tab:h2_table = Heritability table 
     ## tab:cn_perm_table = network similarity PERMANOVA
@@ -68,35 +70,45 @@ plan <- drake_plan(
     ## H2 table all
     tables = make_tables(onc.dat, reml.results, perm.results, digits = 3),
     ## Update lichen manuscript tables and figures
-    print(xtable(tables[["h2_reml"]], type = "latex"), 
+    h2_reml.tex = print(xtable(tables[["h2_reml"]], type = "latex"), 
           file = "results/h2_reml.tex", 
           include.rownames = FALSE,
           include.colnames = TRUE),
-    print(xtable(tables[["cn"]], type = "latex"), 
+    cn_perm.tex = print(xtable(tables[["cn"]], type = "latex"), 
           file = "results/cn_perm.tex", 
           include.rownames = TRUE,
           include.colnames = TRUE),
-    print(xtable(tables[["com"]], type = "latex"), 
+    com_perm.tex =print(xtable(tables[["com"]], type = "latex"), 
           file = "results/com_perm.tex", 
           include.rownames = TRUE,
           include.colnames = TRUE),
-    ## Generate a report
-    report.md = rmarkdown::render(
-      knitr_in("R/report_lcn.Rmd"),
-      output_dir = file_out("results/"),
-      output_format = "md_document",
-      quiet = TRUE
-      ),
-    report.html = rmarkdown::render(
-      knitr_in("R/report_lcn.Rmd"),
-      output_dir = file_out("results/"),
-      output_format = "html_document",
-      quiet = TRUE
-      ),
+    ## Update Tables and Figures in Manuscript
+    update.manuscript = update_manuscript(
+        c("results/cn_onc.pdf",
+          "results/cn_chplot.pdf",
+          "results/cn_metrics.pdf",
+          "results/xg_size.pdf",
+          "results/h2_reml.tex",
+          "results/cn_perm.tex",
+          "results/com_perm.tex"), 
+        dir = "docs/lcn_manuscript/"),
+### Generate a report
+    ## report.md = rmarkdown::render(
+    ##   knitr_in("R/report_lcn.Rmd"),
+    ##   output_dir = file_out("results/"),
+    ##   output_format = "md_document",
+    ##   quiet = TRUE
+    ##   ),
+    ## report.html = rmarkdown::render(
+    ##   knitr_in("R/report_lcn.Rmd"),
+    ##   output_dir = file_out("results/"),
+    ##   output_format = "html_document",
+    ##   quiet = TRUE
+    ##   ),
     report.pdf = rmarkdown::render(
-      knitr_in("R/report_lcn.Rmd"),
-      output_dir = file_out("results/"),
-      output_format = "pdf_document",
-      quiet = TRUE
-      )
+        knitr_in("R/report_lcn.Rmd"),
+        output_dir = file_out("results/"),
+        output_format = "pdf_document",
+        quiet = TRUE
+        )
 )
