@@ -691,6 +691,16 @@ run_xgsize <- function(xgs.data){
     return(out)
 }
 
+## Run trait regressions on network metrics
+run_trait_nm <- function(onc.dat){
+    out <- list()
+    out[[1]] <- summary(lm(I(L^(1/4)) ~ BR + CT, data = onc.dat))
+    out[[2]] <- summary(lm(I(Cen^(1/4)) ~ BR + CT, data = onc.dat))
+    out[[3]] <- summary(lm(I(mod.lik^(1/4)) ~ BR + CT, data = onc.dat))
+    names(out) <- c("L", "Cen", "mod.lik")
+    return(out)
+}
+
 ## X. galericulata size plot
 plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
     pdf(file)

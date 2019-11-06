@@ -52,6 +52,12 @@ plan <- drake_plan(
     ## Size analysis
     ## Size is square-rooted
     xg.reml = run_xgsize(xgs.data), 
+    ## Test correlation between traits with genetic basis
+    reg.trait = summary(lm(I(BR^(1/4))~CT, data = onc.dat)),
+    ## Test correlation between traits and network metrics
+    reg.trait.nm = run_trait_nm(onc.dat), 
+    ## Get correlation values
+    cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Plots
     ## fig: cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"), 

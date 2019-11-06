@@ -11,6 +11,7 @@ b441a2a0e4262e3f,target,cn.d.onc
 256ef3063db507fe,target,cn.onc
 75d0dc3375f25438,target,cn.ord
 db781732b0b0338c,target,com_perm.tex
+94fbf8b6cad7ebcd,target,cor.trait.nm
 a6371d582b0eb6ac,target,garden.data
 7e9ad9c47b76167a,target,garden.data.in
 f938e8781b1a6db8,target,h2_reml.tex
@@ -49,6 +50,8 @@ ba68df65d1ba64b7,import,proc_garden_data
 5ae31fb288a28150,import,proc_onc_ns
 2c0808c9c45567cf,import,proc_onc_q
 6f014e66d2cfa125,import,proc_size
+bafad4813956ee39,target,reg.trait
+3ca3eac2cb110c29,target,reg.trait.nm
 d17c3d0225b0d159,target,reml.reml
 9122c31894a531c4,target,reml.results
 39df8361107010ba,target,report.pdf
@@ -58,6 +61,7 @@ ad49b16c1e21ecaa,target,rough.in
 c31870eb9d84abbf,import,run_nms
 d9c33500ad85da0b,import,run_perm
 901949935f964921,import,run_reml
+e4c2be8aeb0c7ac0,import,run_trait_nm
 64b138bf81cf696c,import,run_xgsize
 3a1dd7d5c5f172da,target,tables
 0a6d139f6b35ad0e,import,update_manuscript
