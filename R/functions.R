@@ -704,13 +704,16 @@ plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
 }
 
 ## Updates the manuscript
-update_manuscript <- function(dir, files, man.tex = "main.tex" ){
+update_manuscript <- function(files, dir, file.tex = "main.tex"){
     if (dir.exists(dir)){
         file.copy(
             overwrite = TRUE, recursive = FALSE, copy.mode = TRUE,
             from = files,
             to = dir
             )
+        texi2pdf(paste(dir, file.tex, sep = "/"), clean = TRUE)
+        file.pdf <- gsub(".tex", ".pdf", file.tex, ignore.case = TRUE)
+        file.rename(from = file.pdf, to = paste(dir, file.pdf, sep = "/"))
     }else{
         print("Manuscript directory not present.")
     }

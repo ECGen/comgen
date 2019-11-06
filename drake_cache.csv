@@ -60,8 +60,8 @@ d9c33500ad85da0b,import,run_perm
 901949935f964921,import,run_reml
 64b138bf81cf696c,import,run_xgsize
 3a1dd7d5c5f172da,target,tables
-f7a02ffb8aa09ac9,import,update_manuscript
-5c487927ca292830,target,update.manuscript
+0a6d139f6b35ad0e,import,update_manuscript
+8271c9325d9ef093,target,update.manuscript
 2129a49e5ced4bca,target,xg_size.pdf
 9b5400ea7d5ace2a,target,xg.reml
 2e3f85a02ff02fd7,target,xgal.size.in

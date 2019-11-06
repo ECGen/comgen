@@ -84,14 +84,15 @@ plan <- drake_plan(
           include.colnames = TRUE),
     ## Update Tables and Figures in Manuscript
     update.manuscript = update_manuscript(
-        c("results/cn_onc.pdf",
+        files = c("results/cn_onc.pdf",
           "results/cn_chplot.pdf",
           "results/cn_metrics.pdf",
           "results/xg_size.pdf",
           "results/h2_reml.tex",
           "results/cn_perm.tex",
           "results/com_perm.tex"), 
-        dir = "docs/lcn_manuscript/"),
+        dir = "docs/lcn_manuscript", 
+        file.tex = "main.tex"),
 ### Generate a report
     ## report.md = rmarkdown::render(
     ##   knitr_in("R/report_lcn.Rmd"),
