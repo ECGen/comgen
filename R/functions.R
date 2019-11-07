@@ -511,7 +511,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
     tab.cn.perm <- xtable::xtable(
        perm.results[["cn"]],
        caption = "Pseudo-F Table of lichen network similarity PERMANOVA.",
-       label = "tab:cn_perm_table",
+       label = "tab:cn_perm",
        type = "latex", 
        include.rownames = TRUE,
        include.colnames = TRUE
@@ -519,7 +519,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
     tab.com.perm <- xtable::xtable(
        perm.results[["com"]],
        caption = "Pseudo-F Table of lichen community similarity PERMANOVA.",
-       label = "tab:com_perm_table",
+       label = "tab:com_perm",
        type = "latex", 
        include.rownames = TRUE,
        include.colnames = TRUE
@@ -715,6 +715,7 @@ plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
 
 ## Updates the manuscript
 update_manuscript <- function(files, dir, file.tex = "main.tex"){
+    files = paste0("results/", names(files))
     if (dir.exists(dir)){
         file.copy(
             overwrite = TRUE, recursive = FALSE, copy.mode = TRUE,

@@ -1,6 +1,6 @@
 ## Check for supporting packages
 cran.pkgs <- c("magrittr", "devtools", 
-              "xtable", "reshape",
+              "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
               "bipartite", "RColorBrewer", "enaR"
               )

@@ -54,6 +54,8 @@ plan <- drake_plan(
     xg.reml = run_xgsize(xgs.data), 
     ## Test correlation between traits with genetic basis
     reg.trait = summary(lm(I(BR^(1/4))~CT, data = onc.dat)),
+    ## Test correlation between networks and community comp
+    cor.cn.com = vegan::mantel(cn.d.onc, vegdist(onc.com.rel)),
     ## Test correlation between traits and network metrics
     reg.trait.nm = run_trait_nm(onc.dat), 
     ## Get correlation values
@@ -74,48 +76,36 @@ plan <- drake_plan(
     ## tab:cn_perm_table = network similarity PERMANOVA
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
-    tables = make_tables(onc.dat, reml.results, perm.results, digits = 3),
+    xtab = make_tables(onc.dat, reml.results, perm.results, digits = 3),
     ## Update lichen manuscript tables and figures
-    h2_reml.tex = print(xtable(tables[["h2_reml"]], type = "latex"), 
-          file = "results/h2_reml.tex", 
-          include.rownames = FALSE,
-          include.colnames = TRUE),
-    cn_perm.tex = print(xtable(tables[["cn"]], type = "latex"), 
-          file = "results/cn_perm.tex", 
-          include.rownames = TRUE,
-          include.colnames = TRUE),
-    com_perm.tex =print(xtable(tables[["com"]], type = "latex"), 
-          file = "results/com_perm.tex", 
-          include.rownames = TRUE,
-          include.colnames = TRUE),
-    ## Update Tables and Figures in Manuscript
+    h2_reml.tex = print(
+        xtab[["h2_reml"]], 
+        file = "results/h2_reml.tex", 
+        include.rownames = FALSE,
+        include.colnames = TRUE),
+    cn_perm.tex = print(
+        xtab[["cn"]], 
+        file = "results/cn_perm.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
+    com_perm.tex = print(
+        xtab[["com"]], 
+        file = "results/com_perm.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
+    ## Tables and Figures for Manuscript
+    tables_figures = list(
+            h2_reml.tex = h2_reml.tex,
+            cn_perm.tex = cn_perm.tex,
+            com_perm.tex = com_perm.tex,
+            cn_onc.pdf = cn_onc.pdf,
+            cn_chplot.pdf = cn_chplot.pdf,
+            cn_metrics.pdf = cn_metrics.pdf,
+            xg_size.pdf = xg_size.pdf
+            ),
+    ## Generate the manuscript
     update.manuscript = update_manuscript(
-        files = c("results/cn_onc.pdf",
-          "results/cn_chplot.pdf",
-          "results/cn_metrics.pdf",
-          "results/xg_size.pdf",
-          "results/h2_reml.tex",
-          "results/cn_perm.tex",
-          "results/com_perm.tex"), 
+        files = tables_figures, 
         dir = "docs/lcn_manuscript", 
-        file.tex = "main.tex"),
-### Generate a report
-    ## report.md = rmarkdown::render(
-    ##   knitr_in("R/report_lcn.Rmd"),
-    ##   output_dir = file_out("results/"),
-    ##   output_format = "md_document",
-    ##   quiet = TRUE
-    ##   ),
-    ## report.html = rmarkdown::render(
-    ##   knitr_in("R/report_lcn.Rmd"),
-    ##   output_dir = file_out("results/"),
-    ##   output_format = "html_document",
-    ##   quiet = TRUE
-    ##   ),
-    report.pdf = rmarkdown::render(
-        knitr_in("R/report_lcn.Rmd"),
-        output_dir = file_out("results/"),
-        output_format = "pdf_document",
-        quiet = TRUE
-        )
+        file.tex = "main.tex")
 )
