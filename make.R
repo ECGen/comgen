@@ -1,13 +1,22 @@
-source("R/packages.R")  # loads packages
-source("R/functions.R") # defines the create_plot() function
-source("R/plan.R")      # creates the drake plan
+# This project uses the Drake workflow manager.
+# https://ropenscilabs.github.io/drake-manual/walkthrough.html
+# Call make() to runs the project.
+# The "targets" will be stored in a hidden .drake/ cache,
+# and you can read them back into memory with loadd() and read().
+# Drake's data target cache is ignored by git to avoid large files.
+# All input data are already tracked with git.
+# A hash log is saved as drake_cache.csv, which git does track.
 
+source("R/packages.R")  # Loads packages, e.g. library(drake).
+source("R/functions.R") # Custom code as a bunch of functions.
+source("R/plan.R")      # Creates the drake plan, i.e. the project.
+make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.
+
+# Run vis_drake_graph to plot the workflow.
+if (exp(1) > pi){
+    vis_drake_graph(drake_config(plan))
+}
+
+# Scaling/Parallel Computing
 # options(clustermq.scheduler = "multicore") # optional parallel
 # computing. Also needs parallelism = "clustermq"
-
-make(
-  plan, # defined in R/plan.R
-  verbose = 2,
-  cache_log_file = TRUE
-)
-# vis_drake_graph(drake_config(plan))
