@@ -60,15 +60,19 @@ plan <- drake_plan(
     reg.trait.nm = run_trait_nm(onc.dat), 
     ## Get correlation values
     cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
+    ## Species centrality analysis
+    spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
-    ## fig: cn_onc
+    ## fig:cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"), 
     ## fig:cn_chplot
     cn_chplot.pdf = plot_netsim(cn.ord, 
         onc.dat, 
         file = "results/cn_chplot.pdf"),
-    ## fig: heritable traits
+    ## fig:cn_metrics
     cn_metrics.pdf = plot_mdc(onc.dat, file = "results/cn_metrics.pdf"),
+    ## fig:spp_cen
+    spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
 ### Tables
@@ -76,7 +80,7 @@ plan <- drake_plan(
     ## tab:cn_perm_table = network similarity PERMANOVA
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
-    xtab = make_tables(onc.dat, reml.results, perm.results, digits = 3),
+    xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
@@ -95,14 +99,15 @@ plan <- drake_plan(
         include.colnames = TRUE),
     ## Tables and Figures for Manuscript
     tables_figures = list(
-            h2_reml.tex = h2_reml.tex,
-            cn_perm.tex = cn_perm.tex,
-            com_perm.tex = com_perm.tex,
-            cn_onc.pdf = cn_onc.pdf,
-            cn_chplot.pdf = cn_chplot.pdf,
-            cn_metrics.pdf = cn_metrics.pdf,
-            xg_size.pdf = xg_size.pdf
-            ),
+        h2_reml.tex = h2_reml.tex,
+        cn_perm.tex = cn_perm.tex,
+        com_perm.tex = com_perm.tex,
+        cn_onc.pdf = cn_onc.pdf,
+        cn_chplot.pdf = cn_chplot.pdf,
+        cn_metrics.pdf = cn_metrics.pdf,
+        spp_cen.pdf = spp_cen.pdf, 
+        xg_size.pdf = xg_size.pdf
+        ),
     ## Generate the manuscript
     update.manuscript = update_manuscript(
         files = tables_figures, 

@@ -6,16 +6,16 @@
 # Drake's data target cache is ignored by git to avoid large files.
 # All input data are already tracked with git.
 # A hash log is saved as drake_cache.csv, which git does track.
-source("R/packages.R")  # Loads packages, e.g. library(drake).
-source("R/functions.R") # Custom code as a bunch of functions.
-source("R/plan.R")      # Creates the drake plan, i.e. the project.
-make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.
-
-# Run vis_drake_graph to plot the workflow.
-if (exp(1) > pi){
-    vis_drake_graph(drake_config(plan))
-}
-
 # Scaling/Parallel Computing
 # options(clustermq.scheduler = "multicore") # optional parallel
 # computing. Also needs parallelism = "clustermq"
+
+source("R/packages.R")  # Loads packages, e.g. library(drake).
+source("R/functions.R") # Custom code as a bunch of functions.
+source("R/plan.R")      # Creates the drake plan, i.e. the project.
+# Run vis_drake_graph to plot the workflow.
+if (exp(1) > pi){
+    vis_drake_graph(drake_config(plan), nav = FALSE, main = "")
+}
+
+make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.

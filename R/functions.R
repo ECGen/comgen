@@ -353,6 +353,35 @@ check_shapiro <- function(reml.reml){
     return(out)
 }
 
+run_spp_centrality <- function(cn.onc, onc.dat){
+    cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
+                      sna::degree, 
+                      rescale = TRUE
+                      )
+    cen.spp <- do.call(rbind, cen.spp)
+    cen.spp[is.na(cen.spp)] <- 0
+    colnames(cen.spp) <- colnames(cn.onc[[1]])
+    if (any(rownames(cen.spp) != onc.dat[, "tree.id"])){stop()}
+    colnames(cen.spp) <- paste0("cen_", colnames(cen.spp))
+    cen.spp <- cen.spp[, apply(sign(cen.spp), 2, sum) > 3]
+    cen.spp.reml <- list()
+    for (i in seq_along(colnames(cen.spp))){
+        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno), 
+                               data = onc.dat, REML = TRUE)
+        reml.pval <- RLRsim::exactRLRT(cen.reml)
+        cen.spp.reml[[i]] <- c(
+            "spp centrality", 
+            H2 = H2(cen.reml, g = onc.dat[, "geno"]), 
+            R2 = R2(cen.reml), 
+            p.value = reml.pval[["p.value"]]
+            )
+    }
+    cen.spp.table <- do.call(rbind, cen.spp.reml)[, -1]
+    cen.spp.table <- apply(cen.spp.table, 2, as.numeric)
+    rownames(cen.spp.table) <- colnames(cen.spp)
+    out <- list(cen.spp = cen.spp, cen.spp.reml = cen.spp.table)
+}
+
 run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     if (rm.na){onc.dat <- na.omit(onc.dat)}
     ## tree traits
@@ -473,7 +502,7 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
+make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     ## Heritability table
     h2.tab <- reml.results
     colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
@@ -499,6 +528,15 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
         digits = digits
     )
     h2.tab <- na.omit(h2.tab)
+    ## Format lichen network permanova table
+    cn.perm <- as.data.frame(perm.results[["cn"]])
+    rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
+                           "C:N Ratio", "Condensed Tannins", 
+                           "Percent Cover", "Species Richness",
+                           "Species Evenness", "Number of Links", 
+                           "Network Modularity", "Network Centrality", 
+                           "Residual", "Total")
+    colnames(cn.perm) <- c("df", "SS", "R2", "F", "p-value")
     ## Create the latex
     tab.h2 <- xtable::xtable(
        h2.tab,
@@ -506,24 +544,27 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 3){
        label = "tab:h2_table",
        type = "latex",
        include.rownames = FALSE,
-       include.colnames = TRUE
+       include.colnames = TRUE, 
+        digits = digits
        )
     tab.cn.perm <- xtable::xtable(
-       perm.results[["cn"]],
-       caption = "Pseudo-F Table of lichen network similarity PERMANOVA.",
-       label = "tab:cn_perm",
-       type = "latex", 
-       include.rownames = TRUE,
-       include.colnames = TRUE
-       )
+        cn.perm,
+        caption = "PERMANOVA Pseudo-F Table of lichen network similarity.",
+        label = "tab:cn_perm",
+        type = "latex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE, 
+        digits = digits
+        )
     tab.com.perm <- xtable::xtable(
-       perm.results[["com"]],
-       caption = "Pseudo-F Table of lichen community similarity PERMANOVA.",
-       label = "tab:com_perm",
-       type = "latex", 
-       include.rownames = TRUE,
-       include.colnames = TRUE
-       )
+        perm.results[["com"]],
+        caption = "Pseudo-F Table of lichen community similarity PERMANOVA.",
+        label = "tab:com_perm",
+        type = "latex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE, 
+        digits = digits
+        )
     out <- list(h2_reml = tab.h2, 
                 cn = tab.cn.perm, 
                 com = tab.com.perm)
@@ -537,6 +578,27 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
     vec <- envfit(nms, vec.data)
     out <- list(nms = nms, vec = vec, report = nms.out)
     return(out)
+}
+
+run_sppcen_aov <- function(spp.cen){
+    sppcen.aov <- aov(value ~ X2, data = melt(spp.cen[["cen.spp"]]))
+    sppcen.mct <- TukeyHSD(sppcen.aov)
+    out <- list(aov = sppcen.aov, mct = sppcen.mct)
+    return(out)
+}
+
+plot_sppcen <- function(spp.cen, file = "results/spp_cen.pdf"){
+    dat <- melt(spp.cen[["cen.spp"]])
+    spp <- do.call(rbind, strsplit(as.character(dat[, "X2"]), split = "_"))[, 2]
+    cen <- dat[, "value"]
+    mu <- tapply(cen, spp, mean)
+    se <- tapply(cen, spp, sd) / sqrt(nrow(dat))
+    se <- se[order(mu, decreasing = TRUE)]
+    mu <- mu[order(mu, decreasing = TRUE)]
+    pdf(file = file)
+    barplot2(mu, plot.ci = TRUE, ci.u = mu + se, ci.l = mu - se,
+             ylab = "Centrality", xlab = "Lichen Species")
+    dev.off()
 }
 
 plot_netsim <- function(ord, onc.dat, file = "./cn_chplot.pdf"){
@@ -558,6 +620,7 @@ plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
     mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
+             xlas = 2, 
              ord = order(tapply(onc.dat[, "CT"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE)

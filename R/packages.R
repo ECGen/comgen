@@ -2,7 +2,7 @@
 cran.pkgs <- c("magrittr", "devtools", 
               "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
-              "bipartite", "RColorBrewer", "enaR"
+              "bipartite", "RColorBrewer", "enaR", "gplots"
               )
 gh.pkgs <- c("ROpenSci/drake", "r-lib/styler",
              "ECGen/ComGenR", "ECGen/conetto")
