@@ -512,7 +512,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                      R2(perm.results[["com"]]),
                      unlist(perm.results[["com"]])["Pr(>F)1"]
                      )
-    cn.perm.h2 <- c("Lichen Network", 
+    cn.perm.h2 <- c("Lichen Network Similarity", 
                     H2(perm.results[["cn"]], g = onc.dat[, "geno"], perm = 10000),
                     R2(perm.results[["cn"]]),
                     unlist(perm.results[["cn"]])["Pr(>F)1"]
@@ -528,6 +528,16 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         digits = digits
     )
     h2.tab <- na.omit(h2.tab)
+    ## Organize H2 table
+    h2.tab <- h2.tab[c(12, 9, 11, 10, 5:8, 13, 1, 3, 4, 2), ]
+                                        # Lichen Networks
+                                        # Lichen Network Metrics
+                                        # Lichen Community
+                                        # Tree Traits
+    ## Remove R2 from H2 table
+    h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
+    ## Add grouping labels
+    h2.tab <- 
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
     rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
@@ -575,7 +585,7 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
     set.seed(seed)
     nms <- nmds(d, dim, dim)
     nms.out <- capture.output(nms <- nmds.min(nms))
-    vec <- envfit(nms, vec.data)
+    vec <- vf(nms, vec.data)
     out <- list(nms = nms, vec = vec, report = nms.out)
     return(out)
 }
@@ -601,22 +611,26 @@ plot_sppcen <- function(spp.cen, file = "results/spp_cen.pdf"){
     dev.off()
 }
 
-plot_netsim <- function(ord, onc.dat, file = "./cn_chplot.pdf"){
+plot_netsim <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
+                        file = "./cn_chplot.pdf"){
     par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1))
     pdf(file)
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
-                         cex = 2.65, lwd = 2.5, mu.pch = 15,
+                         cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = "darkgrey"
+                         bar.col = grey(0.5)
                          )
-    text(chp.coord, labels = rownames(chp.coord), cex = 0.65)
-    plot(ord[["vec"]], col = "black", lwd = 5)
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    if (plot.vectors){
+        plot(ord[["vec"]], pval = sig.alpha, col = grey(0.01), 
+             lwd = 1.0, ascale = 1.25, cex = 1)
+    }
     dev.off()
 }
 
 plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
-    pdf(file)
     ## Significant Genotype and Network Effects
+    pdf(file)
     mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
@@ -629,11 +643,49 @@ plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
              add = TRUE, pch = 1,
              ord = order(tapply(onc.dat[, "CT"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.005
+                 decreasing = TRUE), xjit = 0.005, xlas = 2
              )
     legend("topright", 
            legend = c("Condensed Tannins", "Bark Roughness"), 
            pch = c(19, 1), bty = "none")
+    dev.off()
+}
+
+plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
+                    file = "./cn_trait_h2.pdf"){
+    ## Significant Genotype and Network Effects
+    par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1))
+    pdf(file)
+    chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
+                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         pt.col = "white",
+                         bar.col = grey(0.5)
+                         )
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    if (plot.vectors){
+        plot(ord[["vec"]], pval = sig.alpha, col = grey(0.01), 
+             lwd = 1.0, ascale = 1.25, cex = 1)
+    }
+    legend("topleft", "A", bty = "n", text.font = 2)
+    ## MDC Plot
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
+             ylim = c(-1.25, 3),
+             xlab = "Tree Genotype", ylab = "Standardized Metric",
+             xlas = 2, 
+             ord = order(tapply(onc.dat[, "CT"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE)
+             )
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
+             add = TRUE, pch = 1,
+             ord = order(tapply(onc.dat[, "CT"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE), xjit = 0.005, xlas = 2
+             )
+    legend("topright", 
+           legend = c("Condensed Tannins", "Bark Roughness"), 
+           pch = c(19, 1), bty = "none")
+    legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()
 }
 

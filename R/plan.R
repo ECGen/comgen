@@ -63,14 +63,11 @@ plan <- drake_plan(
     ## Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
-    ## fig:cn_onc
-    cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"), 
-    ## fig:cn_chplot
-    cn_chplot.pdf = plot_netsim(cn.ord, 
-        onc.dat, 
-        file = "results/cn_chplot.pdf"),
-    ## fig:cn_metrics
-    cn_metrics.pdf = plot_mdc(onc.dat, file = "results/cn_metrics.pdf"),
+    ## fig:h2_plot
+    h2_plot.pdf = plot_h2(cn.ord, 
+        onc.dat, sig.alpha = 0.15, 
+        plot.vectors = FALSE,
+        file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
     ## SUPPLEMENTARY
@@ -103,8 +100,7 @@ plan <- drake_plan(
         cn_perm.tex = cn_perm.tex,
         com_perm.tex = com_perm.tex,
         cn_onc.pdf = cn_onc.pdf,
-        cn_chplot.pdf = cn_chplot.pdf,
-        cn_metrics.pdf = cn_metrics.pdf,
+        h2_plot.pdf,
         spp_cen.pdf = spp_cen.pdf, 
         xg_size.pdf = xg_size.pdf
         ),
