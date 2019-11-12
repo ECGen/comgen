@@ -48,7 +48,7 @@ plan <- drake_plan(
     ## PERMANOVAs for Network and Community Similarity
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
     ## Network Ordination
-    cn.ord = run_nms(cn.d.onc, onc.dat[, -c(1, 6, 7)]),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, c(8, 15)]),
     ## Size analysis
     ## Size is square-rooted
     xg.reml = run_xgsize(xgs.data), 
@@ -63,10 +63,12 @@ plan <- drake_plan(
     ## Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
+    ## fig:cn_onc
+    cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
     ## fig:h2_plot
     h2_plot.pdf = plot_h2(cn.ord, 
         onc.dat, sig.alpha = 0.15, 
-        plot.vectors = FALSE,
+        plot.vectors = TRUE,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
@@ -100,7 +102,7 @@ plan <- drake_plan(
         cn_perm.tex = cn_perm.tex,
         com_perm.tex = com_perm.tex,
         cn_onc.pdf = cn_onc.pdf,
-        h2_plot.pdf,
+        h2_plot.pdf = h2_plot.pdf,
         spp_cen.pdf = spp_cen.pdf, 
         xg_size.pdf = xg_size.pdf
         ),

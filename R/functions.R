@@ -536,8 +536,6 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                                         # Tree Traits
     ## Remove R2 from H2 table
     h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
-    ## Add grouping labels
-    h2.tab <- 
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
     rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
@@ -654,19 +652,20 @@ plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
 plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
                     file = "./cn_trait_h2.pdf"){
     ## Significant Genotype and Network Effects
-    par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1))
-    pdf(file)
+    pdf(file, width = 4, height = 8)
+    par(mfrow = c(2, 1), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
                          bar.col = grey(0.5)
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
-    if (plot.vectors){
-        plot(ord[["vec"]], pval = sig.alpha, col = grey(0.01), 
-             lwd = 1.0, ascale = 1.25, cex = 1)
-    }
     legend("topleft", "A", bty = "n", text.font = 2)
+    if (plot.vectors){
+        plot(ord[["vec"]], pval = sig.alpha, 
+             col = grey(0.01), 
+             lwd = 1.0, ascale = 2.0, cex = 1)
+    }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
              ylim = c(-1.25, 3),
