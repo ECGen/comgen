@@ -402,8 +402,8 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     ct.reml.result <- c("Condensed Tannins (CT)", 
                         H2(ct.reml, g = onc.dat$geno), 
                         R2(ct.reml), ct.reml.pval$p.value)
-    cnr.reml <- lme4::lmer(I(CN^(1 / 4)) ~ (1 | geno), 
-                           data = onc.dat, REML = TRUE)
+    cnr.reml <- lme4::lmer(I(log(CN^(1 / 1) + 0.001)) ~ (1 | geno), 
+                            data = onc.dat, REML = TRUE)
     cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
     cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
                          H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), 
@@ -415,19 +415,19 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     ptc.reml.result <- c("Percent Lichen Cover", 
                          H2(ptc.reml, g = onc.dat$geno), 
                          R2(ptc.reml), ptc.reml.pval$p.value)
-    spr.reml <- lme4::lmer(I(SR^(1 / 4)) ~ (1 | geno), 
+    spr.reml <- lme4::lmer(I(log(SR^(1 / 1) + 0.001)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
     spr.reml.result <- c("Lichen Species Richness", 
                          H2(spr.reml, g = onc.dat$geno), 
                          R2(spr.reml), spr.reml.pval$p.value)
-    spd.reml <- lme4::lmer(I(SD^(1 / 4)) ~ (1 | geno), 
+    spd.reml <- lme4::lmer(I(SD^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
     spd.reml.result <- c("Lichen Species Diversity", 
                          H2(spd.reml, g = onc.dat$geno), 
                          R2(spd.reml), spd.reml.pval$p.value)
-    spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~ (1 | geno), 
+    spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
     spe.reml.result <- c("Lichen Species Evenness", 
@@ -446,7 +446,7 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     cen.reml.result <- c("Network Centrality", 
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
-    mod.reml <- lme4::lmer(I(mod.lik^(1 / 4)) ~ (1 | geno), 
+    mod.reml <- lme4::lmer(I(mod.lik^(2 / 1)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
     mod.reml.result <- c("Network Modularity", 
@@ -652,8 +652,8 @@ plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
 plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
                     file = "./cn_trait_h2.pdf"){
     ## Significant Genotype and Network Effects
-    pdf(file, width = 4, height = 8)
-    par(mfrow = c(2, 1), mar = c(5.1, 4.1, 4.1, 2.1))
+    pdf(file, width = 9, height = 4.5)
+    par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
