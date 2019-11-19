@@ -1,5 +1,5 @@
 ## Check for supporting packages
-cran.pkgs <- c("magrittr", "devtools", 
+cran.pkgs <- c("magrittr", "devtools", "beepr",
               "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
               "bipartite", "RColorBrewer", "enaR", "gplots"

@@ -22,4 +22,4 @@ if (exp(1) > pi){
 }
 
 make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.
-   
+beep(4)
