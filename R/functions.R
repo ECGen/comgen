@@ -481,16 +481,6 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     return(out)
 }
 
-g.mat <- model.matrix(~ g - 1)
-gm.d <- dist(g.mat)
-t.mat <- onc.dat[, c("BR", "CT")]
-t.mat <- apply(t.mat, 2, function(x) x/max(x))
-tm.d <- dist(t.mat)
-
-MRM(tm.d ~ gm.d)
-MRM(cn.d.onc ~ gm.d + tm.d)
-MRM(cn.d.onc ~  tm.d + gm.d)
-MRM(cn.d.onc ~  gm.d)
 
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
