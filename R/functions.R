@@ -476,25 +476,38 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
                      link.reml.result,
                      mod.reml.result,
                      cen.reml.result)
-
     }
     return(out)
 }
 
+std <- function(x){
+    (x - mean(x)) / sqrt(length(x))
+}
 
+run_SEM <- function(onc.dat){
+
+    CT.d <- dist(std(onc.dat[, "CT"]))
+    BR.d <- dist(std(onc.dat[, "BR"]))
+    PC.d <- dist(std(onc.dat[, "PC"]))
+    SR.d <- dist(std(onc.dat[, "SR"]))
+    g.m <- model.matrix(~ geno - 1, data = onc.dat)
+    geno.d <- dist(g.m)
+    
+    mantel(cn.d.onc ~ SR.d)
+    mantel(cn.d.onc ~ SR.d + PC.d)
+    mantel(cn.d.onc ~ SR.d + geno.d)
+    mantel(cn.d.onc ~ geno.d + SR.d)
+    mantel(cn.d.onc ~ geno.d + SR.d + PC.d)
+
+}
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
-    com.perm <- vegan::adonis2((onc.com^(1/4)) ~ geno + 
-                                   BR + pH + CN + CT + 
-                                       PC + SR + SE,
+    com.perm <- vegan::adonis2((onc.com.rel^(1/4)) ~ geno + SR + PC,
                                data = onc.dat, 
                                by = "term",
                                mrank = TRUE,
                                perm = 10000)
-    cn.perm <- vegan::adonis2(cn.d.onc ~ geno + 
-                                  BR + pH + CN + CT +
-                                      PC + SR + SE + 
-                                         L + mod.lik + Cen,
+    cn.perm <- vegan::adonis2(cn.d.onc ~ geno + SR + PC,
                               by = "term", 
                               data = onc.dat, 
                               mrank = TRUE,

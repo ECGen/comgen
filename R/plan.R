@@ -12,7 +12,7 @@ plan <- drake_plan(
     xgal.size.in = read.csv("./data/lcn/ONC_Xgal_SizeData_May2011.csv"),
 ### Data wrangling
     ## Genotypes and Trees to Remove
-    rm.geno = c("RL6", "T6", "1007"),
+    rm.geno = c("RL6", "T6"),
     rm.tree = c("N1.31"),
     garden.data = proc_garden_data(garden.data.in, 
                                    rm.geno,
