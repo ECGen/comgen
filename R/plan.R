@@ -18,48 +18,46 @@ plan <- drake_plan(
                                    rm.geno,
                                    rm.tree),
     ## Lichen Quadrats with Cell-wise Observations
-    onc = proc_onc(garden.data),
-    onc.q = proc_onc_q(onc),
+    onc.q = proc_onc_q(garden.data, rm.zeros = FALSE),
     ## Tree Information
     onc.dat = proc_onc_dat(garden.data, rough.in, 
-        onc, onc.q, 
-        onc.nc.in, onc.tan.in, onc.ph.in),
+        onc.q, onc.nc.in, onc.tan.in, onc.ph.in),
     ## Size data 
     xgs.data = proc_size(xgal.size.in), 
 ### Modeling
     ## Lichen Network Models
-    cn.onc = proc_cn_onc(onc),
+    cn.onc = proc_cn_onc(onc.q),
     ## Lichen Network Metrics
-    onc.ns = proc_onc_ns(cn.onc),
+    ## onc.ns = proc_onc_ns(cn.onc),
     ## Lichen Network Model Similarity
     cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, rm.na = TRUE),
     ## Lichen Community Matrix
-    onc.com = proc_onc_com(garden.data, onc, onc.q, onc.dat, rm.na = TRUE),
+    onc.com = proc_onc_com(garden.data, onc.q, onc.dat, rm.na = TRUE),
     ## Relativized Lichen Community Matrix
     onc.com.rel = proc_onc_com_rel(onc.com, onc.dat),
 ### Analyses
     ## REML for Genotype Effects
-    ## These use Fourth Root Transformations
-    reml.reml = run_reml(onc.dat, raw = TRUE), 
+    ## These use tranformations, see R/functions/run_reml for details
     reml.results = run_reml(onc.dat),
-    ## Analytical Checks
-    check.shapiro = check_shapiro(reml.reml),
-    check.fligner = check_fligner(onc.dat),
+### Analytical Checks
+    ## check.shapiro = check_shapiro(run_reml(onc.dat, raw = TRUE)),
+    ## check.fligner = check_fligner(onc.dat),
     ## PERMANOVAs for Network and Community Similarity
+    ## NOTE: run_perm may transform the response distances, see R/functions
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
-    ## Network Ordination
+### Network Ordination
     cn.ord = run_nms(cn.d.onc, onc.dat[, c(8, 15)]),
-    ## Size analysis
+### Size analysis
     ## Size is square-rooted
-    xg.reml = run_xgsize(xgs.data), 
+    ## xg.reml = run_xgsize(xgs.data), 
     ## Test correlation between traits with genetic basis
-    reg.trait = summary(lm(I(BR^(1/4))~CT, data = onc.dat)),
+    ## reg.trait = summary(lm(I(BR^(1/4))~CT, data = onc.dat)),
     ## Test correlation between networks and community comp
-    cor.cn.com = vegan::mantel(cn.d.onc, vegdist(onc.com.rel)),
+    ## cor.cn.com = vegan::mantel(cn.d.onc, vegdist(onc.com.rel)),
     ## Test correlation between traits and network metrics
-    reg.trait.nm = run_trait_nm(onc.dat), 
+    ## reg.trait.nm = run_trait_nm(onc.dat), 
     ## Get correlation values
-    cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
+    ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
     ## Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
@@ -96,7 +94,7 @@ plan <- drake_plan(
         file = "results/com_perm.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
-    ## Tables and Figures for Manuscript
+### Tables and Figures for Manuscript
     tables_figures = list(
         h2_reml.tex = h2_reml.tex,
         cn_perm.tex = cn_perm.tex,
@@ -106,7 +104,7 @@ plan <- drake_plan(
         spp_cen.pdf = spp_cen.pdf, 
         xg_size.pdf = xg_size.pdf
         ),
-    ## Generate the manuscript
+### Generate the manuscript
     update.manuscript = update_manuscript(
         files = tables_figures, 
         dir = "docs/lcn_manuscript", 

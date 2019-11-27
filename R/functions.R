@@ -22,26 +22,24 @@ proc_pit <- function(garden.data) {
 
 }
 
-proc_onc <- function(garden.data) {
-
+proc_onc_q <- function(garden.data, rm.zeros = FALSE) {
     g1 <- substr(garden.data[, 1], 2, 2)
     g1[g1 != "P"] <- "onc"
     onc <- garden.data[g1 == "onc", ]
     colnames(onc)[which(colnames(onc) == "Ls")] <- "Lh"
     colnames(onc)[7:ncol(onc)] <- substr(colnames(onc)[7:ncol(onc)], 1, 2)
-    return(onc)
-
-}
-
-proc_onc_q <- function(onc) {
     onc.q <- split(onc, paste(onc[, 1], onc[, 2]))
     onc.q <- lapply(onc.q, function(x) x[, 7:ncol(x)])
+    if (rm.zeros){
+        onc.q <- onc.q[unlist(lapply(onc.q, sum)) != 0]
+    }
     return(onc.q)
 }
 
 
-proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
-                         onc.nc.in, onc.tan.in, onc.ph.in, rm.na = TRUE) {
+proc_onc_dat <- function(garden.data, rough.in, onc.q,
+                         onc.nc.in, onc.tan.in, onc.ph.in, 
+                         rm.na = TRUE) {
     ## Genotype and Tree vectors
     onc.geno <- unlist(sapply(
         names(onc.q), 
@@ -58,9 +56,8 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
     r.tree <- sub("\\.0", "\\.", r.tree)
     names(avg.rough) <- r.tree
     onc.rough <- avg.rough[match(onc.tree, r.tree)]
-    onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
     ## Network data and metrics
-    cn.onc <- lapply(onc.split, coNet, ci.p = 95)
+    cn.onc <- lapply(onc.q, coNet, ci.p = 95)
     ns.onc <- lapply(lapply(cn.onc, function(x) {
         abs(sign(x))
     }), enaR:::structure.statistics)
@@ -148,8 +145,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
     r.tree <- sub("\\.0", "\\.", r.tree)
     names(avg.rough) <- r.tree
     onc.rough <- avg.rough[match(onc.tree, r.tree)]
-    onc.split <- split(onc[, -1:-6], onc[, "Tree"], drop = TRUE)
-    cn.onc <- lapply(onc.split, coNet, ci.p = 95)
+    cn.onc <- lapply(onc.q, coNet, ci.p = 95)
     ns.onc <- lapply(lapply(cn.onc, function(x) {
         abs(sign(x))
     }), enaR:::structure.statistics)
@@ -218,12 +214,10 @@ proc_onc_dat <- function(garden.data, rough.in, onc, onc.q,
     return(onc.dat)
 }
 
-proc_onc_com <- function(garden.data, onc, onc.q, onc.dat, rm.na = TRUE) {
+proc_onc_com <- function(garden.data, onc.q, onc.dat, rm.na = TRUE) {
     g1 <- substr(garden.data[, 1], 2, 2)
     g1[g1 != "P"] <- "onc"
     onc <- garden.data[g1 == "onc", ]
-    onc.q <- split(onc, paste(onc[, 1], onc[, 2]))
-    onc.q <- lapply(onc.q, function(x) x[, -1:-6])
     onc.com <- do.call(
         rbind, 
         lapply(onc.q, 
@@ -258,9 +252,11 @@ proc_onc_com_rel <- function(onc.com, onc.dat, rm.na = TRUE) {
 }
 
 
-proc_cn_onc <- function(onc, onc.dat, ci.p = 95) {
-    lapply(split(onc[, -1:-6], onc[, "Tree"]), 
-           coNet, ci.p = ci.p)
+proc_cn_onc <- function(onc.q, ci.p = 95) {
+    out <- lapply(onc.q, coNet, ci.p = ci.p)
+    names(out) <- do.call(rbind, 
+                          strsplit(names(out), split = " "))[, 1]
+    return(out)
 }
 
 proc_cn_d_onc <- function(cn.onc, onc.dat, rm.na = TRUE){
@@ -493,7 +489,8 @@ run_SEM <- function(onc.dat){
     g.m <- model.matrix(~ geno - 1, data = onc.dat)
     geno.d <- dist(g.m)
     
-    mantel(cn.d.onc ~ SR.d)
+    adonis2(cn.d.onc ~ geno, data = onc.dat, mrank = TRUE)
+    mantel(cn.d.onc ~ SR.d + geno.d)
     mantel(cn.d.onc ~ SR.d + PC.d)
     mantel(cn.d.onc ~ SR.d + geno.d)
     mantel(cn.d.onc ~ geno.d + SR.d)
@@ -502,12 +499,12 @@ run_SEM <- function(onc.dat){
 }
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
-    com.perm <- vegan::adonis2((onc.com.rel^(1/4)) ~ geno + SR + PC,
+    com.perm <- vegan::adonis2((onc.com^(1/4)) ~ SR + PC + geno,
                                data = onc.dat, 
                                by = "term",
                                mrank = TRUE,
                                perm = 10000)
-    cn.perm <- vegan::adonis2(cn.d.onc ~ geno + SR + PC,
+    cn.perm <- vegan::adonis2(cn.d.onc ~ SR + PC + geno,
                               by = "term", 
                               data = onc.dat, 
                               mrank = TRUE,
@@ -553,12 +550,12 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
-    rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
-                           "C:N Ratio", "Condensed Tannins", 
-                           "Percent Cover", "Species Richness",
-                           "Species Evenness", "Number of Links", 
-                           "Network Modularity", "Network Centrality", 
-                           "Residual", "Total")
+    ## rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
+    ##                        "C:N Ratio", "Condensed Tannins", 
+    ##                        "Percent Cover", "Species Richness",
+    ##                        "Species Evenness", "Number of Links", 
+    ##                        "Network Modularity", "Network Centrality", 
+    ##                        "Residual", "Total")
     colnames(cn.perm) <- c("df", "SS", "R2", "F", "p-value")
     ## Create the latex
     tab.h2 <- xtable::xtable(
