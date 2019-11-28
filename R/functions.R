@@ -22,7 +22,7 @@ proc_pit <- function(garden.data) {
 
 }
 
-proc_onc_q <- function(garden.data, rm.zeros = FALSE) {
+proc_onc_q <- function(garden.data, rm.zeros = FALSE, rm.nless = 2) {
     g1 <- substr(garden.data[, 1], 2, 2)
     g1[g1 != "P"] <- "onc"
     onc <- garden.data[g1 == "onc", ]
@@ -33,6 +33,9 @@ proc_onc_q <- function(garden.data, rm.zeros = FALSE) {
     if (rm.zeros){
         onc.q <- onc.q[unlist(lapply(onc.q, sum)) != 0]
     }
+    sr <- unlist(lapply(onc.q, 
+                        function(x) sum(sign(apply(x, 2, sum)))))
+    onc.q <- onc.q[sr > rm.nless]
     return(onc.q)
 }
 
@@ -271,6 +274,12 @@ proc_cn_d_onc <- function(cn.onc, onc.dat, rm.na = TRUE){
     return(cn.d.onc)
 }
 
+trans_cn_d <- function(cn.d.onc, root = 1){
+    out <- as.matrix(cn.d.onc)^(1/root)
+    out <- as.dist(out)
+    return(out)
+}
+
 proc_onc_ns <- function(cn.onc) {
     ns.onc <- lapply(
         lapply(cn.onc, 
@@ -489,22 +498,24 @@ run_SEM <- function(onc.dat){
     g.m <- model.matrix(~ geno - 1, data = onc.dat)
     geno.d <- dist(g.m)
     
-    adonis2(cn.d.onc ~ geno, data = onc.dat, mrank = TRUE)
-    mantel(cn.d.onc ~ SR.d + geno.d)
-    mantel(cn.d.onc ~ SR.d + PC.d)
-    mantel(cn.d.onc ~ SR.d + geno.d)
-    mantel(cn.d.onc ~ geno.d + SR.d)
-    mantel(cn.d.onc ~ geno.d + SR.d + PC.d)
+    adonis2(vegdist(onc.com^(1/1)) ~ geno, data = onc.dat, mrank = TRUE)
+    adonis2(trans_cn_d(cn.d.onc, 1) ~ geno, data = onc.dat, mrank = TRUE)
 
+    adonis2(trans_cn_d(cn.d.onc, 4) ~ geno, data = onc.dat, mrank = TRUE, nperm = 100000)
+
+    mantel(trans_cn_d(cn.d.onc, 4) ~ geno.d)
+    mantel(trans_cn_d(cn.d.onc, 4) ~ SR.d)
+    mantel(trans_cn_d(cn.d.onc, 4) ~ geno.d + SR.d + PC.d)
+    
 }
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
-    com.perm <- vegan::adonis2((onc.com^(1/4)) ~ SR + PC + geno,
+    com.perm <- vegan::adonis2((onc.com^(1/4)) ~ geno,
                                data = onc.dat, 
                                by = "term",
                                mrank = TRUE,
                                perm = 10000)
-    cn.perm <- vegan::adonis2(cn.d.onc ~ SR + PC + geno,
+    cn.perm <- vegan::adonis2(cn.d.onc ~ geno,
                               by = "term", 
                               data = onc.dat, 
                               mrank = TRUE,
@@ -520,14 +531,17 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
     ## Add PERMANOVA results
     com.perm.h2 <- c("Community Composition", 
-                     H2(perm.results[["com"]], g = onc.dat[["geno"]]),
+                     H2(perm.results[["com"]], 
+                        g = onc.dat[["geno"]]),
                      R2(perm.results[["com"]]),
-                     unlist(perm.results[["com"]])["Pr(>F)1"]
+                     as.data.frame(perm.results[["com"]])["geno", "Pr(>F)"]
                      )
     cn.perm.h2 <- c("Lichen Network Similarity", 
-                    H2(perm.results[["cn"]], g = onc.dat[, "geno"], perm = 10000),
+                    H2(perm.results[["cn"]], 
+                       g = onc.dat[, "geno"], 
+                       perm = 10000),
                     R2(perm.results[["cn"]]),
-                    unlist(perm.results[["cn"]])["Pr(>F)1"]
+                    as.data.frame(perm.results[["cn"]])["geno", "Pr(>F)"]
                     )
     h2.tab <- rbind(h2.tab, 
                     cn.perm.h2,
