@@ -490,23 +490,59 @@ std <- function(x){
 }
 
 run_SEM <- function(onc.dat){
-
+    # loadd(onc.com, onc.dat, cn.d.onc)
     CT.d <- dist(std(onc.dat[, "CT"]))
     BR.d <- dist(std(onc.dat[, "BR"]))
     PC.d <- dist(std(onc.dat[, "PC"]))
     SR.d <- dist(std(onc.dat[, "SR"]))
+    SE.d <- dist(std(onc.dat[, "SE"]))
+    pH.d <- dist(std(onc.dat[, "pH"]))
+    CN.d <- dist(std(onc.dat[, "CN"]))
     g.m <- model.matrix(~ geno - 1, data = onc.dat)
     geno.d <- dist(g.m)
-    
-    adonis2(vegdist(onc.com^(1/1)) ~ geno, data = onc.dat, mrank = TRUE)
-    adonis2(trans_cn_d(cn.d.onc, 1) ~ geno, data = onc.dat, mrank = TRUE)
 
-    adonis2(trans_cn_d(cn.d.onc, 4) ~ geno, data = onc.dat, mrank = TRUE, nperm = 100000)
-
-    mantel(trans_cn_d(cn.d.onc, 4) ~ geno.d)
-    mantel(trans_cn_d(cn.d.onc, 4) ~ SR.d)
-    mantel(trans_cn_d(cn.d.onc, 4) ~ geno.d + SR.d + PC.d)
+    set.seed(70); adonis2(cn.d.onc^(1/4) ~ geno, 
+                          data = onc.dat, mrank = TRUE, nperm = 100000)
     
+    ## geno -> net
+    mantel(cn.d.onc^(1/4) ~ geno.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ geno.d + SR.d + SE.d + PC.d + CT.d + BR.d + pH.d + CN.d, nperm = 100000)
+    
+    ## geno -> lichen 
+    mantel(SR.d^(1/4) ~ geno.d, nperm = 100000)
+    mantel(SE.d^(1/4) ~ geno.d, nperm = 100000)
+    mantel(PC.d^(1/4) ~ geno.d, nperm = 100000)
+
+    ## geno -> trait
+    mantel(CT.d^(1/4) ~ geno.d, nperm = 100000)
+    mantel(BR.d^(1/4) ~ geno.d, nperm = 100000)
+    mantel(pH.d^(1/4) ~ geno.d, nperm = 100000)
+    mantel(CN.d^(1/4) ~ geno.d, nperm = 100000)
+
+    ## Trait -> SR
+    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d, nperm = 100000)
+    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = 100000)
+    mantel(SR.d ~ BR.d + CT.d + pH.d + CN.d + geno.d, nperm = 100000)    
+    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = 100000)
+    mantel(SR.d ~ pH.d + CN.d + BR.d + CT.d + geno.d, nperm = 100000)
+    mantel(SR.d ~ CN.d + BR.d + CT.d + pH.d + geno.d, nperm = 100000)
+
+    ## SR -> net
+    mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + BR.d + pH.d + CN.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + BR.d + pH.d + CN.d + CT.d + geno.d, nperm = 100000)
+
+    mantel(cn.d.onc^(1/4) ~ PC.d + SR.d + SE.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ SE.d + PC.d + SR.d, nperm = 100000)
+    
+    ## Trait -> net
+    mantel(cn.d.onc^(1/4) ~ BR.d + CT.d + pH.d + CN.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ CT.d + pH.d + CN.d + BR.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ pH.d + CN.d + BR.d + CT.d, nperm = 100000)
+    mantel(cn.d.onc^(1/4) ~ CN.d + BR.d + CT.d + pH.d, nperm = 100000)
+
+    
+
+
 }
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
@@ -817,7 +853,7 @@ proc_size <- function(xgal.size.in){
 }
 ## X. galericulata size analysis
 run_xgsize <- function(xgs.data){
-    xgs.median.reml <- lme4::lmer(I(median.thallus^(1 / 4)) ~ (1 | geno),
+    xgs.median.reml <- lme4::lmer(I(median.thallus^(1/4)) ~ (1 | geno),
                                   data = xgs.data[xgs.data$geno %in%
                                       names(which(table(xgs.data$geno) > 2)), ],
                                   REML = TRUE
