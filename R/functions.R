@@ -489,8 +489,8 @@ std <- function(x){
     (x - mean(x)) / sqrt(length(x))
 }
 
-run_SEM <- function(onc.dat){
-    # loadd(onc.com, onc.dat, cn.d.onc)
+run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
+    
     CT.d <- dist(std(onc.dat[, "CT"]))
     BR.d <- dist(std(onc.dat[, "BR"]))
     PC.d <- dist(std(onc.dat[, "PC"]))
@@ -502,46 +502,41 @@ run_SEM <- function(onc.dat){
     geno.d <- dist(g.m)
 
     set.seed(70); adonis2(cn.d.onc^(1/4) ~ geno, 
-                          data = onc.dat, mrank = TRUE, nperm = 100000)
+                          data = onc.dat, mrank = TRUE, nperm = np)
     
     ## geno -> net
-    mantel(cn.d.onc^(1/4) ~ geno.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ geno.d + SR.d + SE.d + PC.d + CT.d + BR.d + pH.d + CN.d, nperm = 100000)
-    
-    ## geno -> lichen 
-    mantel(SR.d^(1/4) ~ geno.d, nperm = 100000)
-    mantel(SE.d^(1/4) ~ geno.d, nperm = 100000)
-    mantel(PC.d^(1/4) ~ geno.d, nperm = 100000)
-
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ geno.d + SR.d + SE.d + 
+                             PC.d + CT.d + BR.d + pH.d + CN.d, 
+                         nperm = np)
+    ## geno -> lichen stats
+    set.seed(70); mantel(SR.d^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(SE.d^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(PC.d^(1/4) ~ geno.d, nperm = np)
     ## geno -> trait
-    mantel(CT.d^(1/4) ~ geno.d, nperm = 100000)
-    mantel(BR.d^(1/4) ~ geno.d, nperm = 100000)
-    mantel(pH.d^(1/4) ~ geno.d, nperm = 100000)
-    mantel(CN.d^(1/4) ~ geno.d, nperm = 100000)
-
+    set.seed(70); mantel(CT.d^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(BR.d^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(pH.d^(1/4) ~ geno.d, nperm = np)
+    set.seed(70); mantel(CN.d^(1/4) ~ geno.d, nperm = np)
     ## Trait -> SR
-    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d, nperm = 100000)
-    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = 100000)
-    mantel(SR.d ~ BR.d + CT.d + pH.d + CN.d + geno.d, nperm = 100000)    
-    mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = 100000)
-    mantel(SR.d ~ pH.d + CN.d + BR.d + CT.d + geno.d, nperm = 100000)
-    mantel(SR.d ~ CN.d + BR.d + CT.d + pH.d + geno.d, nperm = 100000)
-
+    set.seed(70); mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d, nperm = np)
+    set.seed(70); mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = np)
+    set.seed(70); mantel(SR.d ~ BR.d + CT.d + pH.d + CN.d + geno.d, nperm = np)
+    set.seed(70); mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = np)
+    set.seed(70); mantel(SR.d ~ pH.d + CN.d + BR.d + CT.d + geno.d, nperm = np)
+    set.seed(70); mantel(SR.d ~ CN.d + BR.d + CT.d + pH.d + geno.d, nperm = np)
     ## SR -> net
-    mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + BR.d + pH.d + CN.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + BR.d + pH.d + CN.d + CT.d + geno.d, nperm = 100000)
-
-    mantel(cn.d.onc^(1/4) ~ PC.d + SR.d + SE.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ SE.d + PC.d + SR.d, nperm = 100000)
-    
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + 
+                             BR.d + pH.d + CN.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ SR.d + PC.d + SE.d + 
+                             BR.d + pH.d + CN.d + CT.d + geno.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ PC.d + SR.d + SE.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ SE.d + PC.d + SR.d, nperm = np)
     ## Trait -> net
-    mantel(cn.d.onc^(1/4) ~ BR.d + CT.d + pH.d + CN.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ CT.d + pH.d + CN.d + BR.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ pH.d + CN.d + BR.d + CT.d, nperm = 100000)
-    mantel(cn.d.onc^(1/4) ~ CN.d + BR.d + CT.d + pH.d, nperm = 100000)
-
-    
-
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ BR.d + CT.d + pH.d + CN.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ CT.d + pH.d + CN.d + BR.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ pH.d + CN.d + BR.d + CT.d, nperm = np)
+    set.seed(70); mantel(cn.d.onc^(1/4) ~ CN.d + BR.d + CT.d + pH.d, nperm = np)
 
 }
 
