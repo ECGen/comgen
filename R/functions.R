@@ -173,6 +173,12 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
                     Cen = dcen.onc, 
                     mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
+    ## adds ascendency
+    cn.onc.net <- lapply(cn.onc, as.network)
+    asc.l <- lapply(cn.onc.net, enaAscendency)
+    asc.df <- do.call(rbind, asc.l)
+    onc.ns <- cbind(onc.ns, asc.df)
+    ## com
     onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
     onc.com <- cbind(onc.com, 
                      ds = rep(min(onc.com[onc.com != 0]) / 1000, 
@@ -202,7 +208,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         geno = factor(onc.geno), 
         tree = tree, 
         BR = onc.rough, 
-        onc.ns[, c("L", "Cen", "mod.lik")],
+        onc.ns[, c("L", "Cen", "mod.lik", "AMI", "ASC")],
         C = onc.nc[match(onc.dat[, "tree.id"], 
                          onc.nc[, "tree.id"]), "C"], 
         N = onc.nc[match(onc.dat[, "tree.id"], 
@@ -371,7 +377,8 @@ run_spp_centrality <- function(cn.onc, onc.dat){
     cen.spp <- cen.spp[, apply(sign(cen.spp), 2, sum) > 3]
     cen.spp.reml <- list()
     for (i in seq_along(colnames(cen.spp))){
-        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno),  data = onc.dat, REML = TRUE)
+        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno),  
+                               data = onc.dat, REML = TRUE)
         reml.pval <- RLRsim::exactRLRT(cen.reml)
         cen.spp.reml[[i]] <- c(
             "spp centrality", 
@@ -585,7 +592,14 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     )
     h2.tab <- na.omit(h2.tab)
     ## Organize H2 table
-    h2.tab <- h2.tab[c(12, 9, 11, 10, 5:8, 13, 1, 3, 4, 2), ]
+    h2.tab <- h2.tab[c("cn.perm.h2",
+                       "cen.reml.result",
+                       "link.reml.result",
+                       "spd.reml.result",
+                       "spr.reml.result",
+                       "spe.reml.result",
+                       "prb.reml.result",
+                       "ct.reml.result"), ]
                                         # Lichen Networks
                                         # Lichen Network Metrics
                                         # Lichen Community
@@ -677,7 +691,7 @@ plot_netsim <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     if (plot.vectors){
         plot(ord[["vec"]], pval = sig.alpha, col = grey(0.01), 
-             lwd = 1.0, ascale = 1.25, cex = 1)
+             lwd = 1.0, ascale = 1.00, cex = 1)
     }
     dev.off()
 }
@@ -720,7 +734,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     if (plot.vectors){
         plot(ord[["vec"]], pval = sig.alpha, 
              col = grey(0.01), 
-             lwd = 1.0, ascale = 2.0, cex = 1)
+             lwd = 1.0, cex = 1)
     }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
