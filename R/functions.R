@@ -262,14 +262,14 @@ proc_cn_onc <- function(onc.q, ci.p = 95) {
     return(out)
 }
 
-proc_cn_d_onc <- function(cn.onc, onc.dat, rm.na = TRUE){
+proc_cn_d_onc <- function(cn.onc, onc.dat, method = "euclidean", rm.na = TRUE){
     if (rm.na){
         cn.d.onc <- distNet(
             cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id], 
-            method = "euclidean"
+            method = method
         )
     }else{
-        cn.d.onc <- distNet(cn.onc, method = "euclidean")
+        cn.d.onc <- distNet(cn.onc, method = method)
     }
     return(cn.d.onc)
 }
@@ -371,8 +371,7 @@ run_spp_centrality <- function(cn.onc, onc.dat){
     cen.spp <- cen.spp[, apply(sign(cen.spp), 2, sum) > 3]
     cen.spp.reml <- list()
     for (i in seq_along(colnames(cen.spp))){
-        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno), 
-                               data = onc.dat, REML = TRUE)
+        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno),  data = onc.dat, REML = TRUE)
         reml.pval <- RLRsim::exactRLRT(cen.reml)
         cen.spp.reml[[i]] <- c(
             "spp centrality", 

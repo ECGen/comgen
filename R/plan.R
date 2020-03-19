@@ -30,7 +30,7 @@ plan <- drake_plan(
     ## Lichen Network Metrics
     ## onc.ns = proc_onc_ns(cn.onc),
     ## Lichen Network Model Similarity
-    cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, rm.na = TRUE),
+    cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, method = "BC", rm.na = TRUE),
     ## Lichen Community Matrix
     onc.com = proc_onc_com(garden.data, onc.q, onc.dat, rm.na = TRUE),
     ## Relativized Lichen Community Matrix
@@ -59,7 +59,7 @@ plan <- drake_plan(
     ## Get correlation values
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
     ## Species centrality analysis
-  ## spp.cen = run_spp_centrality(cn.onc, onc.dat),
+    spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
     ## fig:cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
@@ -68,6 +68,8 @@ plan <- drake_plan(
         onc.dat, sig.alpha = 0.15, 
         plot.vectors = FALSE,
         file = "results/h2_plot.pdf"),
+    ## fig:spp_cen
+    spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
 ### Tables
@@ -99,6 +101,7 @@ plan <- drake_plan(
         com_perm.tex = com_perm.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
+##        spp_cen.pdf = spp_cen.pdf, 
         xg_size.pdf = xg_size.pdf
         ),
 ### Generate the manuscript
