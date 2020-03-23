@@ -699,22 +699,22 @@ plot_netsim <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
 plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
     ## Significant Genotype and Network Effects
     pdf(file)
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
-             ord = order(tapply(onc.dat[, "CT"], 
+             ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE)
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
              add = TRUE, pch = 1,
-             ord = order(tapply(onc.dat[, "CT"], 
+             ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), xjit = 0.005, xlas = 2
              )
     legend("topright", 
-           legend = c("Condensed Tannins", "Bark Roughness"), 
+           legend = c("AMI", "Bark Roughness"), 
            pch = c(19, 1), bty = "none")
     dev.off()
 }
@@ -737,22 +737,22 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
              lwd = 1.0, cex = 1)
     }
     ## MDC Plot
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "CT"],
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
-             ord = order(tapply(onc.dat[, "CT"], 
+             ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE)
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
              add = TRUE, pch = 1,
-             ord = order(tapply(onc.dat[, "CT"], 
+             ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), xjit = 0.005, xlas = 2
              )
     legend("topright", 
-           legend = c("Condensed Tannins", "Bark Roughness"), 
+           legend = c("AMI", "Bark Roughness"), 
            pch = c(19, 1), bty = "none")
     legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()
