@@ -27,10 +27,9 @@ plan <- drake_plan(
 ### Modeling
     ## Lichen Network Models
     cn.onc = proc_cn_onc(onc.q),
-    ## Lichen Network Metrics
-    ## onc.ns = proc_onc_ns(cn.onc),
     ## Lichen Network Model Similarity
-    cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, method = "BC", rm.na = TRUE),
+    cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, 
+        method = "euclidean", rm.na = TRUE),
     ## Lichen Community Matrix
     onc.com = proc_onc_com(garden.data, onc.q, onc.dat, rm.na = TRUE),
     ## Relativized Lichen Community Matrix
@@ -46,7 +45,7 @@ plan <- drake_plan(
     ## NOTE: run_perm may transform the response distances, see R/functions
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
 ### Network Ordination
-    cn.ord = run_nms(cn.d.onc, onc.dat[, c(8, 15)]),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, c("BR", "L", "Cen", "AMI", "ASC")]),
 ### Size analysis
     ## Size is square-rooted
     ## xg.reml = run_xgsize(xgs.data), 
@@ -66,7 +65,7 @@ plan <- drake_plan(
     ## fig:h2_plot
     h2_plot.pdf = plot_h2(cn.ord, 
         onc.dat, sig.alpha = 0.15, 
-        plot.vectors = FALSE,
+        plot.vectors = TRUE,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
