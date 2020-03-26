@@ -39,8 +39,8 @@ plan <- drake_plan(
     ## These use tranformations, see R/functions/run_reml for details
     reml.results = run_reml(onc.dat),
 ### Analytical Checks
-    ## check.shapiro = check_shapiro(run_reml(onc.dat, raw = TRUE)),
-    ## check.fligner = check_fligner(onc.dat),
+    check.shapiro = check_shapiro(run_reml(onc.dat, raw = TRUE)),
+    check.fligner = check_fligner(onc.dat),
     ## PERMANOVAs for Network and Community Similarity
     ## NOTE: run_perm may transform the response distances, see R/functions
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),

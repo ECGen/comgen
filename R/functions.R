@@ -420,13 +420,13 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
                          H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), 
                          cnr.reml.pval$p.value)
     ## lichen community metrics
-    ptc.reml <- lme4::lmer(I(PC^(1 / 4)) ~ (1 | geno), 
+    ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
     ptc.reml.result <- c("Percent Lichen Cover", 
                          H2(ptc.reml, g = onc.dat$geno), 
                          R2(ptc.reml), ptc.reml.pval$p.value)
-    spr.reml <- lme4::lmer(I(log(SR^(1 / 1) + 0.001)) ~ (1 | geno), 
+    spr.reml <- lme4::lmer(I(SR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
     spr.reml.result <- c("Lichen Species Richness", 
@@ -457,6 +457,18 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
     cen.reml.result <- c("Network Centrality", 
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
+    ami.reml <- lme4::lmer(I(AMI^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    ami.reml.pval <- RLRsim::exactRLRT(ami.reml, nsim = 50000)
+    ami.reml.result <- c("Average Mutual Information", 
+                         H2(ami.reml, g = onc.dat$geno), 
+                         R2(ami.reml), ami.reml.pval$p.value)
+    asc.reml <- lme4::lmer(I(ASC^(1 / 2)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    asc.reml.pval <- RLRsim::exactRLRT(asc.reml, nsim = 50000)
+    asc.reml.result <- c("Network Ascendency", 
+                         H2(asc.reml, g = onc.dat$geno), 
+                         R2(asc.reml), asc.reml.pval$p.value)
     mod.reml <- lme4::lmer(I(mod.lik^(2 / 1)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
@@ -474,7 +486,9 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
                      spd.reml,
                      link.reml,
                      mod.reml,
-                     cen.reml)
+                     cen.reml,
+                    ami.reml,
+                    asc.reml)
     }else{
         out <- rbind(prb.reml.result, 
                      ph.reml.result,
@@ -486,7 +500,9 @@ run_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE){
                      spd.reml.result,
                      link.reml.result,
                      mod.reml.result,
-                     cen.reml.result)
+                     cen.reml.result,
+                     ami.reml.result,
+                     asc.reml.result)
     }
     return(out)
 }
@@ -507,23 +523,23 @@ run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
     g.m <- model.matrix(~ geno - 1, data = onc.dat)
     geno.d <- dist(g.m)
 
-    set.seed(70); adonis2(cn.d.onc^(1/4) ~ geno, 
+    adonis2(cn.d.onc^(1/4) ~ geno, 
                           data = onc.dat, mrank = TRUE, nperm = np)
     
     ## geno -> net
-    set.seed(70); mantel(cn.d.onc^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(cn.d.onc^(1/4) ~ geno.d + SR.d + SE.d + 
-                             PC.d + CT.d + BR.d + pH.d + CN.d, 
-                         nperm = np)
+    mantel(cn.d.onc^(1/4) ~ geno.d, nperm = np)
+    mantel(cn.d.onc^(1/4) ~ geno.d + SR.d + SE.d + 
+               PC.d + CT.d + BR.d + pH.d + CN.d, 
+           nperm = np)
     ## geno -> lichen stats
-    set.seed(70); mantel(SR.d^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(SE.d^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(PC.d^(1/4) ~ geno.d, nperm = np)
+    mantel(SR.d^(1/4) ~ geno.d, nperm = np)
+    mantel(SE.d^(1/4) ~ geno.d, nperm = np)
+    mantel(PC.d^(1/4) ~ geno.d, nperm = np)
     ## geno -> trait
-    set.seed(70); mantel(CT.d^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(BR.d^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(pH.d^(1/4) ~ geno.d, nperm = np)
-    set.seed(70); mantel(CN.d^(1/4) ~ geno.d, nperm = np)
+    mantel(CT.d^(1/1) ~ geno.d, nperm = np)
+    mantel(BR.d^(1/1) ~ geno.d, nperm = np)
+    mantel(pH.d^(1/4) ~ geno.d, nperm = np)
+    mantel(CN.d^(1/4) ~ geno.d, nperm = np)
     ## Trait -> SR
     set.seed(70); mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d, nperm = np)
     set.seed(70); mantel(SR.d ~ CT.d + pH.d + CN.d + BR.d + geno.d, nperm = np)
@@ -593,6 +609,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     h2.tab <- na.omit(h2.tab)
     ## Organize H2 table
     h2.tab <- h2.tab[c("cn.perm.h2",
+                       "asc.reml.result",
                        "cen.reml.result",
                        "link.reml.result",
                        "spd.reml.result",
