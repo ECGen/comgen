@@ -46,8 +46,6 @@ env=lichen[[3]][,-13:-ncol(lichen[[3]])]
 env=env[,-3]
 summary(env)
 
-
-
 tree=rep(c(1,0),(nrow(com)/2))
 data.frame(lichen[[1]][1:nrow(com),1],tree)
 
