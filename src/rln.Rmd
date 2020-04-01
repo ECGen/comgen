@@ -75,7 +75,7 @@ The following are variable descriptions (Variable, Type, Range, Definition):
 ```{r results = "hide"}
 
 ## Data are in ../data/scrl
-l.dat <- read.csv("../data/scrl/sp & env combined.csv")
+l.dat <- read.csv("../data/scrl/spp_env_combined.csv")
 
 ## Summary of data
 summary(l.dat)
