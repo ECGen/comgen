@@ -36,7 +36,7 @@ Analysis Summary
     }
 
     ## Libraries
-    my.libs <- c("vegan", "ecodist")
+    my.libs <- c("vegan", "ecodist", "xtable")
     if (any(!(my.libs %in% installed.packages()[, 1]))){
         sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
                install.packages)
@@ -154,22 +154,25 @@ composition is different (PERMANOVA, in text and supplement)
 
     com.ds <- cbind(com, ds = rep(0.0001, nrow(com)))
     set.seed(123)
-    adonis2(com.ds~ Moth, data = l.dat, 
-            strata = l.dat[, "Tree.pairs"],  
-            by = "margin", nperm = 100000)
+    ptab.moth <- adonis2(com.ds~ Moth, data = l.dat, 
+                        strata = l.dat[, "Tree.pairs"], 
+                        by = "margin", nperm = 100000)
+    xtable(ptab.moth)
 
-    ## Permutation test for adonis under NA model
-    ## Marginal effects of terms
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## adonis2(formula = com.ds ~ Moth, data = l.dat, by = "margin", strata = l.dat[, "Tree.pairs"], nperm = 1e+05)
-    ##          Df SumOfSqs      R2      F Pr(>F)  
-    ## Moth      1   0.8281 0.03894 2.3499  0.023 *
-    ## Residual 58  20.4394 0.96106                
-    ## Total    59  21.2676 1.00000                
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## % latex table generated in R 3.6.2 by xtable 1.8-4 package
+    ## % Tue Apr  7 18:10:37 2020
+    ## \begin{table}[ht]
+    ## \centering
+    ## \begin{tabular}{lrrrrr}
+    ##   \hline
+    ##  & Df & SumOfSqs & R2 & F & Pr($>$F) \\ 
+    ##   \hline
+    ## Moth & 1 & 0.83 & 0.04 & 2.35 & 0.0230 \\ 
+    ##   Residual & 58 & 20.44 & 0.96 &  &  \\ 
+    ##   Total & 59 & 21.27 & 1.00 &  &  \\ 
+    ##    \hline
+    ## \end{tabular}
+    ## \end{table}
 
 three main species were reduced by moths (FDR paired t-tests, in text +
 supplement)
@@ -206,23 +209,26 @@ light not litter predicted lichen composition (PERMANOVA, table 3,
 Ordination)
 
     set.seed(123)
-    adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
-            strata = l.dat[, "Tree.pairs"],  
-            by = "margin", nperm = 100000)
+    ptab.env <- adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
+                       strata = l.dat[, "Tree.pairs"],  
+                       by = "margin", nperm = 100000)
+    xtable(ptab.env)
 
-    ## Permutation test for adonis under reduced model
-    ## Marginal effects of terms
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## adonis2(formula = com.ds ~ Light...average + Litter.., data = l.dat, by = "margin", strata = l.dat[, "Tree.pairs"], nperm = 1e+05)
-    ##                 Df SumOfSqs      R2      F Pr(>F)   
-    ## Light...average  1   0.4115 0.01935 1.2257  0.240   
-    ## Litter..         1   1.0096 0.04747 3.0072  0.007 **
-    ## Residual        57  19.1362 0.89979                 
-    ## Total           59  21.2676 1.00000                 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## % latex table generated in R 3.6.2 by xtable 1.8-4 package
+    ## % Tue Apr  7 18:10:38 2020
+    ## \begin{table}[ht]
+    ## \centering
+    ## \begin{tabular}{lrrrrr}
+    ##   \hline
+    ##  & Df & SumOfSqs & R2 & F & Pr($>$F) \\ 
+    ##   \hline
+    ## Light...average & 1 & 0.41 & 0.02 & 1.23 & 0.2400 \\ 
+    ##   Litter.. & 1 & 1.01 & 0.05 & 3.01 & 0.0070 \\ 
+    ##   Residual & 57 & 19.14 & 0.90 &  &  \\ 
+    ##   Total & 59 & 21.27 & 1.00 &  &  \\ 
+    ##    \hline
+    ## \end{tabular}
+    ## \end{table}
 
     nmds.out <- nmds(vegdist(com.ds), 2, 2)
     ord <- nmds.min(nmds.out, dims = 2)
