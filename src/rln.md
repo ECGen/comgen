@@ -224,11 +224,11 @@ Ordination)
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-    nmds.out <- nmds(vegdist(com.ds), 5, 5)
-    ord <- nmds.min(nmds.out, dims = 5)
+    nmds.out <- nmds(vegdist(com.ds), 2, 2)
+    ord <- nmds.min(nmds.out, dims = 2)
 
-    ## Minimum stress for given dimensionality:  0.08730395 
-    ## r^2 for minimum stress configuration:  0.9159319
+    ## Minimum stress for given dimensionality:  0.2164016 
+    ## r^2 for minimum stress configuration:  0.6474944
 
     ord.pch <- c("R", "S")[(l.dat[, "Moth"] + 1)]
     plot(X2~ X1, data = ord, pch = ord.pch)
@@ -638,7 +638,7 @@ shown using an NMDS ordination plot.
     ## 
     ## adonis2(formula = com.ds ~ Moth, data = l.dat, permutations = 9999, strata = factor(l.dat$Tree.pairs))
     ##          Df SumOfSqs      R2      F Pr(>F)  
-    ## Moth      1   0.8849 0.04412 2.6772 0.0224 *
+    ## Moth      1   0.8849 0.04412 2.6772 0.0222 *
     ## Residual 58  19.1700 0.95588                
     ## Total    59  20.0548 1.00000                
     ## ---

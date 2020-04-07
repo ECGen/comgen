@@ -184,10 +184,10 @@ adonis2(com.ds ~  Light...average + Litter.., data = l.dat,
 
 ```
 
-```{R ord-com-plot, cache = TRUE}
+```{R ord-com-plot, cache = TRUE, width = 5, height = 5, dpi = 400}
 
-nmds.out <- nmds(vegdist(com.ds), 5, 5)
-ord <- nmds.min(nmds.out, dims = 5)
+nmds.out <- nmds(vegdist(com.ds), 2, 2)
+ord <- nmds.min(nmds.out, dims = 2)
 ord.pch <- c("R", "S")[(l.dat[, "Moth"] + 1)]
 plot(X2~ X1, data = ord, pch = ord.pch)
 
