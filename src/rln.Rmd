@@ -41,7 +41,7 @@ dif <- function(x){
 }
 
 ## Libraries
-my.libs <- c("vegan", "ecodist", "xtable")
+my.libs <- c("vegan", "ecodist", "knitr", "kableExtra")
 if (any(!(my.libs %in% installed.packages()[, 1]))){
     sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
            install.packages)
@@ -155,7 +155,7 @@ set.seed(123)
 ptab.moth <- adonis2(com.ds~ Moth, data = l.dat, 
                     strata = l.dat[, "Tree.pairs"], 
                     by = "margin", nperm = 100000)
-xtable(ptab.moth)
+kable(ptab.moth)
 
 ```
 
@@ -182,7 +182,7 @@ set.seed(123)
 ptab.env <- adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
                    strata = l.dat[, "Tree.pairs"],  
                    by = "margin", nperm = 100000)
-xtable(ptab.env)
+kable(ptab.env)
 ```
 
 ```{R ord-com-plot, cache = TRUE, width = 5, height = 5, dpi = 400}
