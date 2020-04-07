@@ -1,6 +1,6 @@
 ---
-title: "Rock Lichen data from Sunset Crater collected by Rikke Naesborg and Richard Michalet"
-author: Rikke, Matt, Cameron, Richard
+title: "Rock Lichen data from Sunset Crater"
+author: M.K. Lau
 output: pdf_document
 
 ---
@@ -105,7 +105,7 @@ rownames(l.dat) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 
 Are the communities on each tree type adequately sampled?
 
-```{r }
+```{r specacum}
 
 spa.all <- specaccum(com)
 spa.res <- specaccum(com[l.dat[, "Moth"] == 0, ])
@@ -125,7 +125,86 @@ legend("bottomright",
 
 ```
 
-## Community Analyses 
+# Moth trees have different microenvironments 
+
+- paired t-tests 
+
+# Moth trees have different lichen communities (FIGURE ch.plot A, R, H) 
+
+less abundant and diverse (paired t-tests, in text) 
+
+```{R }
+abun <- apply(com, 1, sum)
+rich <- apply(com, 1, function(x) sum(sign(x)))
+shan <- apply(com, 1, diversity, index = "shannon")
+tt.a <- t.test(tapply(abun, l.dat[, "Tree.pairs"], diff))
+tt.r <- t.test(tapply(rich, l.dat[, "Tree.pairs"], diff))
+tt.h <- t.test(tapply(shan, l.dat[, "Tree.pairs"], diff))
+tt.arh <- do.call(rbind, 
+                  list(a = unlist(tt.a), r = unlist(tt.r), h = unlist(tt.h)))
+data.frame(tt.arh)
+
+```
+
+composition is different (PERMANOVA, in text and supplement)
+
+```{R}
+
+com.ds <- cbind(com, ds = rep(0.0001, nrow(com)))
+set.seed(123)
+adonis2(com.ds~ Moth, data = l.dat, 
+        strata = l.dat[, "Tree.pairs"],  
+        by = "margin", nperm = 100000)
+
+```
+
+three main species were reduced by moths (FDR paired t-tests, in text + supplement)
+
+```{R}
+
+ind.spp <- lapply(com, function(x, p) t.test(tapply(x, p, diff)), p = l.dat[, "Tree.pairs"])
+isp <- apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric)
+rownames(isp) <- names(ind.spp)
+isp[, "p.value"] <- p.adjust(isp[, "p.value"], method = "fdr")
+isp <- isp[order(isp[, "p.value"]), ]
+head(isp[, 1:3])
+
+```
+
+# Litter covering rocks was the main driver (FIGURE = ORDINATION)
+
+light not litter predicted lichen composition (PERMANOVA, table 3, Ordination)
+
+```{R}
+
+set.seed(123)
+adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
+        strata = l.dat[, "Tree.pairs"],  
+        by = "margin", nperm = 100000)
+
+```
+
+```{R ord-com-plot, cache = TRUE}
+
+nmds.out <- nmds(vegdist(com.ds), 5, 5)
+ord <- nmds.min(nmds.out, dims = 5)
+ord.pch <- c("R", "S")[(l.dat[, "Moth"] + 1)]
+plot(X2~ X1, data = ord, pch = ord.pch)
+
+```
+
+litter not light was correlated with large rocks (dist cor, in text)
+
+```{R}
+
+cor.test(tapply(l.dat[, "Big.rocks.."], l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff))
+cor.test(tapply(l.dat[, "Big.rocks.."], l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff))
+
+```
+
+# Community Analyses 
 
 The following is an analysis of the univariate community metrics,
 abundance, richness and diversity (Shannon's index). These three
@@ -147,6 +226,7 @@ differences as dots and confidence intervals as horizontal lines.
 abun <- apply(com, 1, sum)
 rich <- apply(com, 1, function(x) sum(sign(x)))
 shan <- apply(com, 1, diversity, index = "shannon")
+
 ## Examine intercorrelations
 cor.test(abun, rich, method = "k")
 cor.test(abun, shan, method = "k")
@@ -197,26 +277,6 @@ t.test(tapply(l.dat[, "Cerpur.Bryarg"] , l.dat[, "Tree.pairs"], diff))
 
 ```
 
-<!-- Here are dotplots to visualize the differences. -->
-
-<!-- ```{r } -->
-
-<!-- ### Test for effect of moth -->
-
-
-<!-- t.test(tapply(abun, l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(rich, l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(shan, l.dat[, "Tree.pairs"], diff)) -->
-
-<!-- t.test(tapply(l.dat[, "Litter.."] , l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(l.dat[, "Light...average"] , l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(l.dat[, "Light...N"] , l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(l.dat[, "Light...S"] , l.dat[, "Tree.pairs"], diff)) -->
-<!-- t.test(tapply(l.dat[, "Big.rocks.."] , l.dat[, "Tree.pairs"], diff)) -->
-
-
-<!-- ``` -->
-
 
 Lichen communities as a whole responded to the effects of moth
 infection. Using PerMANOVA, a permutational analysis of variance, with
@@ -229,6 +289,20 @@ should be shown using an NMDS ordination plot.
 ### Composition analysis
 com.ds <- cbind(com, ds = rep(0.01, nrow(com)))
 adonis2(com.ds ~ Moth, data = l.dat, strata = factor(l.dat$Tree.pairs), perm = 9999)
+
+set.seed(159)
+adonis2(com.ds ~ Litter.. + Light...average , data = l.dat, 
+          strata = factor(l.dat$Tree.pairs), perm = 10000, by = "margin")
+set.seed(159)
+adonis2(com.ds ~ Light...average + Litter.. , data = l.dat, 
+          strata = factor(l.dat$Tree.pairs), perm = 10000, by = "margin")
+
+cor.test(tapply(l.dat[, "Litter.."] , l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Big.rocks.."] , l.dat[, "Tree.pairs"], diff))
+cor.test(tapply(l.dat[, "Light...average"] , l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Big.rocks.."] , l.dat[, "Tree.pairs"], diff))
+cor.test(tapply(l.dat[, "Light...average"] , l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Small.rocks.."] , l.dat[, "Tree.pairs"], diff))
 
 ```
 
