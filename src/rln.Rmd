@@ -1,7 +1,7 @@
 ---
 title: "Rock Lichen data from Sunset Crater"
 author: M.K. Lau
-output: pdf_document
+output: md_document
 
 ---
 
@@ -29,6 +29,7 @@ susceptibility.
   need to be considered in an evolutionary context.
 
 ```{r, echo = TRUE, results = "hide", eval = TRUE}
+
 # 0. Supporting functions and libraries
 ## Support functions
 
@@ -40,13 +41,21 @@ dif <- function(x){
     return(out)
 }
 
+se <- function(x){sd(x) / sqrt(length(x))}
+
+
 ## Libraries
-my.libs <- c("vegan", "ecodist", "knitr", "kableExtra")
+my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "devtools", "reshape2")
 if (any(!(my.libs %in% installed.packages()[, 1]))){
     sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
            install.packages)
 }else{}
 sapply(my.libs, require, character.only = TRUE)
+
+if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
+   devtools::install_github("ecgen/comgenr")
+}
+
 
 
 ```
@@ -75,7 +84,7 @@ The following are variable descriptions (Variable, Type, Range, Definition):
 ```{r results = "hide"}
 
 ## Data are in ../data/scrl
-l.dat <- read.csv("../data/scrl/spp_env_combined.csv")
+l.dat <- read.csv("./data/scrl/spp_env_combined.csv")
 
 ## Summary of data
 summary(l.dat)
@@ -107,21 +116,20 @@ Are the communities on each tree type adequately sampled?
 
 ```{r specacum}
 
-spa.all <- specaccum(com)
-spa.res <- specaccum(com[l.dat[, "Moth"] == 0, ])
-spa.sus <- specaccum(com[l.dat[, "Moth"] == 1, ])
+spa.all <- specaccum(com, method = "exact")
+spa.res <- specaccum(com[l.dat[, "Moth"] == 1, ], method = "exact")
+spa.sus <- specaccum(com[l.dat[, "Moth"] == 0, ], method = "exact")
 
 plot(spa.all,
      ylim = c(0, 20),
      xlab = "Cumulative Trees Sampled",
-     ylab = "Lichen Species Observed")
-lines(spa.res$sites, spa.res$richness, 
-      ylim = c(0, 20), lty = 2, lwd = 3)
-lines(spa.sus$sites, spa.sus$richness, 
-      ylim = c(0, 20), lty = 3, lwd = 3)
+     ylab = "Lichen Species Observed", 
+     col = "grey", ci.col = 'lightgrey', ci.type = "poly", ci.lty = 0)
+plot(spa.res, ci.col = "black", ci.type = "bar", lty = 1, add = TRUE, ci.lty = 1)
+plot(spa.sus, ci.col = "black", ci.type = "bar", lty = 3, add = TRUE, ci.lty = 3)
 legend("bottomright", 
        legend = c("All", "Resistant", "Susceptible"), 
-       lty = c(1, 2, 3), lwd = c(1, 2, 2))
+       lty = c(1, 1, 3), lwd = c(5, 2, 2), col = c("lightgrey", "black", "black"))
 
 ```
 
@@ -134,6 +142,7 @@ legend("bottomright",
 less abundant and diverse (paired t-tests, in text) 
 
 ```{R }
+
 abun <- apply(com, 1, sum)
 rich <- apply(com, 1, function(x) sum(sign(x)))
 shan <- apply(com, 1, diversity, index = "shannon")
@@ -151,11 +160,21 @@ composition is different (PERMANOVA, in text and supplement)
 ```{R, cache  = TRUE}
 
 com.ds <- cbind(com, ds = rep(0.0001, nrow(com)))
+com.ds.rel <- apply(com, 2, function(x) x/max(x))
+com.ds.rel <- cbind(com.ds.rel, ds = rep(0.0001, nrow(com)))
+com.ds.rel[is.na(com.ds.rel)] <- 0
+
 set.seed(123)
 ptab.moth <- adonis2(com.ds~ Moth, data = l.dat, 
                     strata = l.dat[, "Tree.pairs"], 
                     by = "margin", nperm = 100000)
+set.seed(123)
+ptab.moth.rel <- adonis2(com.ds.rel ~ Moth, data = l.dat, 
+                         strata = l.dat[, "Tree.pairs"], 
+                         by = "margin", nperm = 100000)
+
 kable(ptab.moth)
+kable(ptab.moth.rel)
 
 ```
 
@@ -168,7 +187,62 @@ isp <- apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric)
 rownames(isp) <- names(ind.spp)
 isp[, "p.value"] <- p.adjust(isp[, "p.value"], method = "fdr")
 isp <- isp[order(isp[, "p.value"]), ]
-head(isp[, 1:3])
+
+```
+
+Calculate the average abundances of the indicators
+
+```{r }
+
+isp.names <- as.character(na.omit(rownames(isp[isp[, "p.value"] < 0.05, ])))
+isp.com <- com[,colnames(com) %in% isp.names]
+isp.dif <- apply(isp.com, 2, function(x,y) tapply(x, y, diff), y = l.dat[ ,"Tree.pairs"])
+
+```
+
+Create a multi-bar plot figure for the community.
+
+```{r}
+
+isp.dat <- melt(isp.dif)
+colnames(isp.dat) <- c("Tree.pairs", "Species", "diff")
+isp.mu <- tapply(isp.dat[, "diff"], isp.dat[, "Species"], mean)
+isp.se <- tapply(isp.dat[, "diff"], isp.dat[, "Species"], se)
+ard.dif <- cbind(tapply(abun, l.dat[, "Tree.pairs"], diff), 
+                 tapply(rich, l.dat[, "Tree.pairs"], diff), 
+                 tapply(shan, l.dat[, "Tree.pairs"], diff))
+colnames(ard.dif) <- c("Abundance", "Richness", "Diversity")
+ard.dat <- melt(ard.dif)
+colnames(ard.dat) <- c("Tree.pairs", "Stat", "diff")
+ard.mu <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], mean)
+ard.se <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], se)
+
+pdf(file = "./results/scrl_isp_ard.pdf", width = 10, height = 5)
+par(mfrow = c(1,2))
+bp.out <- barplot(ard.mu, col = "black", ylim = c(-5, 0), 
+                  ylab = "Difference (S - R)")
+lines(x = as.vector(sapply(bp.out, rep, 2)),
+      y = as.vector(rbind(ard.mu + ard.se, ard.mu - ard.se)),
+      type = "h", lwd = 2
+   )
+bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
+                  ylab = "Difference (S - R)")
+lines(x = as.vector(sapply(bp.out, rep, 2)),
+      y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
+      type = "h", lwd = 2
+   )
+dev.off()
+
+```
+
+Create a plot of the two most indicative species
+
+```{r}
+
+pdf(file = "./results/scrl_complot.pdf", width = 7, height = 7)
+plot(com[, c("Acasup", "Canros")], pch = l.dat[, "Moth"] + 1, cex = 3, col = l.dat[, "Moth"] + 1)
+legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
+dev.off()
 
 ```
 
@@ -201,6 +275,10 @@ litter not light was correlated with large rocks (dist cor, in text)
 cor.test(tapply(l.dat[, "Big.rocks.."], l.dat[, "Tree.pairs"], diff),
          tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff))
 cor.test(tapply(l.dat[, "Big.rocks.."], l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff))
+cor.test(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff),
+         tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff))
+cor.test(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff),
          tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff))
 
 ```
