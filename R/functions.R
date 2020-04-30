@@ -928,5 +928,8 @@ update_manuscript <- function(files, dir, file.tex = "main.tex"){
         file.rename(from = file.pdf, to = paste(dir, file.pdf, sep = "/"))
     }else{
         print("Manuscript directory not present.")
+        print("Setting up submodule:")
+        system("git add submodule https://github.com/ECGen/lcn_manuscript docs/lcn_manuscript")
+        print("Re-run make.R")
     }
 }

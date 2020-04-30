@@ -1,9 +1,3 @@
-[submodule "bin/cooc"]
-	path = bin/cooc
-	url = https://github.com/CommunityGeneticsAnalyses/cooc.git
-[submodule "docs/lcn_paper"]
-	path = docs/lcn_paper
-	url = git@github.com:ecofw/lcn_manuscript.git
 [submodule "docs/lcn_manuscript"]
 	path = docs/lcn_manuscript
-	url = https://github.com/ecofw/lcn_manuscript.git
+	url = https://github.com/ECGen/lcn_manuscript
