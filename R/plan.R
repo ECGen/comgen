@@ -57,7 +57,7 @@ plan <- drake_plan(
     ## reg.trait.nm = run_trait_nm(onc.dat), 
     ## Get correlation values
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
-    ## Species centrality analysis
+### Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### Plots
     ## fig:cn_onc
@@ -100,7 +100,7 @@ plan <- drake_plan(
         com_perm.tex = com_perm.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
-##        spp_cen.pdf = spp_cen.pdf, 
+        spp_cen.pdf = spp_cen.pdf, 
         xg_size.pdf = xg_size.pdf
         ),
 ### Generate the manuscript
