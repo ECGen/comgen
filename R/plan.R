@@ -104,7 +104,7 @@ plan <- drake_plan(
         xg_size.pdf = xg_size.pdf
         ),
 ### Generate the manuscript
-     update.manuscript = update_manuscript(
+    update.manuscript = update_manuscript(
          files = tables_figures, 
          dir = "docs/lcn_manuscript", 
          file.tex = "main.tex")
