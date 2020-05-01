@@ -45,7 +45,7 @@ plan <- drake_plan(
     ## NOTE: run_perm may transform the response distances, see R/functions
     perm.results = run_perm(onc.dat, onc.com.rel, cn.d.onc),
 ### Network Ordination
-    cn.ord = run_nms(cn.d.onc, onc.dat[, c("BR", "L", "Cen", "AMI", "ASC")]),
+    cn.ord = run_nms(cn.d.onc, onc.dat[, c("BR", "L", "Cen", "AMI")]),
 ### Size analysis
     ## Size is square-rooted
     ## xg.reml = run_xgsize(xgs.data), 

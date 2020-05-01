@@ -611,12 +611,15 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     ## Organize H2 table
     h2.tab <- h2.tab[c("cn.perm.h2",
                        "asc.reml.result",
+                       "ami.reml.result",
                        "cen.reml.result",
                        "link.reml.result",
                        "spd.reml.result",
                        "spr.reml.result",
                        "spe.reml.result",
                        "prb.reml.result",
+                       "ph.reml.result",
+                       "cnr.reml.result",
                        "ct.reml.result"), ]
                                         # Lichen Networks
                                         # Lichen Network Metrics
