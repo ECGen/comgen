@@ -377,7 +377,8 @@ run_spp_centrality <- function(cn.onc, onc.dat){
     cen.spp <- cen.spp[, apply(sign(cen.spp), 2, sum) > 3]
     cen.spp.reml <- list()
     for (i in seq_along(colnames(cen.spp))){
-        cen.reml <- lme4::lmer(I(cen.spp[ ,i]^(1 / 4)) ~ (1 | geno), 
+        onc.dat[, "cs"] <- cen.spp[ ,i]
+        cen.reml <- lme4::lmer(cs^(1 / 4) ~ (1 | geno), 
                                data = onc.dat, REML = TRUE)
         reml.pval <- RLRsim::exactRLRT(cen.reml)
         cen.spp.reml[[i]] <- c(
