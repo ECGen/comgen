@@ -63,6 +63,7 @@ plan <- drake_plan(
     ## fig:cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
     ## fig:h2_plot
+
     h2_plot.pdf = plot_h2(cn.ord, 
         onc.dat, sig.alpha = 0.15, 
         plot.vectors = TRUE,
