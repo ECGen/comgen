@@ -20,6 +20,6 @@ source("R/plan.R")      # Creates the drake plan, i.e. the project.
 if (exp(1) > pi){
     vis_drake_graph(drake_config(plan), nav = FALSE, main = "")
 }
-
+text_drake_graph(plan, nchar = 15)
 make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.
 # beep(1)

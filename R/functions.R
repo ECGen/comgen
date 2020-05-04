@@ -512,6 +512,44 @@ std <- function(x){
     (x - mean(x)) / sqrt(length(x))
 }
 
+run_br_path <- function(onc.dat){
+    ## Indirect analysis
+    geno_br_L.reml <- lmer(L^(1/4) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    geno_br_Cen.reml <- lmer(Cen^(1/2) ~ (1 | geno), 
+                             data = onc.dat, REML = TRUE)
+    geno_br_AMI.reml <- lmer(AMI^(1/2) ~ (1 | geno), 
+                             data = onc.dat, REML = TRUE)
+
+    ## Direct effect of genotype effect on BR
+    geno_br.reml <- lmer(BR^(1/1) ~ (1 | geno), 
+                         data = onc.dat, REML = TRUE)
+    ## Direct effect of BR on network
+    br_L <- lm(L^(1/4) ~ BR, data = onc.dat)
+    br_Cen <- lm(Cen^(1/2) ~ BR, data = onc.dat)
+    br_AMI <- lm(AMI^(1/2) ~ BR, data = onc.dat)
+    ## Direct effect of CT on network
+    ct_L <- lm(L^(1/4) ~ CT, data = onc.dat)
+    ct_Cen <- lm(Cen^(1/2) ~ CT, data = onc.dat)
+    ct_AMI <- lm(AMI^(1/2) ~ CT, data = onc.dat)
+    ## Direct effect of pH on network
+    ph_L <- lm(L^(1/4) ~ pH, data = onc.dat)
+    ph_Cen <- lm(Cen^(1/2) ~ pH, data = onc.dat)
+    ph_AMI <- lm(AMI^(1/2) ~ pH, data = onc.dat)
+    ## Direct effect of CN on network
+    cn_L <- lm(L^(1/4) ~ CN, data = onc.dat)
+    cn_Cen <- lm(Cen^(1/2) ~ CN, data = onc.dat)
+    cn_AMI <- lm(AMI^(1/2) ~ CN, data = onc.dat)
+    ## Direct effect of genotype on networks controlling for BR
+    geno_L.reml <- lmer(residuals(br_L)^(1/4) ~ (1 | geno), 
+                        data = onc.dat, REML = TRUE)
+    geno_Cen.reml <- lmer(residuals(br_Cen)^(1/1) ~ (1 | geno), 
+                          data = onc.dat, REML = TRUE)
+    geno_AMI.reml <- lmer(residuals(br_AMI)^(1/4) ~ (1 | geno), 
+                          data = onc.dat, REML = TRUE)
+
+}
+
 run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
     
     CT.d <- dist(std(onc.dat[, "CT"]))
@@ -577,6 +615,39 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     out <- list(com = com.perm, 
                 cn = cn.perm)
     return(out)
+}
+
+make_br_geno_tables <- function(br.geno.results){
+    exactRLRTzo(geno_br_L.reml)
+    exactRLRT(geno_br_Cen.reml)
+    exactRLRT(geno_br_AMI.reml)
+
+    exactRLRT(geno_br.reml)
+    summary(br_L)
+    summary(br_Cen)
+    summary(br_AMI)
+    summary(ct_L)
+    summary(ct_Cen)
+    summary(ct_AMI)
+    summary(ph_L)
+    summary(ph_Cen)
+    summary(ph_AMI)
+    summary(cn_L)
+    summary(cn_Cen)
+    summary(cn_AMI)
+
+    exactRLRT(geno_L.reml)
+    exactRLRT(geno_Cen.reml)
+    exactRLRT(geno_AMI.reml)
+
+    R2(geno_br.reml)
+    R2(geno_br_L.reml)
+    R2(geno_br_Cen.reml)
+    R2(geno_br_AMI.reml)
+    R2(geno_L.reml)
+    R2(geno_Cen.reml)
+    R2(geno_AMI.reml)
+
 }
 
 make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
@@ -937,3 +1008,4 @@ update_manuscript <- function(files, dir, file.tex = "main.tex"){
         print("Re-run make.R")
     }
 }
+
