@@ -513,41 +513,41 @@ std <- function(x){
 }
 
 run_br_path <- function(onc.dat){
+    out <- list()
     ## Indirect analysis
-    geno_br_L.reml <- lmer(L^(1/4) ~ (1 | geno), 
-                           data = onc.dat, REML = TRUE)
-    geno_br_Cen.reml <- lmer(Cen^(1/2) ~ (1 | geno), 
+    out[["geno_br_L.reml"]] <- lme4::lmer(I(L^(1/4)) ~ (1 | geno), data = onc.dat, REML = TRUE)
+    out[["geno_br_Cen.reml"]] <- lmer(Cen^(1/2) ~ (1 | geno), 
                              data = onc.dat, REML = TRUE)
-    geno_br_AMI.reml <- lmer(AMI^(1/2) ~ (1 | geno), 
+    out[["geno_br_AMI.reml"]] <- lmer(AMI^(1/2) ~ (1 | geno), 
                              data = onc.dat, REML = TRUE)
 
     ## Direct effect of genotype effect on BR
-    geno_br.reml <- lmer(BR^(1/1) ~ (1 | geno), 
+    out[["geno_br.reml"]] <- lmer(BR^(1/1) ~ (1 | geno), 
                          data = onc.dat, REML = TRUE)
     ## Direct effect of BR on network
-    br_L <- lm(L^(1/4) ~ BR, data = onc.dat)
-    br_Cen <- lm(Cen^(1/2) ~ BR, data = onc.dat)
-    br_AMI <- lm(AMI^(1/2) ~ BR, data = onc.dat)
+    out[["br_L"]] <- lm(L^(1/4) ~ BR, data = onc.dat)
+    out[["br_Cen"]] <- lm(Cen^(1/2) ~ BR, data = onc.dat)
+    out[["br_AMI"]] <- lm(AMI^(1/2) ~ BR, data = onc.dat)
     ## Direct effect of CT on network
-    ct_L <- lm(L^(1/4) ~ CT, data = onc.dat)
-    ct_Cen <- lm(Cen^(1/2) ~ CT, data = onc.dat)
-    ct_AMI <- lm(AMI^(1/2) ~ CT, data = onc.dat)
+    out[["ct_L"]] <- lm(L^(1/4) ~ CT, data = onc.dat)
+    out[["ct_Cen"]] <- lm(Cen^(1/2) ~ CT, data = onc.dat)
+    out[["ct_AMI"]] <- lm(AMI^(1/2) ~ CT, data = onc.dat)
     ## Direct effect of pH on network
-    ph_L <- lm(L^(1/4) ~ pH, data = onc.dat)
-    ph_Cen <- lm(Cen^(1/2) ~ pH, data = onc.dat)
-    ph_AMI <- lm(AMI^(1/2) ~ pH, data = onc.dat)
+    out[["ph_L"]] <- lm(L^(1/4) ~ pH, data = onc.dat)
+    out[["ph_Cen"]] <- lm(Cen^(1/2) ~ pH, data = onc.dat)
+    out[["ph_AMI"]] <- lm(AMI^(1/2) ~ pH, data = onc.dat)
     ## Direct effect of CN on network
-    cn_L <- lm(L^(1/4) ~ CN, data = onc.dat)
-    cn_Cen <- lm(Cen^(1/2) ~ CN, data = onc.dat)
-    cn_AMI <- lm(AMI^(1/2) ~ CN, data = onc.dat)
+    out[["cn_L"]] <- lm(L^(1/4) ~ CN, data = onc.dat)
+    out[["cn_Cen"]] <- lm(Cen^(1/2) ~ CN, data = onc.dat)
+    out[["cn_AMI"]] <- lm(AMI^(1/2) ~ CN, data = onc.dat)
     ## Direct effect of genotype on networks controlling for BR
-    geno_L.reml <- lmer(residuals(br_L)^(1/4) ~ (1 | geno), 
+    out[["geno_L.reml"]] <- lmer(residuals(out[["br_L"]])^(1/4) ~ (1 | geno), 
                         data = onc.dat, REML = TRUE)
-    geno_Cen.reml <- lmer(residuals(br_Cen)^(1/1) ~ (1 | geno), 
+    out[["geno_Cen.reml"]] <- lmer(residuals(out[["br_Cen"]])^(1/1) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
-    geno_AMI.reml <- lmer(residuals(br_AMI)^(1/4) ~ (1 | geno), 
+    out[["geno_AMI.reml"]] <- lmer(residuals(out[["br_AMI"]])^(1/4) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
-
+    return(out)
 }
 
 run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
@@ -617,37 +617,58 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-make_br_geno_tables <- function(br.geno.results){
-    exactRLRTzo(geno_br_L.reml)
-    exactRLRT(geno_br_Cen.reml)
-    exactRLRT(geno_br_AMI.reml)
-
-    exactRLRT(geno_br.reml)
-    summary(br_L)
-    summary(br_Cen)
-    summary(br_AMI)
-    summary(ct_L)
-    summary(ct_Cen)
-    summary(ct_AMI)
-    summary(ph_L)
-    summary(ph_Cen)
-    summary(ph_AMI)
-    summary(cn_L)
-    summary(cn_Cen)
-    summary(cn_AMI)
-
-    exactRLRT(geno_L.reml)
-    exactRLRT(geno_Cen.reml)
-    exactRLRT(geno_AMI.reml)
-
-    R2(geno_br.reml)
-    R2(geno_br_L.reml)
-    R2(geno_br_Cen.reml)
-    R2(geno_br_AMI.reml)
-    R2(geno_L.reml)
-    R2(geno_Cen.reml)
-    R2(geno_AMI.reml)
-
+make_table_path<- function(br.geno.results){
+    out <- list()
+   ## genotype -> bark roughness
+    out[["geno_br.reml"]] <- c(R2(br.geno.results[["geno_br.reml"]]), 
+                               unlist(exactRLRT(br.geno.results[["geno_br.reml"]])["p.value"]))
+    ## genotype (-> br) -> net(L, Cen, AMI)
+    out[["geno_br_L.reml"]] <- c(R2(br.geno.results[["geno_br_L.reml"]]), 
+                                 unlist(exactRLRT(br.geno.results[["geno_br_L.reml"]])["p.value"]))
+    out[["geno_br_Cen.reml"]] <- c(R2(br.geno.results[["geno_br_Cen.reml"]]), 
+                                   unlist(exactRLRT(br.geno.results[["geno_br_Cen.reml"]])["p.value"]))
+    out[["geno_br_AMI.reml"]] <- c(R2(br.geno.results[["geno_br_AMI.reml"]]), 
+                                   unlist(exactRLRT(br.geno.results[["geno_br_AMI.reml"]])["p.value"]))
+    ## br -> net(L, Cen, AMI)
+    out[["br_L"]] <- c(summary(br.geno.results[["br_L"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["br_L"]]))["Pr(>F)1"])
+    out[["br_Cen"]] <- c(summary(br.geno.results[["br_Cen"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["br_Cen"]]))["Pr(>F)1"])
+    out[["br_AMI"]] <- c(summary(br.geno.results[["br_AMI"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["br_AMI"]]))["Pr(>F)1"])
+    ## ct -> net(L, Cen, AMI)
+    out[["ct_L"]] <- c(summary(br.geno.results[["ct_L"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ct_L"]]))["Pr(>F)1"])
+    out[["ct_Cen"]] <- c(summary(br.geno.results[["ct_Cen"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ct_Cen"]]))["Pr(>F)1"])
+    out[["ct_AMI"]] <- c(summary(br.geno.results[["ct_AMI"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ct_AMI"]]))["Pr(>F)1"])
+    ## ph -> net(L, Cen, AMI)
+    out[["ph_L"]] <- c(summary(br.geno.results[["ph_L"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ph_L"]]))["Pr(>F)1"])
+    out[["ph_Cen"]] <- c(summary(br.geno.results[["ph_Cen"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ph_Cen"]]))["Pr(>F)1"])
+    out[["ph_AMI"]] <- c(summary(br.geno.results[["ph_AMI"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["ph_AMI"]]))["Pr(>F)1"])
+    ## cn -> net(L, Cen, AMI)
+    out[["cn_L"]] <- c(summary(br.geno.results[["cn_L"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["cn_L"]]))["Pr(>F)1"])
+    out[["cn_Cen"]] <- c(summary(br.geno.results[["cn_Cen"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["cn_Cen"]]))["Pr(>F)1"])
+    out[["cn_AMI"]] <- c(summary(br.geno.results[["cn_AMI"]])[["r.squared"]],
+                       unlist(anova(br.geno.results[["cn_AMI"]]))["Pr(>F)1"])
+    ## genotype -> net(L, Cen, AMI) without BR
+    out[["geno_L.reml"]] <- c(R2(br.geno.results[["geno_L.reml"]]), 
+                              unlist(exactRLRT(br.geno.results[["geno_L.reml"]])["p.value"]))
+    out[["geno_Cen.reml"]] <- c(R2(br.geno.results[["geno_Cen.reml"]]), 
+                                unlist(exactRLRT(br.geno.results[["geno_Cen.reml"]])["p.value"]))
+    out[["geno_AMI.reml"]] <- c(R2(br.geno.results[["geno_AMI.reml"]]), 
+                                unlist(exactRLRT(br.geno.results[["geno_AMI.reml"]])["p.value"]))
+    out <- do.call(rbind, out)
+    colnames(out) <- c("R2", "p-value")
+    out[, "R2"] <- round(out, 2)
+    out[, "p-value"] <- round(out, 3)
+    return(out)
 }
 
 make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){

@@ -38,6 +38,7 @@ plan <- drake_plan(
     ## REML for Genotype Effects
     ## These use tranformations, see R/functions/run_reml for details
     reml.results = run_reml(onc.dat),
+    br.geno.results = run_br_path(onc.dat),
 ### Analytical Checks
     check.shapiro = check_shapiro(run_reml(onc.dat, raw = TRUE)),
     check.fligner = check_fligner(onc.dat),
@@ -78,11 +79,18 @@ plan <- drake_plan(
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
+    geno_path_tab = make_table_path(br.geno.results),
+    geno_path_xtab = xtable(geno_path_tab),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
         file = "results/h2_reml.tex", 
         include.rownames = FALSE,
+        include.colnames = TRUE),
+    geno_trait_path.tex = print(
+        geno_path_xtab, 
+        file = "results/geno_trait_path.tex", 
+        include.rownames = TRUE,
         include.colnames = TRUE),
     cn_perm.tex = print(
         xtab[["cn"]], 
