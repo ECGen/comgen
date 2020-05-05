@@ -37,10 +37,10 @@ plan <- drake_plan(
 ### Analyses
     ## REML for Genotype Effects
     ## These use tranformations, see R/functions/run_reml for details
-    reml.results = run_reml(onc.dat),
-    br.geno.results = run_br_path(onc.dat),
+    trait.results = run_trait_path(onc.dat),
+    reml.results = run_reml(onc.dat = onc.dat, trait.results = trait.results),
 ### Analytical Checks
-    check.shapiro = check_shapiro(run_reml(onc.dat, raw = TRUE)),
+    check.shapiro = check_shapiro(run_reml(onc.dat, trait.results, raw = TRUE)),
     check.fligner = check_fligner(onc.dat),
     ## PERMANOVAs for Network and Community Similarity
     ## NOTE: run_perm may transform the response distances, see R/functions
@@ -79,8 +79,8 @@ plan <- drake_plan(
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
-    geno_path_tab = make_table_path(br.geno.results),
-    geno_path_xtab = xtable(geno_path_tab),
+    geno_path_tab = make_table_path(trait.results),
+    geno_path_xtab = xtable(geno_path_tab, digits = 3),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
@@ -105,6 +105,7 @@ plan <- drake_plan(
 ### Tables and Figures for Manuscript
     tables_figures = list(
         h2_reml.tex = h2_reml.tex,
+        geno_trait_path.tex = geno_trait_path.tex,
         cn_perm.tex = cn_perm.tex,
         com_perm.tex = com_perm.tex,
         cn_onc.pdf = cn_onc.pdf,
