@@ -60,11 +60,12 @@ plan <- drake_plan(
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
+### correlation matrix for lichen and network
+    cormat.tab = cormat_tab(onc.dat),
 ### Plots
     ## fig:cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
     ## fig:h2_plot
-
     h2_plot.pdf = plot_h2(cn.ord, 
         onc.dat, sig.alpha = 0.15, 
         plot.vectors = TRUE,
@@ -81,6 +82,7 @@ plan <- drake_plan(
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     geno_path_tab = make_table_path(trait.results),
     geno_path_xtab = xtable(geno_path_tab, digits = 3),
+    cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
@@ -97,9 +99,19 @@ plan <- drake_plan(
         file = "results/cn_perm.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
+    cn_trait_perm.tex = print(
+        xtab[["cn_trait"]], 
+        file = "results/cn_trait_perm.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
     com_perm.tex = print(
         xtab[["com"]], 
         file = "results/com_perm.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
+    cormat.tex = print(
+        cormat_xtab, 
+        file = "results/cormat.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
 ### Tables and Figures for Manuscript
@@ -107,7 +119,9 @@ plan <- drake_plan(
         h2_reml.tex = h2_reml.tex,
         geno_trait_path.tex = geno_trait_path.tex,
         cn_perm.tex = cn_perm.tex,
+        cn_trait_perm.tex = cn_trait_perm.tex,
         com_perm.tex = com_perm.tex,
+        cormat.tex = cormat.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
         spp_cen.pdf = spp_cen.pdf, 

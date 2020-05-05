@@ -615,18 +615,25 @@ run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
 }
 
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
-    com.perm <- vegan::adonis2((onc.com^(1/4)) ~ geno,
+    com.perm <- vegan::adonis2((onc.com^(2)) ~ geno,
                                data = onc.dat, 
                                by = "term",
                                mrank = TRUE,
-                               perm = 10000)
-    cn.perm <- vegan::adonis2(cn.d.onc ~ geno,
+                               perm = 100000)
+    cn.perm <- vegan::adonis2(cn.d.onc^(2) ~ geno,
                               by = "term", 
                               data = onc.dat, 
                               mrank = TRUE,
-                              permutations = 10000)
+                              permutations = 100000)
+    cn.trait.perm <- vegan::adonis2(
+                                cn.d.onc^(2)~BR+CT+pH+CN,
+                                by = "term", 
+                              data = onc.dat, 
+                              mrank = TRUE,
+                              permutations = 100000)
     out <- list(com = com.perm, 
-                cn = cn.perm)
+                cn = cn.perm,
+                cn.trait = cn.trait.perm)
     return(out)
 }
 
@@ -702,19 +709,22 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         digits = digits
     )
     h2.tab <- na.omit(h2.tab)
-    ## Organize H2 table
+    ## Oragnize H2 table
     h2.tab <- h2.tab[c("cn.perm.h2",
-                       "asc.reml.result",
                        "ami.reml.result",
                        "cen.reml.result",
                        "link.reml.result",
+                       "ptc.reml.result",
                        "spd.reml.result",
                        "spr.reml.result",
                        "spe.reml.result",
                        "prb.reml.result",
                        "ph.reml.result",
                        "cnr.reml.result",
-                       "ct.reml.result"), ]
+                       "ct.reml.result",
+                       "resL.reml.result",
+                       "resCen.reml.result",
+                       "resAMI.reml.result"), ]
                                         # Lichen Networks
                                         # Lichen Network Metrics
                                         # Lichen Community
@@ -723,6 +733,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
+    cn.trait.perm <- as.data.frame(perm.results[["cn.trait"]])
     ## rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
     ##                        "C:N Ratio", "Condensed Tannins", 
     ##                        "Percent Cover", "Species Richness",
@@ -740,10 +751,19 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        include.colnames = TRUE, 
         digits = digits
        )
-    tab.cn.perm <- xtable::xtable(
+     tab.cn.perm <- xtable::xtable(
         cn.perm,
-        caption = "PERMANOVA Pseudo-F Table of lichen network similarity.",
+        caption = "PERMANOVA Pseudo-F Table of lichen network similarity to genotype.",
         label = "tab:cn_perm",
+        type = "latex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE, 
+        digits = digits
+        )
+    tab.cn.trait.perm <- xtable::xtable(
+        cn.trait.perm,
+        caption = "PERMANOVA Pseudo-F Table of lichen network similarity response to bark traits.",
+        label = "tab:cn_trait_perm",
         type = "latex", 
         include.rownames = TRUE,
         include.colnames = TRUE, 
@@ -760,6 +780,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         )
     out <- list(h2_reml = tab.h2, 
                 cn = tab.cn.perm, 
+                cn_trait = tab.cn.trait.perm,
                 com = tab.com.perm)
     return(out)
 }
@@ -1010,6 +1031,35 @@ plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
     abline(v = median(xgs.data$median.thallus, 
                na.rm = TRUE), lty = 2)
     dev.off()
+}
+
+## cortest matrix
+cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05){
+    cm <- array(NA, dim = rep(ncol(x), 2))
+    rownames(cm) <- colnames(cm) <- colnames(x)
+    cm.p <- array(NA, dim = rep(ncol(x), 2))
+    for (i in seq(1, ncol(x))){
+        for (j in seq(1, ncol(x))){
+        ct <- cor.test(x[, i], x[, j])
+        cm[i, j] <- unlist(ct["estimate"])
+        cm.p[i, j] <- unlist(ct["p.value"])
+        }
+    }
+    cm <- round(cm, digits)
+    if (sig.only){
+        out <- cm
+        out[cm.p >= alpha] <- 0
+    }else {
+        out <- list(r = cm, p = cm.p)
+    }
+    return(out)
+}
+
+## cormat table
+cormat_tab <- function(onc.dat){
+   cm <- cor.mat(onc.dat[,c("PC","SR","SE","SD","L","Cen","AMI")])
+   out <- cm[c("PC","SR","SE","SD"), c("L","Cen","AMI")]
+   return(out)
 }
 
 ## Updates the manuscript
