@@ -1041,7 +1041,7 @@ spac_geno <- function(onc.q, onc.dat){
     tapply(onc.q, onc.dat[, "geno"], emp_spac)
 }
 
-plot_spag <- function(spac.geno, file = "./spac_geno.pdf", ymax = 10){
+plot_spag <- function(spac.geno, file = "./spac_geno.pdf", y.max = 10){
     if (!(exists("y.max"))){
         mu.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["richness"]])))
         sd.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["sd"]])))
