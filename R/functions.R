@@ -79,7 +79,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     cn.mod.onc[is.na(cn.mod.onc)] <- 0
     names(cn.mod.onc) <- c("mod.lik", "mod.n")
     dcen.onc <- unlist(lapply(cn.onc, function(x) {
-        sna::centralization(x, FUN = sna::degree, normalize = FALSE)
+        sna::centralization(x, FUN = sna::degree, normalize = TRUE)
     }))
     onc.ns <- cbind(ns.onc, 
                     Cen = dcen.onc, 
@@ -167,10 +167,18 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     cn.mod.onc[is.na(cn.mod.onc)] <- 0
     names(cn.mod.onc) <- c("mod.lik", "mod.n")
     dcen.onc <- unlist(lapply(cn.onc, function(x) {
-        sna::centralization(x, FUN = sna::degree, normalize = FALSE)
+        sna::centralization(x, FUN = sna::degree, normalize = TRUE)
+    }))
+    dcen.in.onc <- unlist(lapply(cn.onc, function(x) {
+        sna::centralization(x, FUN = sna::degree, cmode = "indegree", normalize = TRUE)
+    }))
+    dcen.out.onc <- unlist(lapply(cn.onc, function(x) {
+        sna::centralization(x, FUN = sna::degree, cmode = "outdegree", normalize = TRUE)
     }))
     onc.ns <- cbind(ns.onc, 
                     Cen = dcen.onc, 
+                    Cen.in = dcen.in.onc,
+                    Cen.out = dcen.out.onc,
                     mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
     ## adds ascendency
@@ -208,7 +216,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         geno = factor(onc.geno), 
         tree = tree, 
         BR = onc.rough, 
-        onc.ns[, c("L", "Cen", "mod.lik", "AMI", "ASC")],
+        onc.ns[, c("L", "Cen", "Cen.in", "Cen.out", "mod.lik", "AMI", "ASC")],
         C = onc.nc[match(onc.dat[, "tree.id"], 
                          onc.nc[, "tree.id"]), "C"], 
         N = onc.nc[match(onc.dat[, "tree.id"], 
@@ -364,10 +372,11 @@ check_shapiro <- function(reml.reml){
     return(out)
 }
 
-run_spp_centrality <- function(cn.onc, onc.dat){
+run_spp_centrality <- function(cn.onc, onc.dat, cmode = "freeman"){
     cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
                       sna::degree, 
-                      rescale = TRUE
+                      rescale = TRUE,
+                      cmode = cmode
                       )
     cen.spp <- do.call(rbind, cen.spp)
     cen.spp[is.na(cen.spp)] <- 0
@@ -455,7 +464,19 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
     cen.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
-    cen.reml.result <- c("Network Centrality", 
+    cen.reml.result <- c("Degree Centralization", 
+                         H2(cen.reml, g = onc.dat$geno), 
+                         R2(cen.reml), cen.reml.pval$p.value)
+    cen.in.reml <- lme4::lmer(I(Cen.in^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = 50000)
+    cen.in.reml.result <- c("In-degree Centrality", 
+                         H2(cen.in.reml, g = onc.dat$geno), 
+                         R2(cen.in.reml), cen.in.reml.pval$p.value)
+    cen.out.reml <- lme4::lmer(I(Cen.out^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = 50000)
+    cen.out.reml.result <- c("Out-degree Centralization", 
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
     ami.reml <- lme4::lmer(I(AMI^(1 / 4)) ~ (1 | geno), 
@@ -511,7 +532,9 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                      spd.reml,
                      link.reml,
                      mod.reml,
-                     cen.reml,
+                    cen.reml,
+                    cen.in.reml,
+                    cen.out.reml,
                     ami.reml,
                     asc.reml,
                     resL.reml, 
@@ -529,6 +552,8 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                      link.reml.result,
                      mod.reml.result,
                      cen.reml.result,
+                     cen.in.reml.result,
+                     cen.out.reml.result,
                      ami.reml.result,
                      asc.reml.result,
                      resL.reml.result,
@@ -713,6 +738,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     h2.tab <- h2.tab[c("cn.perm.h2",
                        "ami.reml.result",
                        "cen.reml.result",
+                       "cen.in.reml.result",
+                       "cen.out.reml.result",
                        "link.reml.result",
                        "ptc.reml.result",
                        "spd.reml.result",

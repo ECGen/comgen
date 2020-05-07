@@ -59,7 +59,9 @@ plan <- drake_plan(
     ## Get correlation values
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Species centrality analysis
-    spp.cen = run_spp_centrality(cn.onc, onc.dat),
+    spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman"),
+    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "indegree"),
+    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "outdegree"),
 ### correlation matrix for lichen and network
     cormat.tab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -74,6 +76,8 @@ plan <- drake_plan(
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
+    spp_cen_in.pdf = plot_sppcen(spp.cen.in, file = "results/spp_cen_in.pdf"),
+    spp_cen_out.pdf = plot_sppcen(spp.cen.out, file = "results/spp_cen_out.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
@@ -128,6 +132,8 @@ plan <- drake_plan(
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
         spp_cen.pdf = spp_cen.pdf, 
+        spp_cen_in.pdf = spp_cen_in.pdf,
+        spp_cen_out.pdf = spp_cen_out.pdf,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
         ),
