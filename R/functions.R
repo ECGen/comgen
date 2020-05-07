@@ -1050,7 +1050,8 @@ plot_spag <- function(spac.geno, file = "./spac_geno.pdf", y.max = 10){
     pdf(file)
     ## plot(spac.geno[[1]], ci.type = "polygon", ci.col = "lightgrey", ylim = c(0, y.max))
     ## lapply(spac.geno[-1], plot, add = TRUE, ci.type = "polygon", ci.col = "lightgrey")
-    plot(spac.geno[[1]], ci.type = "bar", ylim = c(0, y.max))
+    plot(spac.geno[[1]], ci.type = "bar", 
+         ylim = c(0, y.max), xlab = expression("Cumulative Area Sampled cm"^2), ylab = "Lichen Species")
     lapply(seq(2, length(spac.geno)), 
                function(i, x, col) 
                    plot(x[[i]], add = TRUE, ci.type = "bar", col = col[i]),
