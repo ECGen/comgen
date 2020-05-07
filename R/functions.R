@@ -1041,13 +1041,17 @@ spac_geno <- function(onc.q, onc.dat){
     tapply(onc.q, onc.dat[, "geno"], emp_spac)
 }
 
-plot_spag <- function(spac.geno, file = "./spac_geno.pdf"){
-    mu.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["richness"]])))
-    sd.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["sd"]])))
-    y.max <- mu.max + (1.96 * (sd.max / sqrt(length(spac.geno))))
+plot_spag <- function(spac.geno, file = "./spac_geno.pdf", ymax = 10){
+    if (!(exists("y.max"))){
+        mu.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["richness"]])))
+        sd.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["sd"]])))
+        y.max <- mu.max + (1.96 * (sd.max / sqrt(length(spac.geno))))
+    }
     pdf(file)
-    plot(spac.geno[[1]], ci.type = "polygon", ci.col = "lightgrey", ylim = c(0, y.max))
-    lapply(spac.geno[-1], plot, add = TRUE, ci.type = "polygon", ci.col = "lightgrey")
+    ## plot(spac.geno[[1]], ci.type = "polygon", ci.col = "lightgrey", ylim = c(0, y.max))
+    ## lapply(spac.geno[-1], plot, add = TRUE, ci.type = "polygon", ci.col = "lightgrey")
+    plot(spac.geno[[1]], ci.type = "bar", ylim = c(0, y.max))
+    lapply(spac.geno[-1], plot, add = TRUE, ci.type = "bar")
     dev.off()
 }
 
