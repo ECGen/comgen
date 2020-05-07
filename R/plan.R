@@ -62,6 +62,8 @@ plan <- drake_plan(
     spp.cen = run_spp_centrality(cn.onc, onc.dat),
 ### correlation matrix for lichen and network
     cormat.tab = cormat_tab(onc.dat),
+### species area curves by genotype
+    spac.g = spac_geno(onc.q, onc.dat),
 ### Plots
     ## fig:cn_onc
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
@@ -74,6 +76,7 @@ plan <- drake_plan(
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
+    spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
 ### Tables
     ## tab:h2_table = Heritability table 
     ## tab:cn_perm_table = network similarity PERMANOVA
@@ -125,6 +128,7 @@ plan <- drake_plan(
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
         spp_cen.pdf = spp_cen.pdf, 
+        spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
         ),
 ### Generate the manuscript

@@ -1021,6 +1021,36 @@ run_trait_nm <- function(onc.dat){
     return(out)
 }
 
+## Species accumulation curves by genotype
+emp_spac <- function(x){
+    spac <- lapply(x, specaccum)
+    rich <- lapply(spac, function(x) x[["richness"]])
+    mu.rich <- apply(do.call(rbind, rich), 2, mean)
+    sd.rich <- apply(do.call(rbind, rich), 2, sd)
+    freq <- ldply(lapply(spac, function(x) x[["freq"]]), rbind)
+    freq[is.na(freq)] <- 0
+    mu.freq <- apply(freq[, -1], 2, mean)
+    out <- spac[[1]]
+    out[["richness"]] <- mu.rich
+    out[["sd"]] <- sd.rich
+    out[["freq"]] <- mu.freq
+    return(out)
+}
+
+spac_geno <- function(onc.q, onc.dat){
+    tapply(onc.q, onc.dat[, "geno"], emp_spac)
+}
+
+plot_spag <- function(spac.geno, file = "./spac_geno.pdf"){
+    mu.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["richness"]])))
+    sd.max <- max(do.call(rbind, lapply(spac.geno, function(x) x[["sd"]])))
+    y.max <- mu.max + (1.96 * (sd.max / sqrt(length(spac.geno))))
+    pdf(file)
+    plot(spac.geno[[1]], ci.type = "polygon", ci.col = "lightgrey", ylim = c(0, y.max))
+    lapply(spac.geno[-1], plot, add = TRUE, ci.type = "polygon", ci.col = "lightgrey")
+    dev.off()
+}
+
 ## X. galericulata size plot
 plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
     pdf(file)
