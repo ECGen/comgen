@@ -17,6 +17,6 @@ source("R/packages.R")  # Loads packages, e.g. library(drake).
 source("R/functions.R") # Custom code as a bunch of functions.
 source("R/plan.R")      # Creates the drake plan, i.e. the project.
 # Run vis_drake_graph to plot the workflow.
-text_drake_graph(plan, nchar = 15)
+text_drake_graph(plan, nchar = 5)
 make(plan, verbose = 2, cache_log_file = TRUE) # Build the project.
 # beep(1)
