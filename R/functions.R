@@ -175,10 +175,34 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     dcen.out.onc <- unlist(lapply(cn.onc, function(x) {
         sna::centralization(x, FUN = sna::degree, cmode = "outdegree", normalize = TRUE)
     }))
+    dcen.inp.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "in", type = "pos")
+    }))
+    dcen.outp.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "out", type = "pos")
+    }))
+    dcen.inn.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "in", type = "neg")
+    }))
+    dcen.outn.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "out", type = "neg")
+    }))
+    dcen.inr.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "in", type = "ratio")
+    }))
+    dcen.outr.onc <- unlist(lapply(cn.onc, function(x) {
+        centralization_signed(x, mode = "out", type = "ratio")
+    }))
     onc.ns <- cbind(ns.onc, 
                     Cen = dcen.onc, 
                     Cen.in = dcen.in.onc,
                     Cen.out = dcen.out.onc,
+                    Cen.in.pos = decen.inp.onc,
+                    Cen.out.pos = decen.outp.onc,
+                    Cen.in.neg = decen.inn.onc,
+                    Cen.out.neg = decen.outn.onc,
+                    Cen.in.ratio = decen.inr.onc,
+                    Cen.out.ratio = decen.outr.onc,
                     mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
     ## adds ascendency
@@ -216,7 +240,12 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         geno = factor(onc.geno), 
         tree = tree, 
         BR = onc.rough, 
-        onc.ns[, c("L", "Cen", "Cen.in", "Cen.out", "mod.lik", "AMI", "ASC")],
+        onc.ns[, c("L", 
+                   "Cen", "Cen.in", "Cen.out",
+                   "Cen.in.pos", "Cen.in.neg", "Cen.in.ratio", 
+                   "Cen.out.pos", "Cen.out.neg", "Cen.out.ratio",
+                   "mod.lik", 
+                   "AMI", "ASC")],
         C = onc.nc[match(onc.dat[, "tree.id"], 
                          onc.nc[, "tree.id"]), "C"], 
         N = onc.nc[match(onc.dat[, "tree.id"], 
@@ -1126,6 +1155,28 @@ cormat_tab <- function(onc.dat){
    cm <- cor.mat(onc.dat[,c("PC","SR","SE","SD","L","Cen","AMI")])
    out <- cm[c("PC","SR","SE","SD"), c("L","Cen","AMI")]
    return(out)
+}
+
+### Signed network metrics
+as_graph_signed <- function(x){
+    g = graph_from_adjacency_matrix(x, mode = "directed", weighted = TRUE)
+    sv  <- numeric()
+    for (i in seq(1, nrow(x))){
+        for (j in seq(1, ncol(x))){
+            if (x[i, j] != 0){sv  <- append(sv, sign(x[i, j]))}
+        }
+    }
+    E(g)$sign <- sv
+    return(g)
+}
+
+freeman <- function(x){
+    sum(max(x) - x) 
+}
+
+centralization_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg", "ratio")){
+    g <- as_graph_signed(x)    
+    freeman(signnet::degree_signed(g, mode = mode type = type))
 }
 
 ## Updates the manuscript

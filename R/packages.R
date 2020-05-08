@@ -1,8 +1,8 @@
 ## Check for supporting packages
 cran.pkgs <- c("magrittr", "devtools", "beepr",
               "xtable", "reshape", "tools",
-              "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", 
-              "bipartite", "RColorBrewer", "enaR", "gplots", "plyr"
+              "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "igraph",
+              "bipartite", "RColorBrewer", "enaR", "signnet", "gplots", "plyr"
               )
 gh.pkgs <- c("ROpenSci/drake", "r-lib/styler",
              "ECGen/ComGenR", "ECGen/conetto")
