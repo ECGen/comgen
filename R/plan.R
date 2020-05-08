@@ -60,8 +60,8 @@ plan <- drake_plan(
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman"),
-    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "indegree"),
-    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "outdegree"),
+    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos"),
+    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos"),
 ### correlation matrix for lichen and network
     cormat.tab = cormat_tab(onc.dat),
 ### species area curves by genotype

@@ -395,12 +395,24 @@ check_shapiro <- function(reml.reml){
     return(out)
 }
 
-run_spp_centrality <- function(cn.onc, onc.dat, cmode = "freeman"){
-    cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
-                      sna::degree, 
-                      rescale = TRUE,
-                      cmode = cmode
-                      )
+run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
+                               cmode = c("freeman", "in", "out"), 
+                               type = c("pos", "neg")){
+    if (cmode == "freeman"){
+        cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
+                          sna::degree, 
+                          rescale = rescale,
+                          cmode = cmode
+                          )
+    }else if (cmode == "in" | cmode == "out"){
+        cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
+                          centrality_signed,
+                          mode = cmode,
+                          type = type
+                          )
+    }else {
+        warning("Error: unknown mode or type.")
+    }
     cen.spp <- do.call(rbind, cen.spp)
     cen.spp[is.na(cen.spp)] <- 0
     colnames(cen.spp) <- colnames(cn.onc[[1]])
@@ -1202,6 +1214,16 @@ as_graph_signed <- function(x){
 
 freeman <- function(x){
     sum(max(x) - x) 
+}
+
+centrality_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg", "ratio")){
+    if (sum(abs(sign(x))) == 0){
+        out <- rep(0, nrow(x))
+    }else{
+        g <- as_graph_signed(x)    
+        out <- signnet::degree_signed(g, mode = mode, type = type)
+    }
+    return(out)
 }
 
 centralization_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg", "ratio")){
