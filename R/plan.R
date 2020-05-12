@@ -38,7 +38,7 @@ plan <- drake_plan(
     ## REML for Genotype Effects
     ## These use tranformations, see R/functions/run_reml for details
     trait.results = run_trait_path(onc.dat),
-    reml.results = run_reml(onc.dat = onc.dat, trait.results = trait.results),
+    reml.results = run_reml(onc.dat, trait.results),
 ### Analytical Checks
     check.shapiro = check_shapiro(run_reml(onc.dat, trait.results, raw = TRUE)),
     check.fligner = check_fligner(onc.dat),

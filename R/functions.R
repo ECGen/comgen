@@ -427,6 +427,7 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
         reml.pval <- RLRsim::exactRLRT(cen.reml)
         cen.spp.reml[[i]] <- c(
             "spp centrality", 
+            reml.pval["statistic"],
             H2 = H2(cen.reml, g = onc.dat[, "geno"]), 
             R2 = R2(cen.reml), 
             p.value = reml.pval[["p.value"]]
@@ -445,48 +446,58 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                            data = onc.dat, REML = TRUE)
     prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
     prb.reml.result <- c("Percent Rough Bark", 
+                         prb.reml.pval["statistic"],
                          H2(prb.reml, g = onc.dat$geno), 
                          R2(prb.reml), prb.reml.pval$p.value)
     ph.reml <- lme4::lmer(I(pH^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
     ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
-    ph.reml.result <- c("pH", H2(ph.reml, g = onc.dat$geno), 
+    ph.reml.result <- c("pH", 
+                        ph.reml.pval["statistic"],
+                        H2(ph.reml, g = onc.dat$geno), 
                         R2(ph.reml), ph.reml.pval$p.value)
     ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
     ct.reml.pval <- RLRsim::exactRLRT(ct.reml)
     ct.reml.result <- c("Condensed Tannins (CT)", 
+                        ct.reml.pval["statistic"],
                         H2(ct.reml, g = onc.dat$geno), 
                         R2(ct.reml), ct.reml.pval$p.value)
     cnr.reml <- lme4::lmer(I(log(CN^(1 / 1) + 0.001)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
     cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
     cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
-                         H2(cnr.reml, g = onc.dat$geno), R2(cnr.reml), 
+                         cnr.reml.pval["statistic"],
+                         H2(cnr.reml, g = onc.dat$geno), 
+                         R2(cnr.reml), 
                          cnr.reml.pval$p.value)
     ## lichen community metrics
     ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
     ptc.reml.result <- c("Percent Lichen Cover", 
+                         ptc.reml.pval["statistic"],
                          H2(ptc.reml, g = onc.dat$geno), 
                          R2(ptc.reml), ptc.reml.pval$p.value)
     spr.reml <- lme4::lmer(I(SR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
     spr.reml.result <- c("Lichen Species Richness", 
+                         spr.reml.pval["statistic"],
                          H2(spr.reml, g = onc.dat$geno), 
                          R2(spr.reml), spr.reml.pval$p.value)
     spd.reml <- lme4::lmer(I(SD^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
     spd.reml.result <- c("Lichen Species Diversity", 
+                         spd.reml.pval["statistic"],
                          H2(spd.reml, g = onc.dat$geno), 
                          R2(spd.reml), spd.reml.pval$p.value)
     spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
     spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
     spe.reml.result <- c("Lichen Species Evenness", 
+                         spe.reml.pval["statistic"],
                          H2(spe.reml, g = onc.dat$geno), 
                          R2(spe.reml), spe.reml.pval$p.value)
                                         # Lichen network metrics
@@ -494,68 +505,83 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                             data = onc.dat, REML = TRUE)
     link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
     link.reml.result <- c("Number of Network Links", 
+                          link.reml.pval["statistic"],
                           H2(link.reml, g = onc.dat$geno), 
                           R2(link.reml), link.reml.pval$p.value)
     cen.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
     cen.reml.result <- c("Degree Centralization", 
+                         cen.reml.pval["statistic"],
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
     cen.in.reml <- lme4::lmer(I(Cen.in^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = 50000)
     cen.in.reml.result <- c("In-degree Centralization", 
+                            cen.in.reml.pval["statistic"],
                          H2(cen.in.reml, g = onc.dat$geno), 
                          R2(cen.in.reml), cen.in.reml.pval$p.value)
     cen.out.reml <- lme4::lmer(I(Cen.out^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = 50000)
     cen.out.reml.result <- c("Out-degree Centralization", 
+                             cen.out.reml.pval["statistic"],
                          H2(cen.out.reml, g = onc.dat$geno), 
                          R2(cen.out.reml), cen.out.reml.pval$p.value)
     cen.inp.reml <- lme4::lmer(I(Cen.in.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.inp.reml.pval <- RLRsim::exactRLRT(cen.inp.reml, nsim = 50000)
     cen.inp.reml.result <- c("In-Positive Centralization", 
+                             cen.inp.reml.pval["statistic"],
                              H2(cen.inp.reml, g = onc.dat$geno), 
                              R2(cen.inp.reml), cen.inp.reml.pval$p.value)
     cen.inn.reml <- lme4::lmer(I(Cen.in.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.inn.reml.pval <- RLRsim::exactRLRT(cen.inn.reml, nsim = 50000)
     cen.inn.reml.result <- c("In-Negative Centralization", 
+                             cen.inn.reml.pval["statistic"],
                              H2(cen.inn.reml, g = onc.dat$geno), 
                              R2(cen.inn.reml), cen.inn.reml.pval$p.value)
     cen.outp.reml <- lme4::lmer(I(Cen.out.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.outp.reml.pval <- RLRsim::exactRLRT(cen.outp.reml, nsim = 50000)
     cen.outp.reml.result <- c("Out-Positive Centralization", 
-                         H2(cen.outp.reml, g = onc.dat$geno), 
-                         R2(cen.outp.reml), cen.outp.reml.pval$p.value)
+                              cen.outp.reml.pval["statistic"],
+                              H2(cen.outp.reml, g = onc.dat$geno), 
+                              R2(cen.outp.reml), 
+                              cen.outp.reml.pval$p.value)
     cen.outn.reml <- lme4::lmer(I(Cen.out.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.outn.reml.pval <- RLRsim::exactRLRT(cen.outn.reml, nsim = 50000)
     cen.outn.reml.result <- c("Out-Negative Centralization", 
-                         H2(cen.outn.reml, g = onc.dat$geno), 
-                         R2(cen.outn.reml), cen.outn.reml.pval$p.value)
+                              cen.outn.reml.pval["statistic"],
+                              H2(cen.outn.reml, g = onc.dat$geno), 
+                              R2(cen.outn.reml), cen.outn.reml.pval$p.value)
     ami.reml <- lme4::lmer(I(AMI^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     ami.reml.pval <- RLRsim::exactRLRT(ami.reml, nsim = 50000)
     ami.reml.result <- c("Average Mutual Information", 
+                         ami.reml.pval["statistic"],
                          H2(ami.reml, g = onc.dat$geno), 
-                         R2(ami.reml), ami.reml.pval$p.value)
+                         R2(ami.reml), 
+                         ami.reml.pval$p.value)
     asc.reml <- lme4::lmer(I(ASC^(1 / 2)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     asc.reml.pval <- RLRsim::exactRLRT(asc.reml, nsim = 50000)
     asc.reml.result <- c("Network Ascendency", 
+                         asc.reml.pval["statistic"],
                          H2(asc.reml, g = onc.dat$geno), 
-                         R2(asc.reml), asc.reml.pval$p.value)
+                         R2(asc.reml), 
+                         asc.reml.pval$p.value)
     mod.reml <- lme4::lmer(I(mod.lik^(2 / 1)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
     mod.reml.result <- c("Network Modularity", 
+                         mod.reml.pval["statistic"],
                          H2(mod.reml, g = onc.dat$geno), 
-                         R2(mod.reml), mod.reml.pval$p.value)
+                         R2(mod.reml), 
+                         mod.reml.pval$p.value)
     ## Residual bark roughness effect on net
     res.df <- data.frame(geno = onc.dat[, "geno"],
                     resL = residuals(trait.results[["br_L"]]),
@@ -565,21 +591,26 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                             data = res.df, REML = TRUE)
     resL.reml.pval <- RLRsim::exactRLRT(resL.reml)
     resL.reml.result <- c("BR-L Residuals", 
+                          resL.reml.pval["statistic"],
                           H2(resL.reml, g = res.df$geno), 
-                          R2(resL.reml), resL.reml.pval$p.value)
+                          R2(resL.reml), 
+                          resL.reml.pval$p.value)
     resCen.reml <- lme4::lmer(resCen ~ (1 | geno), 
                            data = res.df, REML = TRUE)
     resCen.reml.pval <- RLRsim::exactRLRT(resCen.reml)
     resCen.reml.result <- c("BR-Cen Residuals", 
+                            resCen.reml.pval["statistic"],
                           H2(resCen.reml, g = res.df$geno), 
-                          R2(resCen.reml), resCen.reml.pval$p.value)
+                          R2(resCen.reml), 
+                          resCen.reml.pval$p.value)
     resAMI.reml <- lme4::lmer(resAMI ~ (1 | geno), 
                            data = res.df, REML = TRUE)
     resAMI.reml.pval <- RLRsim::exactRLRT(resAMI.reml)
     resAMI.reml.result <- c("BR-AMI Residuals", 
+                            resAMI.reml.pval["statistic"],
                           H2(resAMI.reml, g = res.df$geno), 
-                          R2(resAMI.reml), resAMI.reml.pval$p.value)
-
+                          R2(resAMI.reml), 
+                          resAMI.reml.pval$p.value)
     if (raw.reml){
         out <- list(prb.reml, 
                      ph.reml,
@@ -626,6 +657,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                      resL.reml.result,
                      resCen.reml.result,
                      resAMI.reml.result)
+        colnames(out) <- c("response", "statistic", "H2", "R2", "p-value")
     }
     return(out)
 }
@@ -775,15 +807,16 @@ make_table_path<- function(trait.net.results){
 make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     ## Heritability table
     h2.tab <- reml.results
-    colnames(h2.tab) <- c("Response", "H2", "R2", "p-value")
     ## Add PERMANOVA results
     com.perm.h2 <- c("Community Composition", 
+                     as.data.frame(perm.results[["com"]])["geno", "F"],
                      H2(perm.results[["com"]], 
                         g = onc.dat[["geno"]]),
                      R2(perm.results[["com"]]),
                      as.data.frame(perm.results[["com"]])["geno", "Pr(>F)"]
                      )
     cn.perm.h2 <- c("Lichen Network Similarity", 
+                    as.data.frame(perm.results[["cn"]])["geno", "F"],
                     H2(perm.results[["cn"]], 
                        g = onc.dat[, "geno"], 
                        perm = 10000),
@@ -794,8 +827,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                     cn.perm.h2,
                     com.perm.h2)
     ## Format Heritability Table
-    h2.tab[, c("H2", "R2", "p-value")] <- apply(
-        h2.tab[, c("H2", "R2", "p-value")], 
+    h2.tab[, c("statistic", "H2", "R2", "p-value")] <- apply(
+        h2.tab[, c("statistic", "H2", "R2", "p-value")], 
         2, 
         function(x, digits) round(as.numeric(x), digits = digits), 
         digits = digits
