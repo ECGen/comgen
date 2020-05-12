@@ -95,7 +95,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 
                      1, 
                      function(x) sum(sign(x)))
-    spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+    spd.onc <- vegan::diversity(onc.com[, colnames(onc.com) != "ds"])
     spe.onc <- spd.onc / 
         log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
     spe.onc[is.na(spe.onc)] <- 0
@@ -187,22 +187,14 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     dcen.outn.onc <- unlist(lapply(cn.onc, function(x) {
         centralization_signed(x, mode = "out", type = "neg")
     }))
-    dcen.inr.onc <- unlist(lapply(cn.onc, function(x) {
-        centralization_signed(x, mode = "in", type = "ratio")
-    }))
-    dcen.outr.onc <- unlist(lapply(cn.onc, function(x) {
-        centralization_signed(x, mode = "out", type = "ratio")
-    }))
     onc.ns <- cbind(ns.onc, 
                     Cen = dcen.onc, 
                     Cen.in = dcen.in.onc,
                     Cen.out = dcen.out.onc,
-                    Cen.in.pos = decen.inp.onc,
-                    Cen.out.pos = decen.outp.onc,
-                    Cen.in.neg = decen.inn.onc,
-                    Cen.out.neg = decen.outn.onc,
-                    Cen.in.ratio = decen.inr.onc,
-                    Cen.out.ratio = decen.outr.onc,
+                    Cen.in.pos = dcen.inp.onc,
+                    Cen.out.pos = dcen.outp.onc,
+                    Cen.in.neg = dcen.inn.onc,
+                    Cen.out.neg = dcen.outn.onc,
                     mod.lik = cn.mod.onc[, 1], 
                     mod.n = cn.mod.onc[, 2])
     ## adds ascendency
@@ -210,6 +202,8 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     asc.l <- lapply(cn.onc.net, enaAscendency)
     asc.df <- do.call(rbind, asc.l)
     onc.ns <- cbind(onc.ns, asc.df)
+    ## zero NA network statistics
+    onc.ns[is.na(onc.ns)] <- 0
     ## com
     onc.com <- do.call(rbind, lapply(onc.q, function(x) apply(x, 2, sum)))
     onc.com <- cbind(onc.com, 
@@ -221,7 +215,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
     spr.onc <- apply(onc.com[, colnames(onc.com) != "ds"], 
                      1, 
                      function(x) sum(sign(x)))
-    spd.onc <- diversity(onc.com[, colnames(onc.com) != "ds"])
+    spd.onc <- vegan::diversity(onc.com[, colnames(onc.com) != "ds"])
     spe.onc <- spd.onc / log(specnumber(onc.com[, colnames(onc.com) != "ds"]))
     spe.onc[is.na(spe.onc)] <- 0
     tree <- onc.geno
@@ -242,8 +236,8 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         BR = onc.rough, 
         onc.ns[, c("L", 
                    "Cen", "Cen.in", "Cen.out",
-                   "Cen.in.pos", "Cen.in.neg", "Cen.in.ratio", 
-                   "Cen.out.pos", "Cen.out.neg", "Cen.out.ratio",
+                   "Cen.in.pos", "Cen.in.neg", 
+                   "Cen.out.pos", "Cen.out.neg", 
                    "mod.lik", 
                    "AMI", "ASC")],
         C = onc.nc[match(onc.dat[, "tree.id"], 
@@ -401,12 +395,24 @@ check_shapiro <- function(reml.reml){
     return(out)
 }
 
-run_spp_centrality <- function(cn.onc, onc.dat, cmode = "freeman"){
-    cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
-                      sna::degree, 
-                      rescale = TRUE,
-                      cmode = cmode
-                      )
+run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
+                               cmode = c("freeman", "in", "out"), 
+                               type = c("pos", "neg")){
+    if (cmode == "freeman"){
+        cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
+                          sna::degree, 
+                          rescale = rescale,
+                          cmode = cmode
+                          )
+    }else if (cmode == "in" | cmode == "out"){
+        cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
+                          centrality_signed,
+                          mode = cmode,
+                          type = type
+                          )
+    }else {
+        warning("Error: unknown mode or type.")
+    }
     cen.spp <- do.call(rbind, cen.spp)
     cen.spp[is.na(cen.spp)] <- 0
     colnames(cen.spp) <- colnames(cn.onc[[1]])
@@ -499,15 +505,39 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
     cen.in.reml <- lme4::lmer(I(Cen.in^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = 50000)
-    cen.in.reml.result <- c("In-degree Centrality", 
+    cen.in.reml.result <- c("In-degree Centralization", 
                          H2(cen.in.reml, g = onc.dat$geno), 
                          R2(cen.in.reml), cen.in.reml.pval$p.value)
     cen.out.reml <- lme4::lmer(I(Cen.out^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = 50000)
     cen.out.reml.result <- c("Out-degree Centralization", 
-                         H2(cen.reml, g = onc.dat$geno), 
-                         R2(cen.reml), cen.reml.pval$p.value)
+                         H2(cen.out.reml, g = onc.dat$geno), 
+                         R2(cen.out.reml), cen.out.reml.pval$p.value)
+    cen.inp.reml <- lme4::lmer(I(Cen.in.pos^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.inp.reml.pval <- RLRsim::exactRLRT(cen.inp.reml, nsim = 50000)
+    cen.inp.reml.result <- c("In-Positive Centralization", 
+                             H2(cen.inp.reml, g = onc.dat$geno), 
+                             R2(cen.inp.reml), cen.inp.reml.pval$p.value)
+    cen.inn.reml <- lme4::lmer(I(Cen.in.neg^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.inn.reml.pval <- RLRsim::exactRLRT(cen.inn.reml, nsim = 50000)
+    cen.inn.reml.result <- c("In-Negative Centralization", 
+                             H2(cen.inn.reml, g = onc.dat$geno), 
+                             R2(cen.inn.reml), cen.inn.reml.pval$p.value)
+    cen.outp.reml <- lme4::lmer(I(Cen.out.pos^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.outp.reml.pval <- RLRsim::exactRLRT(cen.outp.reml, nsim = 50000)
+    cen.outp.reml.result <- c("Out-Positive Centralization", 
+                         H2(cen.outp.reml, g = onc.dat$geno), 
+                         R2(cen.outp.reml), cen.outp.reml.pval$p.value)
+    cen.outn.reml <- lme4::lmer(I(Cen.out.neg^(1 / 4)) ~ (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.outn.reml.pval <- RLRsim::exactRLRT(cen.outn.reml, nsim = 50000)
+    cen.outn.reml.result <- c("Out-Negative Centralization", 
+                         H2(cen.outn.reml, g = onc.dat$geno), 
+                         R2(cen.outn.reml), cen.outn.reml.pval$p.value)
     ami.reml <- lme4::lmer(I(AMI^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     ami.reml.pval <- RLRsim::exactRLRT(ami.reml, nsim = 50000)
@@ -564,6 +594,10 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                     cen.reml,
                     cen.in.reml,
                     cen.out.reml,
+                    cen.inp.reml,
+                    cen.inn.reml,
+                    cen.outp.reml,
+                    cen.outn.reml,
                     ami.reml,
                     asc.reml,
                     resL.reml, 
@@ -583,6 +617,10 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                      cen.reml.result,
                      cen.in.reml.result,
                      cen.out.reml.result,
+                     cen.inp.reml.result,
+                     cen.inn.reml.result,
+                     cen.outp.reml.result,
+                     cen.outn.reml.result,
                      ami.reml.result,
                      asc.reml.result,
                      resL.reml.result,
@@ -769,6 +807,10 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                        "cen.reml.result",
                        "cen.in.reml.result",
                        "cen.out.reml.result",
+                       "cen.inp.reml.result",
+                       "cen.inn.reml.result",
+                       "cen.outp.reml.result",
+                       "cen.outn.reml.result",
                        "link.reml.result",
                        "ptc.reml.result",
                        "spd.reml.result",
@@ -1174,13 +1216,28 @@ freeman <- function(x){
     sum(max(x) - x) 
 }
 
+centrality_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg", "ratio")){
+    if (sum(abs(sign(x))) == 0){
+        out <- rep(0, nrow(x))
+    }else{
+        g <- as_graph_signed(x)    
+        out <- signnet::degree_signed(g, mode = mode, type = type)
+    }
+    return(out)
+}
+
 centralization_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg", "ratio")){
-    g <- as_graph_signed(x)    
-    freeman(signnet::degree_signed(g, mode = mode type = type))
+    if (sum(abs(sign(x))) == 0){
+        out <- 0
+    }else{
+        g <- as_graph_signed(x)    
+        out <- freeman(signnet::degree_signed(g, mode = mode, type = type))
+    }
+    return(out)
 }
 
 ## Updates the manuscript
-update_manuscript <- function(files, dir, file.tex = "main.tex"){
+update_manuscript <- function(files, dir, file.tex = "main.tex", render = FALSE){
     files = paste0("results/", names(files))
     if (dir.exists(dir)){
         file.copy(
@@ -1188,7 +1245,7 @@ update_manuscript <- function(files, dir, file.tex = "main.tex"){
             from = files,
             to = dir
             )
-        texi2pdf(paste(dir, file.tex, sep = "/"), clean = TRUE)
+        if (render){texi2pdf(paste(dir, file.tex, sep = "/"), clean = TRUE)}
         file.pdf <- gsub(".tex", ".pdf", file.tex, ignore.case = TRUE)
         file.rename(from = file.pdf, to = paste(dir, file.pdf, sep = "/"))
     }else{
