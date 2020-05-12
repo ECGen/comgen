@@ -30,6 +30,7 @@ a97305960ec9bd28,target,geno_trait_path.tex
 b051d00c279ccedf,target,h2_reml_trait.tex
 c0c9ca25fd002f76,target,h2_reml.tex
 6487067300853e1d,import,make_table_path
+af7d6494965bdb33,import,make_table_vectors
 31fdbbebb51ee7d0,import,make_tables
 dbef2b3308e6183a,import,RLRsim::exactRLRT
 6cc828d6836182bf,import,enaR:::structure.statistics
@@ -79,10 +80,13 @@ b212b59951fe696a,target,spp_cen.pdf
 42c5468658aeb26c,target,spp.cen
 690a1a3934036cbd,target,spp.cen.in
 5a57635b807748fb,target,spp.cen.out
-30b78c4b0bd6207f,target,tables_figures
+36e24f5985f9214f,target,tables_figures
 61c9a65527ffcce3,target,trait.results
 173d3bcf187cbab9,import,update_manuscript
 c85d88fc56f4e042,target,update.manuscript
+52d5ddccd6fd0fc1,target,vec_tab
+cec39afbf256c349,target,vec_xtab
+36a9f928ae2ea226,target,vec.tex
 b212b59951fe696a,target,xg_size.pdf
 2e3f85a02ff02fd7,target,xgal.size.in
 574e876d2ce70b36,target,xgs.data

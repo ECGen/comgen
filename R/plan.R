@@ -89,6 +89,8 @@ plan <- drake_plan(
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     geno_path_tab = make_table_path(trait.results, onc.dat),
     geno_path_xtab = xtable(geno_path_tab, digits = 3),
+    vec_tab = make_table_vectors(cn.ord[["vec"]]),
+    vec_xtab = xtable(vec_tab, digits = 3),
     cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
@@ -126,6 +128,11 @@ plan <- drake_plan(
         file = "results/com_perm.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
+    vec.tex = print(
+        vec_xtab, 
+        file = "results/vec.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
     cormat.tex = print(
         cormat_xtab, 
         file = "results/cormat.tex", 
@@ -138,6 +145,7 @@ plan <- drake_plan(
         cn_perm.tex = cn_perm.tex,
         cn_trait_perm.tex = cn_trait_perm.tex,
         com_perm.tex = com_perm.tex,
+        vec.tex = vec.tex,
         cormat.tex = cormat.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,

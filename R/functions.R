@@ -763,6 +763,16 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
+make_table_vectors <- function(vec){
+    out <- vec[, c("r", "pval")]
+    rownames(out) <- c("Bark Roughness",
+                       "Number of Links",
+                       "Centralization",
+                       "AMI")
+    colnames(out) <- c("r", "p-value")
+    return(out)
+}
+
 make_table_path<- function(trait.results, onc.dat){
     ## genotype -> bark roughness
     ## genotype (-> br) -> net(L, Cen, AMI)
