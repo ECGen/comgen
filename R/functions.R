@@ -397,7 +397,8 @@ check_shapiro <- function(reml.reml){
 
 run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
                                cmode = c("freeman", "in", "out"), 
-                               type = c("pos", "neg")){
+                               type = c("pos", "neg"), nsim = 100000, 
+                               rlrt.seed = 2623){
     if (cmode == "freeman"){
         cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
                           sna::degree, 
@@ -424,7 +425,7 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
         onc.dat[, "cs"] <- cen.spp[ ,i]
         cen.reml <- lme4::lmer(cs^(1 / 4) ~ (1 | geno), 
                                data = onc.dat, REML = TRUE)
-        reml.pval <- RLRsim::exactRLRT(cen.reml)
+        reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = nsim, seed = rlrt.seed)
         cen.spp.reml[[i]] <- c(
             "spp centrality", 
             reml.pval["statistic"],
@@ -439,33 +440,33 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
     out <- list(cen.spp = cen.spp, cen.spp.reml = cen.spp.table)
 }
 
-run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
+run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, rlrt.seed = 2623){
     if (rm.na){onc.dat <- na.omit(onc.dat)}
     ## tree traits
     prb.reml <- lme4::lmer(I(BR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    prb.reml.pval <- RLRsim::exactRLRT(prb.reml)
+    prb.reml.pval <- RLRsim::exactRLRT(prb.reml, nsim = nsim, seed = rlrt.seed)
     prb.reml.result <- c("Percent Rough Bark", 
                          prb.reml.pval["statistic"],
                          H2(prb.reml, g = onc.dat$geno), 
                          R2(prb.reml), prb.reml.pval$p.value)
     ph.reml <- lme4::lmer(I(pH^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
-    ph.reml.pval <- RLRsim::exactRLRT(ph.reml)
+    ph.reml.pval <- RLRsim::exactRLRT(ph.reml, nsim = nsim, seed = rlrt.seed)
     ph.reml.result <- c("pH", 
                         ph.reml.pval["statistic"],
                         H2(ph.reml, g = onc.dat$geno), 
                         R2(ph.reml), ph.reml.pval$p.value)
     ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
-    ct.reml.pval <- RLRsim::exactRLRT(ct.reml)
+    ct.reml.pval <- RLRsim::exactRLRT(ct.reml, nsim = nsim, seed = rlrt.seed)
     ct.reml.result <- c("Condensed Tannins (CT)", 
                         ct.reml.pval["statistic"],
                         H2(ct.reml, g = onc.dat$geno), 
                         R2(ct.reml), ct.reml.pval$p.value)
     cnr.reml <- lme4::lmer(I(log(CN^(1 / 1) + 0.001)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
-    cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml)
+    cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml, nsim = nsim, seed = rlrt.seed)
     cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
                          cnr.reml.pval["statistic"],
                          H2(cnr.reml, g = onc.dat$geno), 
@@ -474,28 +475,28 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
     ## lichen community metrics
     ptc.reml <- lme4::lmer(I(PC^(1 / 2)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml)
+    ptc.reml.pval <- RLRsim::exactRLRT(ptc.reml, nsim = nsim, seed = rlrt.seed)
     ptc.reml.result <- c("Percent Lichen Cover", 
                          ptc.reml.pval["statistic"],
                          H2(ptc.reml, g = onc.dat$geno), 
                          R2(ptc.reml), ptc.reml.pval$p.value)
     spr.reml <- lme4::lmer(I(SR^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    spr.reml.pval <- RLRsim::exactRLRT(spr.reml)
+    spr.reml.pval <- RLRsim::exactRLRT(spr.reml, nsim = nsim, seed = rlrt.seed)
     spr.reml.result <- c("Lichen Species Richness", 
                          spr.reml.pval["statistic"],
                          H2(spr.reml, g = onc.dat$geno), 
                          R2(spr.reml), spr.reml.pval$p.value)
     spd.reml <- lme4::lmer(I(SD^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    spd.reml.pval <- RLRsim::exactRLRT(spd.reml)
+    spd.reml.pval <- RLRsim::exactRLRT(spd.reml, nsim = nsim, seed = rlrt.seed)
     spd.reml.result <- c("Lichen Species Diversity", 
                          spd.reml.pval["statistic"],
                          H2(spd.reml, g = onc.dat$geno), 
                          R2(spd.reml), spd.reml.pval$p.value)
     spe.reml <- lme4::lmer(I(SE^(1 / 4)) ~  (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    spe.reml.pval <- RLRsim::exactRLRT(spe.reml)
+    spe.reml.pval <- RLRsim::exactRLRT(spe.reml, nsim = nsim, seed = rlrt.seed)
     spe.reml.result <- c("Lichen Species Evenness", 
                          spe.reml.pval["statistic"],
                          H2(spe.reml, g = onc.dat$geno), 
@@ -503,49 +504,49 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                                         # Lichen network metrics
     link.reml <- lme4::lmer(I(L^(1 / 4)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
-    link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000)
+    link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     link.reml.result <- c("Number of Network Links", 
                           link.reml.pval["statistic"],
                           H2(link.reml, g = onc.dat$geno), 
                           R2(link.reml), link.reml.pval$p.value)
     cen.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000)
+    cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.reml.result <- c("Degree Centralization", 
                          cen.reml.pval["statistic"],
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
     cen.in.reml <- lme4::lmer(I(Cen.in^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = 50000)
+    cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.in.reml.result <- c("In-degree Centralization", 
                             cen.in.reml.pval["statistic"],
                          H2(cen.in.reml, g = onc.dat$geno), 
                          R2(cen.in.reml), cen.in.reml.pval$p.value)
     cen.out.reml <- lme4::lmer(I(Cen.out^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = 50000)
+    cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.out.reml.result <- c("Out-degree Centralization", 
                              cen.out.reml.pval["statistic"],
                          H2(cen.out.reml, g = onc.dat$geno), 
                          R2(cen.out.reml), cen.out.reml.pval$p.value)
     cen.inp.reml <- lme4::lmer(I(Cen.in.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.inp.reml.pval <- RLRsim::exactRLRT(cen.inp.reml, nsim = 50000)
+    cen.inp.reml.pval <- RLRsim::exactRLRT(cen.inp.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.inp.reml.result <- c("In-Positive Centralization", 
                              cen.inp.reml.pval["statistic"],
                              H2(cen.inp.reml, g = onc.dat$geno), 
                              R2(cen.inp.reml), cen.inp.reml.pval$p.value)
     cen.inn.reml <- lme4::lmer(I(Cen.in.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.inn.reml.pval <- RLRsim::exactRLRT(cen.inn.reml, nsim = 50000)
+    cen.inn.reml.pval <- RLRsim::exactRLRT(cen.inn.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.inn.reml.result <- c("In-Negative Centralization", 
                              cen.inn.reml.pval["statistic"],
                              H2(cen.inn.reml, g = onc.dat$geno), 
                              R2(cen.inn.reml), cen.inn.reml.pval$p.value)
     cen.outp.reml <- lme4::lmer(I(Cen.out.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.outp.reml.pval <- RLRsim::exactRLRT(cen.outp.reml, nsim = 50000)
+    cen.outp.reml.pval <- RLRsim::exactRLRT(cen.outp.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.outp.reml.result <- c("Out-Positive Centralization", 
                               cen.outp.reml.pval["statistic"],
                               H2(cen.outp.reml, g = onc.dat$geno), 
@@ -553,14 +554,14 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                               cen.outp.reml.pval$p.value)
     cen.outn.reml <- lme4::lmer(I(Cen.out.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    cen.outn.reml.pval <- RLRsim::exactRLRT(cen.outn.reml, nsim = 50000)
+    cen.outn.reml.pval <- RLRsim::exactRLRT(cen.outn.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     cen.outn.reml.result <- c("Out-Negative Centralization", 
                               cen.outn.reml.pval["statistic"],
                               H2(cen.outn.reml, g = onc.dat$geno), 
                               R2(cen.outn.reml), cen.outn.reml.pval$p.value)
     ami.reml <- lme4::lmer(I(AMI^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    ami.reml.pval <- RLRsim::exactRLRT(ami.reml, nsim = 50000)
+    ami.reml.pval <- RLRsim::exactRLRT(ami.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     ami.reml.result <- c("Average Mutual Information", 
                          ami.reml.pval["statistic"],
                          H2(ami.reml, g = onc.dat$geno), 
@@ -568,7 +569,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                          ami.reml.pval$p.value)
     asc.reml <- lme4::lmer(I(ASC^(1 / 2)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    asc.reml.pval <- RLRsim::exactRLRT(asc.reml, nsim = 50000)
+    asc.reml.pval <- RLRsim::exactRLRT(asc.reml, nsim = 50000, nsim = nsim, seed = rlrt.seed)
     asc.reml.result <- c("Network Ascendency", 
                          asc.reml.pval["statistic"],
                          H2(asc.reml, g = onc.dat$geno), 
@@ -576,7 +577,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                          asc.reml.pval$p.value)
     mod.reml <- lme4::lmer(I(mod.lik^(2 / 1)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
-    mod.reml.pval <- RLRsim::exactRLRT(mod.reml)
+    mod.reml.pval <- RLRsim::exactRLRT(mod.reml, nsim = nsim, seed = rlrt.seed)
     mod.reml.result <- c("Network Modularity", 
                          mod.reml.pval["statistic"],
                          H2(mod.reml, g = onc.dat$geno), 
@@ -589,7 +590,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                     resAMI = residuals(trait.results[["br_AMI"]]))
     resL.reml <- lme4::lmer(resL ~ (1 | geno), 
                             data = res.df, REML = TRUE)
-    resL.reml.pval <- RLRsim::exactRLRT(resL.reml)
+    resL.reml.pval <- RLRsim::exactRLRT(resL.reml, nsim = nsim, seed = rlrt.seed)
     resL.reml.result <- c("BR-L Residuals", 
                           resL.reml.pval["statistic"],
                           H2(resL.reml, g = res.df$geno), 
@@ -597,7 +598,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                           resL.reml.pval$p.value)
     resCen.reml <- lme4::lmer(resCen ~ (1 | geno), 
                            data = res.df, REML = TRUE)
-    resCen.reml.pval <- RLRsim::exactRLRT(resCen.reml)
+    resCen.reml.pval <- RLRsim::exactRLRT(resCen.reml, nsim = nsim, seed = rlrt.seed)
     resCen.reml.result <- c("BR-Cen Residuals", 
                             resCen.reml.pval["statistic"],
                           H2(resCen.reml, g = res.df$geno), 
@@ -605,7 +606,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE){
                           resCen.reml.pval$p.value)
     resAMI.reml <- lme4::lmer(resAMI ~ (1 | geno), 
                            data = res.df, REML = TRUE)
-    resAMI.reml.pval <- RLRsim::exactRLRT(resAMI.reml)
+    resAMI.reml.pval <- RLRsim::exactRLRT(resAMI.reml, nsim = nsim, seed = rlrt.seed)
     resAMI.reml.result <- c("BR-AMI Residuals", 
                             resAMI.reml.pval["statistic"],
                           H2(resAMI.reml, g = res.df$geno), 
@@ -1127,13 +1128,13 @@ proc_size <- function(xgal.size.in){
     return(xgs.data)
 }
 ## X. galericulata size analysis
-run_xgsize <- function(xgs.data){
+run_xgsize <- function(xgs.data, nsim = 100000, rlrt.seed = 2623){
     xgs.median.reml <- lme4::lmer(I(median.thallus^(1/4)) ~ (1 | geno),
                                   data = xgs.data[xgs.data$geno %in%
                                       names(which(table(xgs.data$geno) > 2)), ],
                                   REML = TRUE
                                   )
-    reml.results <- RLRsim::exactRLRT(xgs.median.reml)
+    reml.results <- RLRsim::exactRLRT(xgs.median.reml, nsim = nsim, seed = rlrt.seed)
     check.norm <- shapiro.test(residuals(xgs.median.reml))
     check.var <- fligner.test(xgs.data$median.thallus, xgs.data$geno)
     out <- list(reml = reml.results, 
