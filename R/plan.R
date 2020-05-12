@@ -87,13 +87,23 @@ plan <- drake_plan(
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
-    geno_path_tab = make_table_path(trait.results),
+    geno_path_tab = make_table_path(trait.results, onc.dat),
     geno_path_xtab = xtable(geno_path_tab, digits = 3),
     cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
         file = "results/h2_reml.tex", 
+        include.rownames = FALSE,
+        include.colnames = TRUE),
+    h2_reml_net.tex = print(
+        xtab[["h2_net"]], 
+        file = "results/h2_reml_net.tex", 
+        include.rownames = FALSE,
+        include.colnames = TRUE),
+    h2_reml_trait.tex = print(
+        xtab[["h2_trait"]], 
+        file = "results/h2_reml_trait.tex", 
         include.rownames = FALSE,
         include.colnames = TRUE),
     geno_trait_path.tex = print(

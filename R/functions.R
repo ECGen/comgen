@@ -670,23 +670,24 @@ std <- function(x){
 run_trait_path <- function(onc.dat){
     out <- list()
     ## Direct effect of BR on network
-    out[["br_L"]] <- lm(L^(1/4) ~ BR, data = onc.dat)
-    out[["br_Cen"]] <- lm(Cen^(1/2) ~ BR, data = onc.dat)
-    out[["br_AMI"]] <- lm(AMI^(1/2) ~ BR, data = onc.dat)
+    out[["br_L"]] <- lm(L ~ BR, data = onc.dat)
+    out[["br_Cen"]] <- lm(Cen ~ BR, data = onc.dat)
+    out[["br_AMI"]] <- lm(AMI ~ BR, data = onc.dat)
     ## Direct effect of CT on network
-    out[["ct_L"]] <- lm(L^(1/4) ~ CT, data = onc.dat)
-    out[["ct_Cen"]] <- lm(Cen^(1/2) ~ CT, data = onc.dat)
-    out[["ct_AMI"]] <- lm(AMI^(1/2) ~ CT, data = onc.dat)
+    out[["ct_L"]] <- lm(L ~ CT, data = onc.dat)
+    out[["ct_Cen"]] <- lm(Cen ~ CT, data = onc.dat)
+    out[["ct_AMI"]] <- lm(AMI ~ CT, data = onc.dat)
     ## Direct effect of pH on network
-    out[["ph_L"]] <- lm(L^(1/4) ~ pH, data = onc.dat)
-    out[["ph_Cen"]] <- lm(Cen^(1/2) ~ pH, data = onc.dat)
-    out[["ph_AMI"]] <- lm(AMI^(1/2) ~ pH, data = onc.dat)
+    out[["ph_L"]] <- lm(L ~ pH, data = onc.dat)
+    out[["ph_Cen"]] <- lm(Cen ~ pH, data = onc.dat)
+    out[["ph_AMI"]] <- lm(AMI ~ pH, data = onc.dat)
     ## Direct effect of CN on network
-    out[["cn_L"]] <- lm(L^(1/4) ~ CN, data = onc.dat)
-    out[["cn_Cen"]] <- lm(Cen^(1/2) ~ CN, data = onc.dat)
-    out[["cn_AMI"]] <- lm(AMI^(1/2) ~ CN, data = onc.dat)
+    out[["cn_L"]] <- lm(L ~ CN, data = onc.dat)
+    out[["cn_Cen"]] <- lm(Cen ~ CN, data = onc.dat)
+    out[["cn_AMI"]] <- lm(AMI ~ CN, data = onc.dat)
     return(out)
 }
+
 
 run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
     
@@ -762,46 +763,19 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-make_table_path<- function(trait.net.results){
-    out <- list()
-   ## genotype -> bark roughness
-
+make_table_path<- function(trait.results, onc.dat){
+    ## genotype -> bark roughness
     ## genotype (-> br) -> net(L, Cen, AMI)
-
-    ## br -> net(L, Cen, AMI)
-    out[["br_L"]] <- c(summary(trait.net.results[["br_L"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["br_L"]]))["Pr(>F)1"])
-    out[["br_Cen"]] <- c(summary(trait.net.results[["br_Cen"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["br_Cen"]]))["Pr(>F)1"])
-    out[["br_AMI"]] <- c(summary(trait.net.results[["br_AMI"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["br_AMI"]]))["Pr(>F)1"])
-    ## ct -> net(L, Cen, AMI)
-    out[["ct_L"]] <- c(summary(trait.net.results[["ct_L"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ct_L"]]))["Pr(>F)1"])
-    out[["ct_Cen"]] <- c(summary(trait.net.results[["ct_Cen"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ct_Cen"]]))["Pr(>F)1"])
-    out[["ct_AMI"]] <- c(summary(trait.net.results[["ct_AMI"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ct_AMI"]]))["Pr(>F)1"])
-    ## ph -> net(L, Cen, AMI)
-    out[["ph_L"]] <- c(summary(trait.net.results[["ph_L"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ph_L"]]))["Pr(>F)1"])
-    out[["ph_Cen"]] <- c(summary(trait.net.results[["ph_Cen"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ph_Cen"]]))["Pr(>F)1"])
-    out[["ph_AMI"]] <- c(summary(trait.net.results[["ph_AMI"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["ph_AMI"]]))["Pr(>F)1"])
-    ## cn -> net(L, Cen, AMI)
-    out[["cn_L"]] <- c(summary(trait.net.results[["cn_L"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["cn_L"]]))["Pr(>F)1"])
-    out[["cn_Cen"]] <- c(summary(trait.net.results[["cn_Cen"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["cn_Cen"]]))["Pr(>F)1"])
-    out[["cn_AMI"]] <- c(summary(trait.net.results[["cn_AMI"]])[["r.squared"]],
-                       unlist(anova(trait.net.results[["cn_AMI"]]))["Pr(>F)1"])
-    out <- do.call(rbind, out)
-    colnames(out) <- c("R2", "p-value")
-    ## genotype -> net(L, Cen, AMI) without BR
-
-    out[, "R2"] <- round(out[, "R2"], 2)
-    out[, "p-value"] <- round(out[, "p-value"], 3)
+    ## correlations
+    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], 
+                  digits = 7, sig.only = FALSE)[["r"]]
+    r <- as.vector(cm[c("L", "Cen", "AMI"), c("BR", "CT", "pH", "CN")])
+    ## trait -> net(L, Cen, AMI)
+    out <- lapply(trait.results, function(x) as.matrix(summary(x)[["coefficients"]])[2, ])
+    r2 <- sapply(trait.results, function(x) summary(x)[["r.squared"]])
+    ## output binding
+    out <- cbind(r, r2, do.call(rbind, out))
+    colnames(out) <- c("r", "R2", "estimate", "SE", "t", "p-value")
     return(out)
 }
 
@@ -876,8 +850,41 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     ## Create the latex
     tab.h2 <- xtable::xtable(
        h2.tab,
-       caption = "Genotypic effects on the associated lichen community.",
+       caption = "Genotypic effects on tree traits and bark lichen.",
        label = "tab:h2_table",
+       type = "latex",
+       include.rownames = FALSE,
+       include.colnames = TRUE, 
+        digits = digits
+       )
+    tab.h2.net <- xtable::xtable(
+       h2.tab[c("cn.perm.h2",
+                "ami.reml.result",
+                "cen.reml.result",
+                "cen.in.reml.result",
+                "cen.inp.reml.result",
+                "cen.inn.reml.result",
+                "cen.out.reml.result",
+                "cen.outp.reml.result",
+                "cen.outn.reml.result",
+                "link.reml.result"), ],
+       caption = "Genotypic effects on the associated lichen network structure.",
+       label = "tab:h2_net",
+       type = "latex",
+       include.rownames = FALSE,
+       include.colnames = TRUE, 
+        digits = digits
+       )
+    tab.h2.trait <- xtable::xtable(
+       h2.tab[c("prb.reml.result",
+                "ph.reml.result",
+                "cnr.reml.result",
+                "ct.reml.result",
+                "resL.reml.result",
+                "resCen.reml.result",
+                "resAMI.reml.result"), ],
+       caption = "Genotypic effects on tree traits and residuals from trait regressions of lichen network structure.",
+       label = "tab:h2_trait",
        type = "latex",
        include.rownames = FALSE,
        include.colnames = TRUE, 
@@ -911,6 +918,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         digits = digits
         )
     out <- list(h2_reml = tab.h2, 
+                h2_net = tab.h2.net, 
+                h2_trait = tab.h2.trait, 
                 cn = tab.cn.perm, 
                 cn_trait = tab.cn.trait.perm,
                 com = tab.com.perm)
