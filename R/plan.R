@@ -62,6 +62,10 @@ plan <- drake_plan(
     spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman"),
     spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos"),
     spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos"),
+    spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg"),
+    spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg"),
+### Species centrality table
+    sppcen.tab = make_table_sppcen(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out),
 ### correlation matrix for lichen and network
     cormat.tab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -91,6 +95,7 @@ plan <- drake_plan(
     geno_path_xtab = xtable(geno_path_tab, digits = 3),
     vec_tab = make_table_vectors(cn.ord[["vec"]]),
     vec_xtab = xtable(vec_tab, digits = 3),
+    sppcen_xtab = xtable(sppcen.tab),
     cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(

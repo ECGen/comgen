@@ -419,23 +419,28 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
     colnames(cen.spp) <- colnames(cn.onc[[1]])
     if (any(rownames(cen.spp) != onc.dat[, "tree.id"])){stop()}
     colnames(cen.spp) <- paste0("cen_", colnames(cen.spp))
-    cen.spp <- cen.spp[, apply(sign(cen.spp), 2, sum) > 3]
     cen.spp.reml <- list()
     for (i in seq_along(colnames(cen.spp))){
-        onc.dat[, "cs"] <- cen.spp[ ,i]
-        cen.reml <- lme4::lmer(cs^(1 / 4) ~ (1 | geno), 
-                               data = onc.dat, REML = TRUE)
-        reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = nsim, seed = rlrt.seed)
-        cen.spp.reml[[i]] <- c(
-            "spp centrality", 
-            reml.pval["statistic"],
-            H2 = H2(cen.reml, g = onc.dat[, "geno"]), 
-            R2 = R2(cen.reml), 
-            p.value = reml.pval[["p.value"]]
+        if (sum(cen.spp[ ,i]) > 0){
+            onc.dat[, "cs"] <- cen.spp[ ,i]
+            cen.reml <- lme4::lmer(cs^(1 / 4) ~ (1 | geno), 
+                                   data = onc.dat, REML = TRUE)
+            reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = nsim, seed = rlrt.seed)
+            cen.spp.reml[[i]] <- c(
+                "spp centrality", 
+                mean(cen.spp[, i]),
+                reml.pval["statistic"],
+                H2 = H2(cen.reml, g = onc.dat[, "geno"]), 
+                p.value = reml.pval[["p.value"]]
             )
+        }else{cen.spp.reml[[i]] <- c("spp centrality", mean(cen.spp[, i]), rep(NA, 3))}
     }
+    spp <- c("X. galericulata", "C. subdeflexa", "L. spp.", "C. holocarpa", "X. montana", 
+             "P. melanchra", "P. adscendens", "P. undulata", "R. sp.")
     cen.spp.table <- do.call(rbind, cen.spp.reml)[, -1]
     cen.spp.table <- apply(cen.spp.table, 2, as.numeric)
+    cen.spp.table <- cbind(spp, cen.spp.table)
+    colnames(cen.spp.table) <- c("lichen species", "mean", "statistic", "H2", "p-value")
     rownames(cen.spp.table) <- colnames(cen.spp)
     out <- list(cen.spp = cen.spp, cen.spp.reml = cen.spp.table)
 }
@@ -760,6 +765,22 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     out <- list(com = com.perm, 
                 cn = cn.perm,
                 cn.trait = cn.trait.perm)
+    return(out)
+}
+
+make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out){
+    sc <- list(c("Positive", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.in[["cen.spp.reml"]], 
+               c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.out[["cen.spp.reml"]], 
+               c("Positive", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.neg.in[["cen.spp.reml"]], 
+               c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.neg.out[["cen.spp.reml"]]
+               )
+    out <- do.call(rbind, sc)
     return(out)
 }
 

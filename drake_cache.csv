@@ -30,6 +30,7 @@ a97305960ec9bd28,target,geno_trait_path.tex
 b051d00c279ccedf,target,h2_reml_trait.tex
 c0c9ca25fd002f76,target,h2_reml.tex
 6487067300853e1d,import,make_table_path
+b09218abf6b9e42e,import,make_table_sppcen
 af7d6494965bdb33,import,make_table_vectors
 31fdbbebb51ee7d0,import,make_tables
 dbef2b3308e6183a,import,RLRsim::exactRLRT
@@ -69,7 +70,7 @@ ad49b16c1e21ecaa,target,rough.in
 42d169c041bbc7ba,import,run_nms
 4e71fb3c8f1e4ae8,import,run_perm
 1b4ef7814f3bcf60,import,run_reml
-f8b94f2a114f63d5,import,run_spp_centrality
+2998c4d6facbcac5,import,run_spp_centrality
 32a93722535ab913,import,run_trait_path
 23b00cd37ff44d60,import,spac_geno
 b212b59951fe696a,target,spac_geno.pdf
@@ -77,9 +78,13 @@ b212b59951fe696a,target,spac_geno.pdf
 b212b59951fe696a,target,spp_cen_in.pdf
 b212b59951fe696a,target,spp_cen_out.pdf
 b212b59951fe696a,target,spp_cen.pdf
-42c5468658aeb26c,target,spp.cen
-690a1a3934036cbd,target,spp.cen.in
-5a57635b807748fb,target,spp.cen.out
+565ac970655bc66a,target,spp.cen
+a087c61143cbe1fc,target,spp.cen.in
+0072400ec35d2d3b,target,spp.cen.neg.in
+74549d576912cd67,target,spp.cen.neg.out
+81b718ffcd59cd8d,target,spp.cen.out
+9361be4a89594ff0,target,sppcen_xtab
+b041accfd53b7bc8,target,sppcen.tab
 36e24f5985f9214f,target,tables_figures
 61c9a65527ffcce3,target,trait.results
 173d3bcf187cbab9,import,update_manuscript
