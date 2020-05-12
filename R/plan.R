@@ -151,6 +151,8 @@ plan <- drake_plan(
 ### Tables and Figures for Manuscript
     tables_figures = list(
         h2_reml.tex = h2_reml.tex,
+        h2_reml_net.tex = h2_reml_net.tex,
+        h2_reml_trait.tex = h2_reml_trait.tex,
         geno_trait_path.tex = geno_trait_path.tex,
         cn_perm.tex = cn_perm.tex,
         cn_trait_perm.tex = cn_trait_perm.tex,
