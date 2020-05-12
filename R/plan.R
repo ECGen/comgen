@@ -162,6 +162,7 @@ plan <- drake_plan(
         spp_cen.pdf = spp_cen.pdf, 
         spp_cen_in.pdf = spp_cen_in.pdf,
         spp_cen_out.pdf = spp_cen_out.pdf,
+        sppcen.tex = sppcen.tex,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
         ),
