@@ -799,8 +799,7 @@ make_table_path<- function(trait.results, onc.dat){
     ## genotype -> bark roughness
     ## genotype (-> br) -> net(L, Cen, AMI)
     ## correlations
-    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], 
-                  digits = 7, sig.only = FALSE)[["r"]]
+    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], digits = 7, sig.only = FALSE, p.val = TRUE)[["r"]]
     r <- as.vector(cm[c("L", "Cen", "AMI"), c("BR", "CT", "pH", "CN")])
     ## trait -> net(L, Cen, AMI)
     out <- lapply(trait.results, function(x) as.matrix(summary(x)[["coefficients"]])[2, ])
@@ -1246,7 +1245,7 @@ plot_xg_size <- function(xgs.data, file = "./xg_size.pdf"){
 }
 
 ## cortest matrix
-cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05){
+cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05, p.val = FALSE){
     cm <- array(NA, dim = rep(ncol(x), 2))
     rownames(cm) <- colnames(cm) <- colnames(x)
     cm.p <- array(NA, dim = rep(ncol(x), 2))
@@ -1261,15 +1260,17 @@ cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05){
     if (sig.only){
         out <- cm
         out[cm.p >= alpha] <- NA
-    }else {
+    }else if (p.val){
         out <- list(r = cm, p = cm.p)
+    }else{
+        out <- cm
     }
     return(out)
 }
 
 ## cormat table
 cormat_tab <- function(onc.dat, upper = TRUE){
-    out <- cor.mat(onc.dat[,c("BR", "CT", "PC","SR","SE","SD","L","Cen","AMI")])
+    out <- cor.mat(onc.dat[,c("BR", "CT", "pH", "CN", "PC","SR","SE","SD","L","Cen","AMI")])
     if (upper){
         out[lower.tri(out)] <- NA
         diag(out) <- NA

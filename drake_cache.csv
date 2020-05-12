@@ -13,11 +13,11 @@ b69b6fc8a2f17824,target,cn.d.onc
 04652e437dc9914f,target,cn.onc
 a27d07268f397597,target,cn.ord
 8be5465b527caf69,target,com_perm.tex
-eb04967d7d90808a,import,cor.mat
-602643751a2d8036,import,cormat_tab
-825f7e441e786d0b,target,cormat_xtab
-9469626edb8a1591,target,cormat.tab
-b289ecf4f29503ec,target,cormat.tex
+ffe06d51659e0d1c,import,cor.mat
+71f5b04045938458,import,cormat_tab
+81cdc90b7686ce3c,target,cormat_xtab
+12193d17fd1c8999,target,cormat.tab
+c63955211e477c57,target,cormat.tex
 d625d8c92deaddfe,import,emp_spac
 b657f9457ba04e3c,import,freeman
 15dd61e36cbf4cce,target,garden.data
@@ -29,7 +29,7 @@ c01d9b0b273b2ab5,target,geno_trait_path.tex
 3a42c113f954c118,target,h2_reml_net.tex
 b051d00c279ccedf,target,h2_reml_trait.tex
 c0c9ca25fd002f76,target,h2_reml.tex
-e01ec181983e1aa5,import,make_table_path
+60c99fbdfa9eded3,import,make_table_path
 dbbb168688de21b7,import,make_table_sppcen
 af7d6494965bdb33,import,make_table_vectors
 31fdbbebb51ee7d0,import,make_tables
@@ -86,7 +86,7 @@ b212b59951fe696a,target,spp_cen.pdf
 868f60cf23e4c94a,target,sppcen_xtab
 ebcc9792b2b6bf9a,target,sppcen.tab
 f3c8ba086ba3e873,target,sppcen.tex
-68f783341f1b6807,target,tables_figures
+11dc3c0efb736586,target,tables_figures
 61c9a65527ffcce3,target,trait.results
 173d3bcf187cbab9,import,update_manuscript
 c85d88fc56f4e042,target,update.manuscript
