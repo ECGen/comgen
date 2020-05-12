@@ -1260,7 +1260,7 @@ cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05){
     cm <- round(cm, digits)
     if (sig.only){
         out <- cm
-        out[cm.p >= alpha] <- 0
+        out[cm.p >= alpha] <- NA
     }else {
         out <- list(r = cm, p = cm.p)
     }
@@ -1268,9 +1268,12 @@ cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05){
 }
 
 ## cormat table
-cormat_tab <- function(onc.dat){
-   cm <- cor.mat(onc.dat[,c("PC","SR","SE","SD","L","Cen","AMI")])
-   out <- cm[c("PC","SR","SE","SD"), c("L","Cen","AMI")]
+cormat_tab <- function(onc.dat, upper = TRUE){
+    out <- cor.mat(onc.dat[,c("BR", "CT", "PC","SR","SE","SD","L","Cen","AMI")])
+    if (upper){
+        out[lower.tri(out)] <- NA
+        diag(out) <- NA
+    }
    return(out)
 }
 
