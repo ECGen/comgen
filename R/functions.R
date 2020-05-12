@@ -398,7 +398,7 @@ check_shapiro <- function(reml.reml){
 run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
                                cmode = c("freeman", "in", "out"), 
                                type = c("pos", "neg"), nsim = 100000, 
-                               rlrt.seed = 2623){
+                               rlrt.seed = 2623, digits = 15){
     if (cmode == "freeman"){
         cen.spp <- lapply(cn.onc[names(cn.onc) %in% na.omit(onc.dat)$tree.id],
                           sna::degree, 
@@ -439,6 +439,7 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
              "P. melanchra", "P. adscendens", "P. undulata", "R. sp.")
     cen.spp.table <- do.call(rbind, cen.spp.reml)[, -1]
     cen.spp.table <- apply(cen.spp.table, 2, as.numeric)
+    cen.spp.table <- round(cen.spp.table, digits)
     cen.spp.table <- cbind(spp, cen.spp.table)
     colnames(cen.spp.table) <- c("lichen species", "mean", "statistic", "H2", "p-value")
     rownames(cen.spp.table) <- colnames(cen.spp)
@@ -774,7 +775,7 @@ make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.n
                spp.cen.in[["cen.spp.reml"]], 
                c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
                spp.cen.out[["cen.spp.reml"]], 
-               c("Positive", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               c("Negative", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
                c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
                spp.cen.neg.in[["cen.spp.reml"]], 
                c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),

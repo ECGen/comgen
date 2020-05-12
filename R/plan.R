@@ -59,11 +59,11 @@ plan <- drake_plan(
     ## Get correlation values
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Species centrality analysis
-    spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman"),
-    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos"),
-    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos"),
-    spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg"),
-    spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg"),
+    spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman", digits = 4),
+    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos", digits = 4),
+    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos", digits = 4),
+    spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg", digits = 4),
+    spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg", digits = 4),
 ### Species centrality table
     sppcen.tab = make_table_sppcen(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out),
 ### correlation matrix for lichen and network
@@ -92,10 +92,10 @@ plan <- drake_plan(
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     geno_path_tab = make_table_path(trait.results, onc.dat),
-    geno_path_xtab = xtable(geno_path_tab, digits = 3),
+    geno_path_xtab = xtable(geno_path_tab),
     vec_tab = make_table_vectors(cn.ord[["vec"]]),
     vec_xtab = xtable(vec_tab, digits = 3),
-    sppcen_xtab = xtable(sppcen.tab),
+    sppcen_xtab = xtable(sppcen.tab, digits = 4),
     cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
@@ -137,6 +137,11 @@ plan <- drake_plan(
         vec_xtab, 
         file = "results/vec.tex", 
         include.rownames = TRUE,
+        include.colnames = TRUE),
+    sppcen.tex = print(
+        sppcen_xtab, 
+        file = "results/sppcen.tex", 
+        include.rownames = FALSE,
         include.colnames = TRUE),
     cormat.tex = print(
         cormat_xtab, 
