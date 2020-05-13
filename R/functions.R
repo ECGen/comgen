@@ -1198,7 +1198,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
     pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
-             ylim = c(0, max(scpi)),
+             ylim = c(0, max(spp.cen.pos.in[["cen.spp"]])),
              xlab = "Tree Genotype", ylab = "Centraliity (In-Degree)",
              xlas = 2, 
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
@@ -1216,7 +1216,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
            legend = c("C. holocarpa", "X. montana"), 
            pch = c(19, 1), bty = "none")
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
-             ylim = c(0, max(scpi)),
+             ylim = c(0, max(spp.cen.pos.out[["cen.spp"]])),
              xlab = "Tree Genotype", ylab = "Centraliity (Out-Degree)",
              xlas = 2, 
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
