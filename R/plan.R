@@ -93,8 +93,7 @@ plan <- drake_plan(
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     trait_path_xtab = make_table_path(trait.results, onc.dat),
-    vec_tab = make_table_vectors(cn.ord[["vec"]]),
-    vec_xtab = xtable(vec_tab, digits = 3),
+    vec_xtab = make_table_vectors(cn.ord[["vec"]]),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 

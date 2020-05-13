@@ -795,13 +795,22 @@ make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.n
     return(out)
 }
 
-make_table_vectors <- function(vec){
+make_table_vectors <- function(vec, xtab = TRUE, digits = 3){
     out <- vec[, c("r", "pval")]
     rownames(out) <- c("Bark Roughness",
                        "Number of Links",
                        "Centralization",
                        "AMI")
     colnames(out) <- c("r", "p-value")
+    if (xtab){
+        out  <-  xtable(
+            out, 
+            caption = "Correlation tests for vectors displayed in NMDS ordination of network similarity.",
+            label = "tab:vec",
+            type = "latex",
+            digits = digits
+        )
+    }
     return(out)
 }
 

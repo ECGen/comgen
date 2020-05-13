@@ -31,7 +31,7 @@ b051d00c279ccedf,target,h2_reml_trait.tex
 c0c9ca25fd002f76,target,h2_reml.tex
 922d4b0f4e1126f3,import,make_table_path
 f9f4c1719f181043,import,make_table_sppcen
-af7d6494965bdb33,import,make_table_vectors
+a33a675b7cb930cc,import,make_table_vectors
 31fdbbebb51ee7d0,import,make_tables
 dbef2b3308e6183a,import,RLRsim::exactRLRT
 6cc828d6836182bf,import,enaR:::structure.statistics
@@ -88,15 +88,15 @@ b212b59951fe696a,target,spp_cen.pdf
 eddc00e115d1cd4f,target,sppcen_xtab
 ebcc9792b2b6bf9a,target,sppcen.tab
 4e327769957f6939,target,sppcen.tex
-0dc961b7c68369b7,target,tables_figures
+d4a89f7774f489bf,target,tables_figures
 033f499c70f7c967,target,trait_path_xtab
 0981517702ed9838,target,trait_path.tex
 61c9a65527ffcce3,target,trait.results
 173d3bcf187cbab9,import,update_manuscript
 c85d88fc56f4e042,target,update.manuscript
 52d5ddccd6fd0fc1,target,vec_tab
-cec39afbf256c349,target,vec_xtab
-36a9f928ae2ea226,target,vec.tex
+b786602f36e311f6,target,vec_xtab
+8db195f138c3a3c3,target,vec.tex
 b212b59951fe696a,target,xg_size.pdf
 2e3f85a02ff02fd7,target,xgal.size.in
 574e876d2ce70b36,target,xgs.data
