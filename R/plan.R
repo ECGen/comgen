@@ -60,12 +60,13 @@ plan <- drake_plan(
     ## cor.trait.nm = cor(onc.dat[, -c(1, 6, 7)]),
 ### Species centrality analysis
     spp.cen = run_spp_centrality(cn.onc, onc.dat, cmode = "freeman", digits = 4),
-    spp.cen.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos", digits = 4),
-    spp.cen.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos", digits = 4),
+    spp.cen.pos.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "pos", digits = 4),
+    spp.cen.pos.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos", digits = 4),
     spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg", digits = 4),
     spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg", digits = 4),
 ### Species centrality table
-    sppcen.tab = make_table_sppcen(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out),
+    sppcen_xtab = make_table_sppcen(spp.cen.pos.in, spp.cen.pos.out, 
+                                    spp.cen.neg.in, spp.cen.neg.out, digits = 4),
 ### correlation matrix for lichen and network
     cormat.tab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -80,8 +81,8 @@ plan <- drake_plan(
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
-    spp_cen_in.pdf = plot_sppcen(spp.cen.in, file = "results/spp_cen_in.pdf"),
-    spp_cen_out.pdf = plot_sppcen(spp.cen.out, file = "results/spp_cen_out.pdf"),
+    spp_cen_in.pdf = plot_sppcen(spp.cen.pos.in, file = "results/spp_cen_in.pdf"),
+    spp_cen_out.pdf = plot_sppcen(spp.cen.pos.out, file = "results/spp_cen_out.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
@@ -94,7 +95,6 @@ plan <- drake_plan(
     trait_path_xtab = make_table_path(trait.results, onc.dat),
     vec_tab = make_table_vectors(cn.ord[["vec"]]),
     vec_xtab = xtable(vec_tab, digits = 3),
-    sppcen_xtab = xtable(sppcen.tab, digits = 4),
     cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(

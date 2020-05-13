@@ -769,7 +769,8 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out){
+make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out, 
+                              xtab = TRUE, digits = 4){
     sc <- list(c("Positive", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
                c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
                spp.cen.in[["cen.spp.reml"]], 
@@ -782,6 +783,15 @@ make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.n
                spp.cen.neg.out[["cen.spp.reml"]]
                )
     out <- do.call(rbind, sc)
+    if (xtab){
+        out  <-  xtable(
+            out, 
+            caption = "REML tests of the effect of tree genotype on lichen species centrality.",
+            label = "tab:sppcen",
+            type = "latex",
+            digits = digits
+        )
+    }
     return(out)
 }
 
