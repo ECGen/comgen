@@ -1156,7 +1156,7 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
     dev.off()
 }
 
-plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5){
+plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5, lab.cex = 1.5){
     pdf(file, width = 15, height = 5)
     par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
@@ -1164,7 +1164,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          pt.col = "white",
                          bar.col = "black"
                          )
-    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     legend("topleft", "A", bty = "n", text.font = 2)
 
     chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
@@ -1172,7 +1172,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          pt.col = "white",
                          bar.col = "black"
                          )
-    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     legend("topleft", "B", bty = "n", text.font = 2)
 
     chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
@@ -1180,7 +1180,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          pt.col = "white",
                          bar.col = "black"
                          )
-    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     legend("topleft", "C", bty = "n", text.font = 2)
     dev.off()
 }
