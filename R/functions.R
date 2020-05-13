@@ -1157,7 +1157,7 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
 }
 
 plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5){
-    pdf(file, width = 9, height = 4.5)
+    pdf(file, width = 15, height = 5)
     par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
