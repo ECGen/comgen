@@ -820,12 +820,12 @@ make_table_path<- function(trait.results, onc.dat, digits = 7, xtab = TRUE){
     colnames(out) <- c("r", "R2", "estimate", "SE", "t", "p-value")
     if (xtab){
         out  <-  xtable(
-            geno_path_tab, 
+            out, 
             caption = "Tests of the correlation between tree bark traits and lichen network structure",
             label = "tab:trait_path",
             type = "latex",
             include.rownames = TRUE,
-            include.colnames = TRUE, 
+            include.colnames = TRUE
         )
     }
     return(out)
@@ -1308,11 +1308,11 @@ cormat_tab <- function(onc.dat, upper = TRUE, xtab = TRUE, digits = 2){
         diag(out) <- NA
     }
     if (xtab){
-        xtable(out, 
+        out <- xtable(out, 
                caption = "Matrix of correlations among tree traits, lichen community metrics and network metrics",
                label = "tab:cormat",
                type = "latex",               
-               digits = digits),
+               digits = digits)
     }
    return(out)
 }
