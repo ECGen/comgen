@@ -1156,11 +1156,11 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
     dev.off()
 }
 
-plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
-    pdf(file)
+plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5){
+    pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1))
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
-                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black"
                          )
@@ -1168,7 +1168,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
     legend("topleft", "A", bty = "n", text.font = 2)
 
     chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
-                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black"
                          )
@@ -1176,7 +1176,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
     legend("topleft", "B", bty = "n", text.font = 2)
 
     chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
-                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black"
                          )
