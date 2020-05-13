@@ -1156,7 +1156,7 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
     dev.off()
 }
 
-plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5, lab.cex = 1.5){
+plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5, lab.cex = 1.5, no.geno.line = TRUE){
     gmu <- data.frame(apply(onc.dat[, c("BR", "L", "Cen", "AMI")], 2, function(x, y) tapply(x, y, mean), y = onc.dat[, "geno"]))
     pdf(file, width = 15, height = 5)
     par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1))
@@ -1167,7 +1167,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(L ~ BR, data = gmu), lty = 1)
-    abline(lm(L ~ BR, data = onc.dat), lty = 2)
+    if (no.geno.line){abline(lm(L ~ BR, data = onc.dat), lty = 2)}
     legend("topleft", "A", bty = "n", text.font = 2, cex = 2)
     chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
@@ -1176,7 +1176,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(Cen ~ BR, data = gmu), lty = 1)
-    abline(lm(Cen ~ BR, data = onc.dat), lty = 2)
+    if (no.geno.line){abline(lm(Cen ~ BR, data = onc.dat), lty = 2)}
     legend("topleft", "B", bty = "n", text.font = 2, cex = 2)
     chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
@@ -1185,7 +1185,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(AMI ~ BR, data = gmu), lty = 1)
-    abline(lm(AMI ~ BR, data = onc.dat), lty = 2)
+    if (no.geno.line){abline(lm(AMI ~ BR, data = onc.dat), lty = 2)}
     legend("topleft", "C", bty = "n", text.font = 2, cex = 2)
     dev.off()
 }
