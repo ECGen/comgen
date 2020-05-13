@@ -1156,6 +1156,35 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
     dev.off()
 }
 
+plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
+    pdf(file)
+    par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1))
+    chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
+                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         pt.col = "white",
+                         bar.col = black
+                         )
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    legend("topleft", "A", bty = "n", text.font = 2)
+
+    chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
+                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         pt.col = "white",
+                         bar.col = black
+                         )
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    legend("topleft", "B", bty = "n", text.font = 2)
+
+    chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
+                         cex = 2.5, lwd = 2.5, mu.pch = 15,
+                         pt.col = "white",
+                         bar.col = black
+                         )
+    text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
+    legend("topleft", "C", bty = "n", text.font = 2)
+    dev.off()
+}
+
 ## Supplementary Figures
 proc_size <- function(xgal.size.in){
     xgal.size <- xgal.size.in
