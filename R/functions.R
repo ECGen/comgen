@@ -1159,7 +1159,7 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
 plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5, lab.cex = 1.5, no.geno.line = TRUE){
     gmu <- data.frame(apply(onc.dat[, c("BR", "L", "Cen", "AMI")], 2, function(x, y) tapply(x, y, mean), y = onc.dat[, "geno"]))
     pdf(file, width = 15, height = 5)
-    par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 2)
+    par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.5)
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
