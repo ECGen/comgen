@@ -84,7 +84,7 @@ plan <- drake_plan(
     spp_cen_in.pdf = plot_sppcen(spp.cen.pos.in, file = "results/spp_cen_in.pdf"),
     spp_cen_out.pdf = plot_sppcen(spp.cen.pos.out, file = "results/spp_cen_out.pdf"),
     ## bark roughness
-    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf")
+    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf"),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
@@ -167,7 +167,7 @@ plan <- drake_plan(
         sppcen.tex = sppcen.tex,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
-        ),
+    ),
 ### Generate the manuscript
     update.manuscript = update_manuscript(
         files = tables_figures, 

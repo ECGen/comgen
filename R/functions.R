@@ -1162,7 +1162,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = black
+                         bar.col = "black"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "A", bty = "n", text.font = 2)
@@ -1170,7 +1170,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
     chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = black
+                         bar.col = "black"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "B", bty = "n", text.font = 2)
@@ -1178,7 +1178,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf"){
     chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = black
+                         bar.col = "black"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "C", bty = "n", text.font = 2)
