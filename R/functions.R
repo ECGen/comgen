@@ -1202,7 +1202,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
              ylim = c(ylim.min, ylim.max),
-             xlab = "Tree Genotype", ylab = "Centraliity (In-Degree)",
+             xlab = "Tree Genotype", ylab = "Centraliity (In)",
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
@@ -1224,7 +1224,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
            pch = c(19, 1), bty = "none")
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
              ylim = c(ylim.min, ylim.max),
-             xlab = "Tree Genotype", ylab = "Centraliity (Out-Degree)",
+             xlab = "Tree Genotype", ylab = "Centraliity (Out)",
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
