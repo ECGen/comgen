@@ -1067,13 +1067,13 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
-             ylim = c(-1.25, 3),
+             ylim = c(-0.5, 1.5),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
              ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
-             std = FALSE
+             std = TRUE
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"],
              add = TRUE, pch = 1,
@@ -1081,7 +1081,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
              xjit = 0.005, xlas = 2,
-             std = FALSE
+             std = TRUE
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
              add = TRUE, pch = 2,
@@ -1089,10 +1089,10 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
              xjit = 0.005, xlas = 2,
-             std = FALSE
+             std = TRUE
              )
     legend("topright", 
-           legend = c("AMI", "Cen", "L"), 
+           legend = c("AMI", "Centralization", "Number of Links"), 
            pch = c(19, 1, 2), bty = "none")
     legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()
