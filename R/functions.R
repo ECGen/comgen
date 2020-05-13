@@ -1072,17 +1072,28 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
              xlas = 2, 
              ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE)
+                 decreasing = TRUE),
+             std = FALSE
              )
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"],
              add = TRUE, pch = 1,
              ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.005, xlas = 2
+                 decreasing = TRUE), 
+             xjit = 0.005, xlas = 2,
+             std = FALSE
+             )
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
+             add = TRUE, pch = 2,
+             ord = order(tapply(onc.dat[, "AMI"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE), 
+             xjit = 0.005, xlas = 2,
+             std = FALSE
              )
     legend("topright", 
-           legend = c("AMI", "Bark Roughness"), 
-           pch = c(19, 1), bty = "none")
+           legend = c("AMI", "Cen", "L"), 
+           pch = c(19, 1, 2), bty = "none")
     legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()
 }
