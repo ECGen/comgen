@@ -1076,7 +1076,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
-             ylim = c(-0.5, 1.5),
+             ylim = c(-2, 2),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
              ord = order(tapply(onc.dat[, "AMI"], 
