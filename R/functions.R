@@ -1201,18 +1201,21 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
              ylim = c(-0.25, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (In-Degree)",
-             xlas = 2, 
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
              std = FALSE,
-             xjit = 0
+             xjit = -0.005,
+             xlas = 2
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.000, xlas = 2
+                 decreasing = TRUE), 
+             std = FALSE,
+             xjit = 0.005, 
+             xlas = 2
              )
     legend("topright", 
            legend = c("C. holocarpa", "X. montana"), 
@@ -1220,17 +1223,21 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
              ylim = c(-0.25, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (Out-Degree)",
-             xlas = 2, 
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
-             std = FALSE
+             std = FALSE, 
+             xjit = -0.005,
+             xlas = 2
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.01, xlas = 2
+                 decreasing = TRUE), 
+             std = FALSE,
+             xjit = 0.005, 
+             xlas = 2
              )
     legend("topright", 
            legend = c("C. holocarpa", "X. montana"), 
