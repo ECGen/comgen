@@ -81,8 +81,8 @@ plan <- drake_plan(
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
-    spp_cen_in.pdf = plot_sppcen(spp.cen.pos.in, file = "results/spp_cen_in.pdf"),
-    spp_cen_out.pdf = plot_sppcen(spp.cen.pos.out, file = "results/spp_cen_out.pdf"),
+    spp_cen_in.pdf = plot_sppcen(spp.cen.pos.in, file = "results/spp_cen_in.pdf", ylab = "Centrality (In)"),
+    spp_cen_out.pdf = plot_sppcen(spp.cen.pos.out, file = "results/spp_cen_out.pdf", ylab = "Centrality (Out)"),
     geno_sppcen.pdf = plot_geno_sppcen(onc.dat, spp.cen.pos.in, spp.cen.pos.out,
                                        file = "results/geno_sppcen.pdf"),
     ## bark roughness
