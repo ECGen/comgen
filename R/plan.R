@@ -83,6 +83,8 @@ plan <- drake_plan(
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
     spp_cen_in.pdf = plot_sppcen(spp.cen.pos.in, file = "results/spp_cen_in.pdf"),
     spp_cen_out.pdf = plot_sppcen(spp.cen.pos.out, file = "results/spp_cen_out.pdf"),
+    ## bark roughness
+    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf")
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
@@ -158,6 +160,7 @@ plan <- drake_plan(
         cormat.tex = cormat.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
+        br_net.pdf = br_net.pdf,
         spp_cen.pdf = spp_cen.pdf, 
         spp_cen_in.pdf = spp_cen_in.pdf,
         spp_cen_out.pdf = spp_cen_out.pdf,
