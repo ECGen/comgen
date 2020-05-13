@@ -1181,7 +1181,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          bar.col = "black"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
-    legend("topleft", "C", bty = "n", text.font = 2)
+    legend("topleft", "C", bty = "n", text.font = 2, cex = 3)
     dev.off()
 }
 
