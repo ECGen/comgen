@@ -1072,7 +1072,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     if (plot.vectors){
         plot(ord[["vec"]], pval = sig.alpha, 
              col = grey(0.01), 
-             lwd = 1.0, cex = 1)
+             lwd = 1.0, cex = 0.75)
     }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
