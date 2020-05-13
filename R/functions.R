@@ -795,11 +795,12 @@ make_table_vectors <- function(vec){
     return(out)
 }
 
-make_table_path<- function(trait.results, onc.dat){
+make_table_path<- function(trait.results, onc.dat, digits = 7, xtab = TRUE){
     ## genotype -> bark roughness
     ## genotype (-> br) -> net(L, Cen, AMI)
     ## correlations
-    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], digits = 7, sig.only = FALSE, p.val = TRUE)[["r"]]
+    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], 
+                  digits = digits, sig.only = FALSE, p.val = TRUE)[["r"]]
     r <- as.vector(cm[c("L", "Cen", "AMI"), c("BR", "CT", "pH", "CN")])
     ## trait -> net(L, Cen, AMI)
     out <- lapply(trait.results, function(x) as.matrix(summary(x)[["coefficients"]])[2, ])
@@ -807,6 +808,16 @@ make_table_path<- function(trait.results, onc.dat){
     ## output binding
     out <- cbind(r, r2, do.call(rbind, out))
     colnames(out) <- c("r", "R2", "estimate", "SE", "t", "p-value")
+    if (xtab){
+        out  <-  xtable(
+            geno_path_tab, 
+            caption = "Tests of the correlation between tree bark traits and lichen network structure",
+            label = "tab:trait_path",
+            type = "latex",
+            include.rownames = TRUE,
+            include.colnames = TRUE, 
+        )
+    }
     return(out)
 }
 

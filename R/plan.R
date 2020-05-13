@@ -91,8 +91,7 @@ plan <- drake_plan(
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
-    geno_path_tab = make_table_path(trait.results, onc.dat),
-    geno_path_xtab = xtable(geno_path_tab),
+    trait_path_xtab = make_table_path(trait.results, onc.dat),
     vec_tab = make_table_vectors(cn.ord[["vec"]]),
     vec_xtab = xtable(vec_tab, digits = 3),
     sppcen_xtab = xtable(sppcen.tab, digits = 4),
@@ -113,9 +112,9 @@ plan <- drake_plan(
         file = "results/h2_reml_trait.tex", 
         include.rownames = FALSE,
         include.colnames = TRUE),
-    geno_trait_path.tex = print(
-        geno_path_xtab, 
-        file = "results/geno_trait_path.tex", 
+    trait_path.tex = print(
+        trait_path_xtab, 
+        file = "results/trait_path.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
     cn_perm.tex = print(
@@ -153,7 +152,7 @@ plan <- drake_plan(
         h2_reml.tex = h2_reml.tex,
         h2_reml_net.tex = h2_reml_net.tex,
         h2_reml_trait.tex = h2_reml_trait.tex,
-        geno_trait_path.tex = geno_trait_path.tex,
+        trait_path.tex = trait_path.tex,
         cn_perm.tex = cn_perm.tex,
         cn_trait_perm.tex = cn_trait_perm.tex,
         com_perm.tex = com_perm.tex,
