@@ -1167,6 +1167,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(L ~ BR, data = gmu), lty = 1)
+    abline(lm(L ~ BR, data = onc.dat), lty = 2)
     legend("topleft", "A", bty = "n", text.font = 2, cex = 2)
     chp.coord <- ch.plot(onc.dat[, c("BR", "Cen")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
@@ -1175,6 +1176,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(Cen ~ BR, data = gmu), lty = 1)
+    abline(lm(Cen ~ BR, data = onc.dat), lty = 2)
     legend("topleft", "B", bty = "n", text.font = 2, cex = 2)
     chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
@@ -1183,6 +1185,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(AMI ~ BR, data = gmu), lty = 1)
+    abline(lm(AMI ~ BR, data = onc.dat), lty = 2)
     legend("topleft", "C", bty = "n", text.font = 2, cex = 2)
     dev.off()
 }
