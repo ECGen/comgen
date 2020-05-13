@@ -1196,7 +1196,8 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
 ## Supplementary Figures
 plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = "./results/geno_sppcen.pdf"){
     ylim.min <- 0
-    ylim.max <- max(cbind(spp.cen.pos.in[["cen.spp"]], spp.cen.pos.out[["cen.spp"]]))
+    ylim.max <- max(cbind(spp.cen.pos.in[["cen.spp"]][, c("cen_Ch", "cen_Xm")], 
+                          spp.cen.pos.out[["cen.spp"]][, c("cen_Ch", "cen_Xm")]))
     pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
