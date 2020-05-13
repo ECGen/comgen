@@ -1290,11 +1290,18 @@ cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05, p.val = FALSE)
 }
 
 ## cormat table
-cormat_tab <- function(onc.dat, upper = TRUE){
+cormat_tab <- function(onc.dat, upper = TRUE, xtab = TRUE, digits = 2){
     out <- cor.mat(onc.dat[,c("BR", "CT", "pH", "CN", "PC","SR","SE","SD","L","Cen","AMI")])
     if (upper){
         out[lower.tri(out)] <- NA
         diag(out) <- NA
+    }
+    if (xtab){
+        xtable(out, 
+               caption = "Matrix of correlations among tree traits, lichen community metrics and network metrics",
+               label = "tab:cormat",
+               type = "latex",               
+               digits = digits),
     }
    return(out)
 }

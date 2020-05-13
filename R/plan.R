@@ -68,7 +68,7 @@ plan <- drake_plan(
     sppcen_xtab = make_table_sppcen(spp.cen.pos.in, spp.cen.pos.out, 
                                     spp.cen.neg.in, spp.cen.neg.out, digits = 4),
 ### correlation matrix for lichen and network
-    cormat.tab = cormat_tab(onc.dat),
+    cormat_xtab = cormat_tab(onc.dat),
 ### species area curves by genotype
     spac.g = spac_geno(onc.q, onc.dat),
 ### Plots
@@ -95,7 +95,6 @@ plan <- drake_plan(
     trait_path_xtab = make_table_path(trait.results, onc.dat),
     vec_tab = make_table_vectors(cn.ord[["vec"]]),
     vec_xtab = xtable(vec_tab, digits = 3),
-    cormat_xtab = xtable(cormat.tab, digits = 2),
     ## Update lichen manuscript tables and figures
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
