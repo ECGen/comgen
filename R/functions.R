@@ -1164,6 +1164,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          pt.col = "white",
                          bar.col = "black"
                          )
+    abline(lm(L ~ BR, data = onc.dat))
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     legend("topleft", "A", bty = "n", text.font = 2, cex = 2)
 
