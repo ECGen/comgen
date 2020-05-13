@@ -77,7 +77,7 @@ plan <- drake_plan(
     ## fig:h2_plot
     h2_plot.pdf = plot_h2(cn.ord, 
         onc.dat, sig.alpha = 0.15, 
-        plot.vectors = TRUE,
+        plot.vectors = FALSE,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
