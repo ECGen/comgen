@@ -1163,7 +1163,8 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = "black"
+                         bar.col = "black",
+                         xlab = "Bark Roughness", ylab = "Number of Links (L)"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(L ~ BR, data = gmu), lty = 1)
@@ -1173,6 +1174,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black"
+                         xlab = "Bark Roughness", ylab = "Centralization"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(Cen ~ BR, data = gmu), lty = 1)
@@ -1182,6 +1184,7 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
                          cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black"
+                         xlab = "Bark Roughness", ylab = "Average Mutual Information (AMI)"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(AMI ~ BR, data = gmu), lty = 1)
