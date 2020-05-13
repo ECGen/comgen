@@ -1206,13 +1206,13 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
              std = FALSE,
-             xjit = -0.01
+             xjit = 0
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.005, xlas = 2
+                 decreasing = TRUE), xjit = 0.000, xlas = 2
              )
     legend("topright", 
            legend = c("C. holocarpa", "X. montana"), 
