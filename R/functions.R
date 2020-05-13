@@ -769,17 +769,17 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
-make_table_sppcen <- function(spp.cen.in, spp.cen.out, spp.cen.neg.in, spp.cen.neg.out, 
+make_table_sppcen <- function(spp.cen.pos.in, spp.cen.pos.out, spp.cen.neg.in, spp.cen.neg.out, 
                               xtab = TRUE, digits = 4){
-    sc <- list(c("Positive", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
-               c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
-               spp.cen.in[["cen.spp.reml"]], 
-               c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
-               spp.cen.out[["cen.spp.reml"]], 
-               c("Negative", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
-               c("In-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+    sc <- list(c("Positive", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
+               c("In-Degree", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.pos.in[["cen.spp.reml"]], 
+               c("Out-Degree", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
+               spp.cen.pos.out[["cen.spp.reml"]], 
+               c("Negative", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
+               c("In-Degree", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
                spp.cen.neg.in[["cen.spp.reml"]], 
-               c("Out-Degree", rep(NA, (ncol(spp.cen.in[["cen.spp.reml"]]) - 1))),
+               c("Out-Degree", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
                spp.cen.neg.out[["cen.spp.reml"]]
                )
     out <- do.call(rbind, sc)
@@ -1194,6 +1194,49 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
 }
 
 ## Supplementary Figures
+plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = "./results/geno_sppcen.pdf"){
+    pdf(file, width = 9, height = 4.5)
+    par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
+             ylim = c(0, max(scpi)),
+             xlab = "Tree Genotype", ylab = "Centraliity (In-Degree)",
+             xlas = 2, 
+             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE),
+             std = FALSE
+             )
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Xm"],
+             add = TRUE, pch = 1,
+             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE), xjit = 0.005, xlas = 2
+             )
+    legend("topright", 
+           legend = c("C. holocarpa", "X. montana"), 
+           pch = c(19, 1), bty = "none")
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
+             ylim = c(0, max(scpi)),
+             xlab = "Tree Genotype", ylab = "Centraliity (Out-Degree)",
+             xlas = 2, 
+             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE),
+             std = FALSE
+             )
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Xm"],
+             add = TRUE, pch = 1,
+             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
+                 onc.dat[, "geno"], mean), 
+                 decreasing = TRUE), xjit = 0.005, xlas = 2
+             )
+    legend("topright", 
+           legend = c("C. holocarpa", "X. montana"), 
+           pch = c(19, 1), bty = "none")
+    dev.off()
+    
+}
+
 proc_size <- function(xgal.size.in){
     xgal.size <- xgal.size.in
     xgs <- xgal.size[-1:-7, -(ncol(xgal.size) - 1):-ncol(xgal.size)]
