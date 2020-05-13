@@ -1003,7 +1003,7 @@ run_sppcen_aov <- function(spp.cen){
     return(out)
 }
 
-plot_sppcen <- function(spp.cen, file = "results/spp_cen.pdf"){
+plot_sppcen <- function(spp.cen, file = "results/spp_cen.pdf", ylab = "Centrality"){
     dat <- melt(spp.cen[["cen.spp"]])
     spp <- do.call(rbind, strsplit(as.character(dat[, "X2"]), split = "_"))[, 2]
     cen <- dat[, "value"]
@@ -1013,7 +1013,7 @@ plot_sppcen <- function(spp.cen, file = "results/spp_cen.pdf"){
     mu <- mu[order(mu, decreasing = TRUE)]
     pdf(file = file)
     barplot2(mu, plot.ci = TRUE, ci.u = mu + se, ci.l = mu - se,
-             ylab = "Centrality", xlab = "Lichen Species")
+             ylab = ylab, xlab = "Lichen Species")
     dev.off()
 }
 
