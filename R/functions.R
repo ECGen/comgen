@@ -1089,7 +1089,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
              ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
-             xjit = 0.005, xlas = 2,
+             xjit = 0.01, xlas = 2,
              std = TRUE
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
@@ -1097,7 +1097,7 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
              ord = order(tapply(onc.dat[, "AMI"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
-             xjit = 0.005, xlas = 2,
+             xjit = 0.02, xlas = 2,
              std = TRUE
              )
     legend("topright", 
