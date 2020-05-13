@@ -1195,16 +1195,18 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
 
 ## Supplementary Figures
 plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = "./results/geno_sppcen.pdf"){
+    ylim.max <- max(cbind(spp.cen.pos.in[["cen.spp"]], spp.cen.pos.out[["cen.spp"]]))
     pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
-             ylim = c(0, max(spp.cen.pos.in[["cen.spp"]])),
+             ylim = c(0, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (In-Degree)",
              xlas = 2, 
              ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
-             std = FALSE
+             std = FALSE,
+             xjit = -0.01
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
@@ -1216,7 +1218,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
            legend = c("C. holocarpa", "X. montana"), 
            pch = c(19, 1), bty = "none")
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
-             ylim = c(0, max(spp.cen.pos.out[["cen.spp"]])),
+             ylim = c(0, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (Out-Degree)",
              xlas = 2, 
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
@@ -1228,7 +1230,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
              add = TRUE, pch = 1,
              ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
                  onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), xjit = 0.005, xlas = 2
+                 decreasing = TRUE), xjit = 0.01, xlas = 2
              )
     legend("topright", 
            legend = c("C. holocarpa", "X. montana"), 
