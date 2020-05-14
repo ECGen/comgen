@@ -64,9 +64,16 @@ plan <- drake_plan(
     spp.cen.pos.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos", digits = 4),
     spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg", digits = 4),
     spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg", digits = 4),
+    ## centrality by species analyses
+    spp.cen.aov = run_sppcen_aov(spp.cen),
+    spp.cen.pos.in.aov = run_sppcen_aov(spp.cen.pos.in),
+    spp.cen.pos.out.aov = run_sppcen_aov(spp.cen.pos.out),
+    spp.cen.neg.in.aov = run_sppcen_aov(spp.cen.neg.in),
+    spp.cen.neg.out.aov = run_sppcen_aov(spp.cen.neg.out),
 ### Species centrality table
     sppcen_xtab = make_table_sppcen(spp.cen.pos.in, spp.cen.pos.out, 
                                     spp.cen.neg.in, spp.cen.neg.out, digits = 4),
+    sppcen_aov_xtab = xtable(spp.cen.aov[["aov"]]),
 ### correlation matrix for lichen and network
     cormat_xtab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -143,6 +150,11 @@ plan <- drake_plan(
         sppcen_xtab, 
         file = "results/sppcen.tex", 
         include.rownames = FALSE,
+        include.colnames = TRUE),
+    sppcen_aov.tex = print(
+        sppcen_aov_xtab, 
+        file = "results/sppcen_aov.tex", 
+        include.rownames = TRUE,
         include.colnames = TRUE),
     cormat.tex = print(
         cormat_xtab, 

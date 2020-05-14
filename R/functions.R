@@ -997,7 +997,9 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
 }
 
 run_sppcen_aov <- function(spp.cen){
-    sppcen.aov <- aov(value ~ X2, data = melt(spp.cen[["cen.spp"]]))
+    spp.cen.dat <- melt(spp.cen[["cen.spp"]])
+    colnames(spp.cen.dat) <- c("tree.id", "species", "centrality")
+    sppcen.aov <- aov(centrality ~ species, data = spp.cen.dat)
     sppcen.mct <- TukeyHSD(sppcen.aov)
     out <- list(aov = sppcen.aov, mct = sppcen.mct)
     return(out)
