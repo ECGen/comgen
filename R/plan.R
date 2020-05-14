@@ -64,9 +64,16 @@ plan <- drake_plan(
     spp.cen.pos.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "pos", digits = 4),
     spp.cen.neg.in = run_spp_centrality(cn.onc, onc.dat, cmode = "in", type = "neg", digits = 4),
     spp.cen.neg.out = run_spp_centrality(cn.onc, onc.dat, cmode = "out", type = "neg", digits = 4),
+    ## centrality by species analyses
+    spp.cen.aov = run_sppcen_aov(spp.cen),
+    spp.cen.pos.in.aov = run_sppcen_aov(spp.cen.pos.in),
+    spp.cen.pos.out.aov = run_sppcen_aov(spp.cen.pos.out),
+    spp.cen.neg.in.aov = run_sppcen_aov(spp.cen.neg.in),
+    spp.cen.neg.out.aov = run_sppcen_aov(spp.cen.neg.out),
 ### Species centrality table
     sppcen_xtab = make_table_sppcen(spp.cen.pos.in, spp.cen.pos.out, 
                                     spp.cen.neg.in, spp.cen.neg.out, digits = 4),
+    sppcen_aov_xtab = xtable(anova(spp.cen.aov[["aov"]])),
 ### correlation matrix for lichen and network
     cormat_xtab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -95,10 +102,15 @@ plan <- drake_plan(
     ## tab:cn_perm_table = network similarity PERMANOVA
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
+    muse_tab = xtable(make_table_muse(onc.dat)),
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     trait_path_xtab = make_table_path(trait.results, onc.dat),
-    vec_xtab = make_table_vectors(cn.ord[["vec"]]),
     ## Update lichen manuscript tables and figures
+    muse.tex = print(
+        muse_tab,
+        file = "results/muse.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
         file = "results/h2_reml.tex", 
@@ -134,16 +146,18 @@ plan <- drake_plan(
         file = "results/com_perm.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
-    vec.tex = print(
-        vec_xtab, 
-        file = "results/vec.tex", 
-        include.rownames = TRUE,
-        include.colnames = TRUE),
     sppcen.tex = print(
         sppcen_xtab, 
         file = "results/sppcen.tex", 
         include.rownames = FALSE,
         include.colnames = TRUE),
+    sppcen_aov.tex = print(
+        sppcen_aov_xtab, 
+        file = "results/sppcen_aov.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
+    sppcen_aov.txt = capture.output(summary(spp.cen.aov[["aov"]]), 
+                                    file = "./results/sppcen_aov.txt"),
     cormat.tex = print(
         cormat_xtab, 
         file = "results/cormat.tex", 
@@ -151,6 +165,7 @@ plan <- drake_plan(
         include.colnames = TRUE),
 ### Tables and Figures for Manuscript
     tables_figures = list(
+        muse.tex = muse.tex,
         h2_reml.tex = h2_reml.tex,
         h2_reml_net.tex = h2_reml_net.tex,
         h2_reml_trait.tex = h2_reml_trait.tex,
@@ -158,7 +173,6 @@ plan <- drake_plan(
         cn_perm.tex = cn_perm.tex,
         cn_trait_perm.tex = cn_trait_perm.tex,
         com_perm.tex = com_perm.tex,
-        vec.tex = vec.tex,
         cormat.tex = cormat.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
@@ -168,6 +182,8 @@ plan <- drake_plan(
         spp_cen_out.pdf = spp_cen_out.pdf,
         geno_sppcen.pdf = geno_sppcen.pdf,
         sppcen.tex = sppcen.tex,
+        sppcen_aov.tex = sppcen_aov.tex,
+        sppcen_aov.txt = sppcen_aov.txt,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
     ),
