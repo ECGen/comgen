@@ -73,7 +73,7 @@ plan <- drake_plan(
 ### Species centrality table
     sppcen_xtab = make_table_sppcen(spp.cen.pos.in, spp.cen.pos.out, 
                                     spp.cen.neg.in, spp.cen.neg.out, digits = 4),
-    sppcen_aov_xtab = xtable(spp.cen.aov[["aov"]]),
+    sppcen_aov_xtab = xtable(anova(spp.cen.aov[["aov"]])),
 ### correlation matrix for lichen and network
     cormat_xtab = cormat_tab(onc.dat),
 ### species area curves by genotype
@@ -156,6 +156,8 @@ plan <- drake_plan(
         file = "results/sppcen_aov.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
+    sppcen_aov.txt = capture.output(summary(spp.cen.aov[["aov"]]), 
+                                    file = "./results/sppcen_aov.txt"),
     cormat.tex = print(
         cormat_xtab, 
         file = "results/cormat.tex", 
@@ -180,6 +182,8 @@ plan <- drake_plan(
         spp_cen_out.pdf = spp_cen_out.pdf,
         geno_sppcen.pdf = geno_sppcen.pdf,
         sppcen.tex = sppcen.tex,
+        sppcen_aov.tex = sppcen_aov.tex,
+        sppcen_aov.txt = sppcen_aov.txt,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
     ),
