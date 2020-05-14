@@ -153,6 +153,10 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         abs(sign(x))
     }), enaR:::structure.statistics)
     ns.onc <- do.call(rbind, ns.onc)
+    ## L degree pos and neg
+    L.pos <- sapply(cn.onc, function(x) sum(sign(x[x > 0])))
+    L.neg <- sapply(cn.onc, function(x) sum(abs(sign(x[x < 0]))))
+    ## modularity
     cn.mod.onc <- matrix(nrow = length(cn.onc), ncol = 2)
     for (i in 1:length(cn.onc)) {
         if (sum(sign(cn.onc[[i]])) >= 3) {
@@ -188,6 +192,8 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         centralization_signed(x, mode = "out", type = "neg")
     }))
     onc.ns <- cbind(ns.onc, 
+                    L.pos = L.pos,
+                    L.neg = L.neg,
                     Cen = dcen.onc, 
                     Cen.in = dcen.in.onc,
                     Cen.out = dcen.out.onc,
@@ -234,7 +240,7 @@ proc_onc_dat <- function(garden.data, rough.in, onc.q,
         geno = factor(onc.geno), 
         tree = tree, 
         BR = onc.rough, 
-        onc.ns[, c("L", 
+        onc.ns[, c("L", "L.pos", "L.neg",
                    "Cen", "Cen.in", "Cen.out",
                    "Cen.in.pos", "Cen.in.neg", 
                    "Cen.out.pos", "Cen.out.neg", 
@@ -511,49 +517,64 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     link.reml <- lme4::lmer(I(L^(1 / 4)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
     link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = nsim, seed = rlrt.seed)
-    link.reml.result <- c("Number of Network Links", 
+    link.reml.result <- c("Number of Network Links (Degree)", 
                           link.reml.pval["statistic"],
                           H2(link.reml, g = onc.dat$geno), 
                           R2(link.reml), link.reml.pval$p.value)
+
+    link.pos.reml <- lme4::lmer(I(L.pos^(1 / 4)) ~ (1 | geno), 
+                            data = onc.dat, REML = TRUE)
+    link.pos.reml.pval <- RLRsim::exactRLRT(link.pos.reml, nsim = nsim, seed = rlrt.seed)
+    link.pos.reml.result <- c("Degree (positive)", 
+                          link.pos.reml.pval["statistic"],
+                          H2(link.pos.reml, g = onc.dat$geno), 
+                          R2(link.pos.reml), link.pos.reml.pval$p.value)
+    link.neg.reml <- lme4::lmer(I(L.neg^(1 / 4)) ~ (1 | geno), 
+                            data = onc.dat, REML = TRUE)
+    link.neg.reml.pval <- RLRsim::exactRLRT(link.neg.reml, nsim = nsim, seed = rlrt.seed)
+    link.neg.reml.result <- c("Degree (negative)", 
+                          link.neg.reml.pval["statistic"],
+                          H2(link.neg.reml, g = onc.dat$geno), 
+                          R2(link.neg.reml), link.neg.reml.pval$p.value)
     cen.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.reml.pval <- RLRsim::exactRLRT(cen.reml, nsim = nsim, seed = rlrt.seed)
-    cen.reml.result <- c("Degree Centralization", 
+    cen.reml.result <- c("Centralization", 
                          cen.reml.pval["statistic"],
                          H2(cen.reml, g = onc.dat$geno), 
                          R2(cen.reml), cen.reml.pval$p.value)
     cen.in.reml <- lme4::lmer(I(Cen.in^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.in.reml.pval <- RLRsim::exactRLRT(cen.in.reml, nsim = nsim, seed = rlrt.seed)
-    cen.in.reml.result <- c("In-degree Centralization", 
+    cen.in.reml.result <- c("Centralization In-Degree", 
                             cen.in.reml.pval["statistic"],
                          H2(cen.in.reml, g = onc.dat$geno), 
                          R2(cen.in.reml), cen.in.reml.pval$p.value)
     cen.out.reml <- lme4::lmer(I(Cen.out^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.out.reml.pval <- RLRsim::exactRLRT(cen.out.reml, nsim = nsim, seed = rlrt.seed)
-    cen.out.reml.result <- c("Out-degree Centralization", 
+    cen.out.reml.result <- c("Centralization Out-Degree", 
                              cen.out.reml.pval["statistic"],
                          H2(cen.out.reml, g = onc.dat$geno), 
                          R2(cen.out.reml), cen.out.reml.pval$p.value)
     cen.inp.reml <- lme4::lmer(I(Cen.in.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.inp.reml.pval <- RLRsim::exactRLRT(cen.inp.reml, nsim = nsim, seed = rlrt.seed)
-    cen.inp.reml.result <- c("In-Positive Centralization", 
+    cen.inp.reml.result <- c("Centralization In-Degree (positive)", 
                              cen.inp.reml.pval["statistic"],
                              H2(cen.inp.reml, g = onc.dat$geno), 
                              R2(cen.inp.reml), cen.inp.reml.pval$p.value)
     cen.inn.reml <- lme4::lmer(I(Cen.in.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.inn.reml.pval <- RLRsim::exactRLRT(cen.inn.reml, nsim = nsim, seed = rlrt.seed)
-    cen.inn.reml.result <- c("In-Negative Centralization", 
+    cen.inn.reml.result <- c("Centralization In-Degree (negative)", 
                              cen.inn.reml.pval["statistic"],
                              H2(cen.inn.reml, g = onc.dat$geno), 
                              R2(cen.inn.reml), cen.inn.reml.pval$p.value)
     cen.outp.reml <- lme4::lmer(I(Cen.out.pos^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.outp.reml.pval <- RLRsim::exactRLRT(cen.outp.reml, nsim = nsim, seed = rlrt.seed)
-    cen.outp.reml.result <- c("Out-Positive Centralization", 
+    cen.outp.reml.result <- c("Centralization Out-Degree (positive)", 
                               cen.outp.reml.pval["statistic"],
                               H2(cen.outp.reml, g = onc.dat$geno), 
                               R2(cen.outp.reml), 
@@ -561,7 +582,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     cen.outn.reml <- lme4::lmer(I(Cen.out.neg^(1 / 4)) ~ (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.outn.reml.pval <- RLRsim::exactRLRT(cen.outn.reml, nsim = nsim, seed = rlrt.seed)
-    cen.outn.reml.result <- c("Out-Negative Centralization", 
+    cen.outn.reml.result <- c("Centralization Out-Degree (negative)", 
                               cen.outn.reml.pval["statistic"],
                               H2(cen.outn.reml, g = onc.dat$geno), 
                               R2(cen.outn.reml), cen.outn.reml.pval$p.value)
@@ -592,8 +613,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     ## Residual bark roughness effect on net
     res.df <- data.frame(geno = onc.dat[, "geno"],
                     resL = residuals(trait.results[["br_L"]]),
-                    resCen = residuals(trait.results[["br_Cen"]]),
-                    resAMI = residuals(trait.results[["br_AMI"]]))
+                    resCen = residuals(trait.results[["br_Cen"]]))
     resL.reml <- lme4::lmer(resL ~ (1 | geno), 
                             data = res.df, REML = TRUE)
     resL.reml.pval <- RLRsim::exactRLRT(resL.reml, nsim = nsim, seed = rlrt.seed)
@@ -610,14 +630,6 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                           H2(resCen.reml, g = res.df$geno), 
                           R2(resCen.reml), 
                           resCen.reml.pval$p.value)
-    resAMI.reml <- lme4::lmer(resAMI ~ (1 | geno), 
-                           data = res.df, REML = TRUE)
-    resAMI.reml.pval <- RLRsim::exactRLRT(resAMI.reml, nsim = nsim, seed = rlrt.seed)
-    resAMI.reml.result <- c("BR-AMI Residuals", 
-                            resAMI.reml.pval["statistic"],
-                          H2(resAMI.reml, g = res.df$geno), 
-                          R2(resAMI.reml), 
-                          resAMI.reml.pval$p.value)
     if (raw.reml){
         out <- list(prb.reml, 
                      ph.reml,
@@ -627,7 +639,9 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                      spr.reml,
                      spe.reml,
                      spd.reml,
-                     link.reml,
+                    link.reml,
+                    link.pos.reml,
+                    link.neg.reml,
                      mod.reml,
                     cen.reml,
                     cen.in.reml,
@@ -639,8 +653,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                     ami.reml,
                     asc.reml,
                     resL.reml, 
-                    resCen.reml,
-                    resAMI.reml)
+                    resCen.reml)
     }else{
         out <- rbind(prb.reml.result, 
                      ph.reml.result,
@@ -651,6 +664,8 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                      spe.reml.result,
                      spd.reml.result,
                      link.reml.result,
+                     link.pos.reml.result,
+                     link.neg.reml.result,
                      mod.reml.result,
                      cen.reml.result,
                      cen.in.reml.result,
@@ -662,8 +677,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                      ami.reml.result,
                      asc.reml.result,
                      resL.reml.result,
-                     resCen.reml.result,
-                     resAMI.reml.result)
+                     resCen.reml.result)
         colnames(out) <- c("response", "statistic", "H2", "R2", "p-value")
     }
     return(out)
@@ -673,24 +687,22 @@ std <- function(x){
     (x - mean(x)) / sqrt(length(x))
 }
 
+
+
 run_trait_path <- function(onc.dat){
     out <- list()
     ## Direct effect of BR on network
     out[["br_L"]] <- lm(L ~ BR, data = onc.dat)
     out[["br_Cen"]] <- lm(Cen ~ BR, data = onc.dat)
-    out[["br_AMI"]] <- lm(AMI ~ BR, data = onc.dat)
     ## Direct effect of CT on network
     out[["ct_L"]] <- lm(L ~ CT, data = onc.dat)
     out[["ct_Cen"]] <- lm(Cen ~ CT, data = onc.dat)
-    out[["ct_AMI"]] <- lm(AMI ~ CT, data = onc.dat)
     ## Direct effect of pH on network
     out[["ph_L"]] <- lm(L ~ pH, data = onc.dat)
     out[["ph_Cen"]] <- lm(Cen ~ pH, data = onc.dat)
-    out[["ph_AMI"]] <- lm(AMI ~ pH, data = onc.dat)
     ## Direct effect of CN on network
     out[["cn_L"]] <- lm(L ~ CN, data = onc.dat)
     out[["cn_Cen"]] <- lm(Cen ~ CN, data = onc.dat)
-    out[["cn_AMI"]] <- lm(AMI ~ CN, data = onc.dat)
     return(out)
 }
 
@@ -769,6 +781,18 @@ run_perm <- function(onc.dat, onc.com, cn.d.onc){
     return(out)
 }
 
+make_table_muse <- function(onc.dat){
+    dat <- onc.dat[, c("PC", "SR", "SD", "SE", "BR", "L", "L.pos",
+                      "L.neg", "Cen", "Cen.in", "Cen.out",
+                      "Cen.in.pos", "Cen.in.neg", "Cen.out.pos",
+                      "Cen.out.neg", "mod.lik", "AMI", "ASC", "C", "N",
+                      "CN", "CT", "pH")]
+    mu <- apply(dat, 2, mean)
+    se <- apply(dat, 2, function(x) sd(x)/sqrt(length(x)))
+    out <- rbind(mean = mu, se)
+    return(out)
+}
+
 make_table_sppcen <- function(spp.cen.pos.in, spp.cen.pos.out, spp.cen.neg.in, spp.cen.neg.out, 
                               xtab = TRUE, digits = 4){
     sc <- list(c("Positive", rep(NA, (ncol(spp.cen.pos.in[["cen.spp.reml"]]) - 1))),
@@ -798,9 +822,8 @@ make_table_sppcen <- function(spp.cen.pos.in, spp.cen.pos.out, spp.cen.neg.in, s
 make_table_vectors <- function(vec, xtab = TRUE, digits = 3){
     out <- vec[, c("r", "pval")]
     rownames(out) <- c("Bark Roughness",
-                       "Number of Links",
-                       "Centralization",
-                       "AMI")
+                       "Degree (L)",
+                       "Centralization")
     colnames(out) <- c("r", "p-value")
     if (xtab){
         out  <-  xtable(
@@ -818,9 +841,9 @@ make_table_path<- function(trait.results, onc.dat, digits = 7, xtab = TRUE){
     ## genotype -> bark roughness
     ## genotype (-> br) -> net(L, Cen, AMI)
     ## correlations
-    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen", "AMI")], 
+    cm <- cor.mat(onc.dat[, c("BR", "CT", "pH", "CN", "L", "Cen")], 
                   digits = digits, sig.only = FALSE, p.val = TRUE)[["r"]]
-    r <- as.vector(cm[c("L", "Cen", "AMI"), c("BR", "CT", "pH", "CN")])
+    r <- as.vector(cm[c("L", "Cen"), c("BR", "CT", "pH", "CN")])
     ## trait -> net(L, Cen, AMI)
     out <- lapply(trait.results, function(x) as.matrix(summary(x)[["coefficients"]])[2, ])
     r2 <- sapply(trait.results, function(x) summary(x)[["r.squared"]])
@@ -881,6 +904,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                        "cen.outp.reml.result",
                        "cen.outn.reml.result",
                        "link.reml.result",
+                       "link.pos.reml.result",
+                       "link.neg.reml.result",
                        "ptc.reml.result",
                        "spd.reml.result",
                        "spr.reml.result",
@@ -890,8 +915,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                        "cnr.reml.result",
                        "ct.reml.result",
                        "resL.reml.result",
-                       "resCen.reml.result",
-                       "resAMI.reml.result"), ]
+                       "resCen.reml.result"), ]
                                         # Lichen Networks
                                         # Lichen Network Metrics
                                         # Lichen Community
@@ -920,7 +944,6 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        )
     tab.h2.net <- xtable::xtable(
        h2.tab[c("cn.perm.h2",
-                "ami.reml.result",
                 "cen.reml.result",
                 "cen.in.reml.result",
                 "cen.inp.reml.result",
@@ -928,7 +951,9 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                 "cen.out.reml.result",
                 "cen.outp.reml.result",
                 "cen.outn.reml.result",
-                "link.reml.result"), ],
+                "link.reml.result", 
+                "link.pos.reml.result",
+                "link.neg.reml.result"), ],
        caption = "Genotypic effects on the associated lichen network structure.",
        label = "tab:h2_net",
        type = "latex",
@@ -942,8 +967,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                 "cnr.reml.result",
                 "ct.reml.result",
                 "resL.reml.result",
-                "resCen.reml.result",
-                "resAMI.reml.result"), ],
+                "resCen.reml.result"), ],
        caption = "Genotypic effects on tree traits and residuals from trait regressions of lichen network structure.",
        label = "tab:h2_trait",
        type = "latex",
@@ -1039,22 +1063,22 @@ plot_netsim <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
 plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
     ## Significant Genotype and Network Effects
     pdf(file)
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
              ylim = c(-1.25, 3),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
-             ord = order(tapply(onc.dat[, "AMI"], 
+             ord = order(tapply(onc.dat[, "L"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE)
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "BR"],
              add = TRUE, pch = 1,
-             ord = order(tapply(onc.dat[, "AMI"], 
+             ord = order(tapply(onc.dat[, "L"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), xjit = 0.005, xlas = 2
              )
     legend("topright", 
-           legend = c("AMI", "Bark Roughness"), 
+           legend = c("Degree", "Bark Roughness"), 
            pch = c(19, 1), bty = "none")
     dev.off()
 }
@@ -1077,34 +1101,26 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
              lwd = 1.0, cex = 0.75)
     }
     ## MDC Plot
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "AMI"],
+    mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
              ylim = c(-1.5, 2.5),
              xlab = "Tree Genotype", ylab = "Standardized Metric",
              xlas = 2, 
-             ord = order(tapply(onc.dat[, "AMI"], 
+             ord = order(tapply(onc.dat[, "L"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
              std = TRUE
              )
     mdc.plot(onc.dat[, "geno"], onc.dat[, "Cen"],
              add = TRUE, pch = 1,
-             ord = order(tapply(onc.dat[, "AMI"], 
+             ord = order(tapply(onc.dat[, "L"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
              xjit = 0.01, xlas = 2,
              std = TRUE
              )
-    mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
-             add = TRUE, pch = 2,
-             ord = order(tapply(onc.dat[, "AMI"], 
-                 onc.dat[, "geno"], mean), 
-                 decreasing = TRUE), 
-             xjit = 0.02, xlas = 2,
-             std = TRUE
-             )
     legend("topright", 
-           legend = c("AMI", "Centralization", "Number of Links"), 
-           pch = c(19, 1, 2), bty = "none")
+           legend = c("Degree", "Centralization"), 
+           pch = c(19, 1), bty = "none")
     legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()
 }
@@ -1159,14 +1175,14 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
 }
 
 plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd = 1.5, lab.cex = 1.5, no.geno.line = FALSE){
-    gmu <- data.frame(apply(onc.dat[, c("BR", "L", "Cen", "AMI")], 2, function(x, y) tapply(x, y, mean), y = onc.dat[, "geno"]))
-    pdf(file, width = 15, height = 5)
-    par(mfrow = c(1, 3), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.5, cex.axis = 1.25)
+    gmu <- data.frame(apply(onc.dat[, c("BR", "L", "Cen")], 2, function(x, y) tapply(x, y, mean), y = onc.dat[, "geno"]))
+    pdf(file, width = 9, height = 4.5)
+    par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.5, cex.axis = 1.25)
     chp.coord <- ch.plot(onc.dat[, c("BR", "L")], onc.dat[, "geno"],
                          cex = cex, lwd = lwd, mu.pch = 15,
                          pt.col = "white",
                          bar.col = "black",
-                         xlab = "Bark Roughness", ylab = "Number of Links (L)"
+                         xlab = "Bark Roughness", ylab = "Degree"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
     abline(lm(L ~ BR, data = gmu), lty = 1)
@@ -1182,16 +1198,6 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", cex = 2.5, lwd =
     abline(lm(Cen ~ BR, data = gmu), lty = 1)
     if (no.geno.line){abline(lm(Cen ~ BR, data = onc.dat), lty = 2)}
     legend("topleft", "B", bty = "n", text.font = 2, cex = 2)
-    chp.coord <- ch.plot(onc.dat[, c("BR", "AMI")], onc.dat[, "geno"],
-                         cex = cex, lwd = lwd, mu.pch = 15,
-                         pt.col = "white",
-                         bar.col = "black",
-                         xlab = "Bark Roughness", ylab = "Average Mutual Information (AMI)"
-                         )
-    text(chp.coord, labels = rownames(chp.coord), cex = lab.cex)
-    abline(lm(AMI ~ BR, data = gmu), lty = 1)
-    if (no.geno.line){abline(lm(AMI ~ BR, data = onc.dat), lty = 2)}
-    legend("topleft", "C", bty = "n", text.font = 2, cex = 2)
     dev.off()
 }
 
@@ -1406,7 +1412,7 @@ cor.mat <- function(x, digits = 2, sig.only = TRUE, alpha = 0.05, p.val = FALSE)
 
 ## cormat table
 cormat_tab <- function(onc.dat, upper = TRUE, xtab = TRUE, digits = 2){
-    out <- cor.mat(onc.dat[,c("BR", "CT", "pH", "CN", "PC","SR","SE","SD","L","Cen","AMI")])
+    out <- cor.mat(onc.dat[,c("BR", "CT", "pH", "CN", "PC","SR","SE","SD","L","Cen")])
     if (upper){
         out[lower.tri(out)] <- NA
         diag(out) <- NA

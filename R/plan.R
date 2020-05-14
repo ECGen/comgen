@@ -102,10 +102,15 @@ plan <- drake_plan(
     ## tab:cn_perm_table = network similarity PERMANOVA
     ## tab:com_perm_table = community similarity PERMANOVA
     ## H2 table all
+    muse_tab = xtable(make_table_muse(onc.dat)),
     xtab = make_tables(onc.dat, reml.results, perm.results, digits = 4),
     trait_path_xtab = make_table_path(trait.results, onc.dat),
-    vec_xtab = make_table_vectors(cn.ord[["vec"]]),
     ## Update lichen manuscript tables and figures
+    muse.tex = print(
+        muse_tab,
+        file = "results/muse.tex", 
+        include.rownames = TRUE,
+        include.colnames = TRUE),
     h2_reml.tex = print(
         xtab[["h2_reml"]], 
         file = "results/h2_reml.tex", 
@@ -141,11 +146,6 @@ plan <- drake_plan(
         file = "results/com_perm.tex", 
         include.rownames = TRUE,
         include.colnames = TRUE),
-    vec.tex = print(
-        vec_xtab, 
-        file = "results/vec.tex", 
-        include.rownames = TRUE,
-        include.colnames = TRUE),
     sppcen.tex = print(
         sppcen_xtab, 
         file = "results/sppcen.tex", 
@@ -165,6 +165,7 @@ plan <- drake_plan(
         include.colnames = TRUE),
 ### Tables and Figures for Manuscript
     tables_figures = list(
+        muse.tex = muse.tex,
         h2_reml.tex = h2_reml.tex,
         h2_reml_net.tex = h2_reml_net.tex,
         h2_reml_trait.tex = h2_reml_trait.tex,
@@ -172,7 +173,6 @@ plan <- drake_plan(
         cn_perm.tex = cn_perm.tex,
         cn_trait_perm.tex = cn_trait_perm.tex,
         com_perm.tex = com_perm.tex,
-        vec.tex = vec.tex,
         cormat.tex = cormat.tex,
         cn_onc.pdf = cn_onc.pdf,
         h2_plot.pdf = h2_plot.pdf,
