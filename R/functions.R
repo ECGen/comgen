@@ -472,14 +472,14 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
     ct.reml.pval <- RLRsim::exactRLRT(ct.reml, nsim = nsim, seed = rlrt.seed)
-    ct.reml.result <- c("Condensed Tannins (CT)", 
+    ct.reml.result <- c("Condensed Tannins", 
                         ct.reml.pval["statistic"],
                         H2(ct.reml, g = onc.dat$geno), 
                         R2(ct.reml), ct.reml.pval$p.value)
     cnr.reml <- lme4::lmer(I(log(CN^(1 / 1) + 0.001)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
     cnr.reml.pval <- RLRsim::exactRLRT(cnr.reml, nsim = nsim, seed = rlrt.seed)
-    cnr.reml.result <- c("Carbon-Nitrogen (CN) Ratio", 
+    cnr.reml.result <- c("Carbon-Nitrogen Ratio", 
                          cnr.reml.pval["statistic"],
                          H2(cnr.reml, g = onc.dat$geno), 
                          R2(cnr.reml), 
