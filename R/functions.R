@@ -517,7 +517,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     link.reml <- lme4::lmer(I(L^(1 / 4)) ~ (1 | geno), 
                             data = onc.dat, REML = TRUE)
     link.reml.pval <- RLRsim::exactRLRT(link.reml, nsim = nsim, seed = rlrt.seed)
-    link.reml.result <- c("Number of Network Links (Degree)", 
+    link.reml.result <- c("Degree", 
                           link.reml.pval["statistic"],
                           H2(link.reml, g = onc.dat$geno), 
                           R2(link.reml), link.reml.pval$p.value)
