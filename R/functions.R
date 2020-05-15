@@ -944,16 +944,16 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        )
     tab.h2.net <- xtable::xtable(
        h2.tab[c("cn.perm.h2",
+                "link.reml.result", 
+                "link.pos.reml.result",
+                "link.neg.reml.result"
                 "cen.reml.result",
                 "cen.in.reml.result",
                 "cen.inp.reml.result",
                 "cen.inn.reml.result",
                 "cen.out.reml.result",
                 "cen.outp.reml.result",
-                "cen.outn.reml.result",
-                "link.reml.result", 
-                "link.pos.reml.result",
-                "link.neg.reml.result"), ],
+                "cen.outn.reml.result"), ],
        caption = "Genotypic effects on the associated lichen network structure.",
        label = "tab:h2_net",
        type = "latex",
