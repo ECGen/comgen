@@ -30,6 +30,8 @@ plan <- drake_plan(
     ## Lichen Network Model Similarity
     cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, 
         method = "euclidean", rm.na = TRUE),
+    cn.dbc.onc = proc_cn_d_onc(cn.onc, onc.dat, 
+        method = "BC", rm.na = TRUE),
     ## Lichen Community Matrix
     onc.com = proc_onc_com(garden.data, onc.q, onc.dat, rm.na = TRUE),
     ## Relativized Lichen Community Matrix

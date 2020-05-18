@@ -9,7 +9,7 @@ library (lmerTest) #For overall models
 library(RLRsim) #For testing random effects
 #library (emmeans) #For fixed effects and covariates
 
-https://www.ssc.wisc.edu/sscc/pubs/MM/MM_TestEffects.html.  #For GLM
+# https://www.ssc.wisc.edu/sscc/pubs/MM/MM_TestEffects.html.  #For GLM
 
 
 
@@ -17,8 +17,8 @@ https://www.ssc.wisc.edu/sscc/pubs/MM/MM_TestEffects.html.  #For GLM
 
 ###################################################################################
 ##########Data
-load("onc_cn_dist.Rdata")
-load("onc_lcn_data.Rdata")
+load("data/onc_cn_dist.Rdata")
+load("data/onc_lcn_data.Rdata")
 ls()
 attributes(cn.d.onc)
 attributes(onc.dat)
@@ -150,7 +150,7 @@ fligner.test(onc.dat$BR ~ onc.dat$geno)
 plot(onc.dat$BR ~ onc.dat$geno)
 
 exactRLRT(BR_Mod1) #Doesn't work with GLM!  p for lmer = RLRT = 4.3895, p-value = 0.0172. I used this function in the past, so...let's go with it.
-ranova(BR_Mod1, )   #Another version of a random effect test. Doesn't work with GLM. P for lmer = 0.05963 ...so close!
+lmerTest::ranova(BR_Mod1, )   #Another version of a random effect test. Doesn't work with GLM. P for lmer = 0.05963 ...so close!
 
 102.4/(102.4+269.6) #Herit from regular lm = 0.2752688
 0.03621/(0.09144+0.03621) #Herit = 0.2836663 #Heritability from GLM
@@ -416,7 +416,7 @@ exactRLRT(pH_Mod1)
 ##########Composition      #Try the negative binomial model?
 
 library(vegan)
-adonis((cn.d.onc^.25)~onc.dat$geno, family="bray")
+## adonis((cn.d.onc^.25)~onc.dat$geno, family="bray")
+adonis((cn.d.onc^2)~onc.dat$geno, perm = 100000)
 
-
-
+txtplot::txtplot(cn.d.onc, cn.d.onc^2)
