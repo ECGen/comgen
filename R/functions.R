@@ -946,7 +946,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        h2.tab[c("cn.perm.h2",
                 "link.reml.result", 
                 "link.pos.reml.result",
-                "link.neg.reml.result"
+                "link.neg.reml.result",
                 "cen.reml.result",
                 "cen.in.reml.result",
                 "cen.inp.reml.result",
