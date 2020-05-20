@@ -5,8 +5,9 @@
 
 ###################################################################################
 ##########Packages
-library (lmerTest) #For overall models
+#library (lmerTest) #For overall models
 library(RLRsim) #For testing random effects
+library(lme4)
 #library (emmeans) #For fixed effects and covariates
 
 # https://www.ssc.wisc.edu/sscc/pubs/MM/MM_TestEffects.html.  #For GLM
@@ -22,10 +23,6 @@ load("data/onc_lcn_data.Rdata")
 ls()
 attributes(cn.d.onc)
 attributes(onc.dat)
-
-
-
-
 
 
 ###################################################################################
@@ -48,8 +45,6 @@ exactRLRT(PC_Mod1) #Test of random effect
 
 
 
-
-
 JunkFact<-as.factor(onc.dat$Junk)
 
 ###################################################################################
@@ -68,12 +63,6 @@ qqline(resid(SR_Mod1))
 fligner.test(onc.dat$SR ~ onc.dat$geno)
 
 exactRLRT(SR_Mod1) #Note, doesn't work on glmer, just on lmer
-
-
-
-
-
-
 
 
 
@@ -196,8 +185,7 @@ exactRLRT(L_Mod1)
 ###################################################################################
 ##########L.      #Try the negative binomial model?
 
-Cen_Mod1<-lmer(log(L+0.1)~(1|geno), data=onc.dat, REML=TRUE)
-Cen_Mod1<-glmer(L~(1|geno), data=onc.dat, family=poisson(link = "log")) #In the form of a GLM
+Cen_Mod1<-lmer(Cen^(1/2)~(1|geno), data=onc.dat, REML=TRUE)
 
 summary(Cen_Mod1)
 plot(Cen_Mod1)
@@ -220,19 +208,10 @@ plot(log(onc.dat$Cen +1) ~ onc.dat$geno)
 
 
 
-
-
-
-
-
-
-
-
-
 ###################################################################################
 ##########mod.lik   
 
-mod.lik_Mod1<-lmer(log(mod.lik+1)~(1|geno), data=onc.dat, REML=TRUE)
+mod.lik_Mod1<-lmer(rank(mod.lik)~(1|geno), data=onc.dat, REML=TRUE)
 #mod.lik_Mod1<-glmer(mod.lik ~(1|geno)+(1|as.factor(Junk)), data=onc.dat, family=poisson(link = "log")) #In the form of a GLM
 
 summary(mod.lik_Mod1)
@@ -249,20 +228,6 @@ exactRLRT(mod.lik_Mod1)
 
 
 #very Zero inflated. Hard to test.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -289,18 +254,10 @@ exactRLRT(C_Mod1)
 
 
 
-
-
-
-
-
-
-
-
 ###################################################################################
 ##########CN     
 
-CN_Mod1<-lmer(log(CN)~(1|geno), data=onc.dat, REML=TRUE)
+CN_Mod1<-lmer(rank(CN)~(1|geno), data=onc.dat, REML=TRUE)
 
 summary(CN_Mod1)
 plot(CN_Mod1)
@@ -325,7 +282,7 @@ exactRLRT(CN_Mod1)
 ###################################################################################
 ##########N
 
-N_Mod1<-lmer(sqrt(N)~(1|geno), data=onc.dat, REML=TRUE)
+N_Mod1<-lmer(rank(N)~(1|geno), data=onc.dat, REML=TRUE)
 
 summary(N_Mod1)
 plot(N_Mod1)
@@ -338,17 +295,6 @@ fligner.test(onc.dat$N ~ onc.dat$geno)
 plot((onc.dat$N) ~ onc.dat$geno) 
 
 exactRLRT(N_Mod1)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -369,7 +315,7 @@ hist(resid(CT_Mod1))
 qqnorm(resid(CT_Mod1))
 qqline(resid(CT_Mod1))
 fligner.test(onc.dat$CT ~ onc.dat$geno)
-plot((onc.dat$CT) ~ onc.dat$geno) 
+plot(rank(onc.dat$CT) ~ onc.dat$geno) 
 
 exactRLRT(CT_Mod1)
 
@@ -386,7 +332,7 @@ exactRLRT(CT_Mod1)
 
 ###################################################################################
 ##########pH
-pH_Mod1<-lmer((pH)~(1|geno), data=onc.dat, REML=TRUE)
+pH_Mod1<-lmer(rank(pH)~(1|geno), data=onc.dat, REML=TRUE)
 
 summary(pH_Mod1)
 plot(pH_Mod1)
