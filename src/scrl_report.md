@@ -300,7 +300,7 @@ Create a multi-bar plot figure for the community.
                       ylab = "Difference (S - R)", border = "NA")
     segments(bp.out[, 1], ard.mu + ard.se,
              bp.out[, 1], ard.mu - ard.se, 
-             lwd = 2)
+             lwd = 1.5)
     bp.out <- barplot(isp.mu, col = "darkgrey", ylim = c(-0.5, 0), 
                       ylab = "Difference (S - R)", border = "NA",
                 axisnames = TRUE, 
@@ -310,7 +310,7 @@ Create a multi-bar plot figure for the community.
                                                 substr(x, 4, 4)), collapse = "")))
     segments(bp.out[, 1], isp.mu + isp.se,
              bp.out[, 1], isp.mu - isp.se, 
-             lwd = 2)
+             lwd = 1.5)
 
     dev.off()
 
