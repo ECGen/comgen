@@ -44,16 +44,16 @@ se <- function(x){sd(x) / sqrt(length(x))}
 
 
 ## Libraries
-my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "devtools", "reshape2")
+my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "reshape2")
 if (any(!(my.libs %in% installed.packages()[, 1]))){
     sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
            install.packages)
 }else{}
 sapply(my.libs, require, character.only = TRUE)
 
-if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
-   devtools::install_github("ecgen/comgenr")
-}
+# if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
+#    devtools::install_github("ecgen/comgenr")
+# }
 
 
 
@@ -122,7 +122,7 @@ spa.sus <- specaccum(com[l.dat[, "Moth"] == 0, ], method = "exact")
 plot(spa.all,
      ylim = c(0, 20),
      xlab = "Cumulative Trees Sampled",
-     ylab = "Lichen Species Observed", 
+     ylab = "Species Observed", 
      col = "grey", ci.col = 'lightgrey', ci.type = "poly", ci.lty = 0)
 plot(spa.res, ci.col = "black", ci.type = "bar", lty = 1, add = TRUE, ci.lty = 1)
 plot(spa.sus, ci.col = "black", ci.type = "bar", lty = 3, add = TRUE, ci.lty = 3)
@@ -225,7 +225,8 @@ lines(x = as.vector(sapply(bp.out, rep, 2)),
       type = "h", lwd = 2
    )
 bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
-                  ylab = "Difference (S - R)")
+                  ylab = "Difference (S - R)", 
+				  axisnames = TRUE, names.arg = "")
 lines(x = as.vector(sapply(bp.out, rep, 2)),
       y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
       type = "h", lwd = 2

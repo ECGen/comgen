@@ -6,14 +6,14 @@ Analysis Summary
     accumulation curves, with moth resistant trees accumulating slightly
     more lichen species.
 -   Communities (abundance, richness, diversity, composition) were
-    significantly, generally negatively, affected by
-    moth susceptibility.
+    significantly, generally negatively, affected by moth
+    susceptibility.
 -   Several tree variables, including light availability, leaf litter
     abundance and rock abundance, were impacted by moth susceptibility.
 -   Analysis of causal pathways supported an indirect link between moth
-    susceptibility and impacts on lichen communities via decreasing
-    rock (i.e. habitat) availability through increased leaf abscission
-    and accumulation on rocks under trees.
+    susceptibility and impacts on lichen communities via decreasing rock
+    (i.e. habitat) availability through increased leaf abscission and
+    accumulation on rocks under trees.
 -   These results support a genetically based link between intraspecific
     variation in susceptibility to an insect herbivore and community
     dynamics in an arid ecosystem.
@@ -38,16 +38,42 @@ Analysis Summary
 
 
     ## Libraries
-    my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "devtools", "reshape2")
+    my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "reshape2")
     if (any(!(my.libs %in% installed.packages()[, 1]))){
         sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
                install.packages)
     }else{}
+
+    ## Installing package into '/home/glomus/R/aarch64-unknown-linux-gnu-library/3.6'
+    ## (as 'lib' is unspecified)
+
+    ## also installing the dependencies 'cli', 'pillar', 'tibble', 'readr'
+
+    ## Warning in FUN(X[[i]], ...): installation of package 'cli' had non-zero exit
+    ## status
+
+    ## Warning in FUN(X[[i]], ...): installation of package 'pillar' had non-zero exit
+    ## status
+
+    ## Warning in FUN(X[[i]], ...): installation of package 'tibble' had non-zero exit
+    ## status
+
+    ## Warning in FUN(X[[i]], ...): installation of package 'readr' had non-zero exit
+    ## status
+
+    ## Warning in FUN(X[[i]], ...): installation of package 'kableExtra' had non-zero
+    ## exit status
+
     sapply(my.libs, require, character.only = TRUE)
 
-    if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
-       devtools::install_github("ecgen/comgenr")
-    }
+    ## Loading required package: kableExtra
+
+    ## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
+    ## logical.return = TRUE, : there is no package called 'kableExtra'
+
+    # if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
+    #    devtools::install_github("ecgen/comgenr")
+    # }
 
 Load Data
 =========
@@ -67,8 +93,8 @@ Definition):
 -   Grass %,continuous,0 to 100,Percent cover of grass inside quadrat
 -   Branches %,continuous,0 to 100,Percent cover of branches on ground
     inside quadrat
--   Distance,continuous,0 to 100,"Distance from main trunk, converted to
-    percent of crown radius at that azimuth"
+-   Distance,continuous,0 to 100,“Distance from main trunk, converted to
+    percent of crown radius at that azimuth”
 -   Azimuth,continuous,0 to 360,Compass direction from main trunk
 -   Slope,continuous,0 to 90,Topographical steepness
 -   Aspect,continuous,0 to 360,Compass direction of slope
@@ -112,7 +138,7 @@ Are the communities on each tree type adequately sampled?
     plot(spa.all,
          ylim = c(0, 20),
          xlab = "Cumulative Trees Sampled",
-         ylab = "Lichen Species Observed", 
+         ylab = "Species Observed", 
          col = "grey", ci.col = 'lightgrey', ci.type = "poly", ci.lty = 0)
     plot(spa.res, ci.col = "black", ci.type = "bar", lty = 1, add = TRUE, ci.lty = 1)
     plot(spa.sus, ci.col = "black", ci.type = "bar", lty = 3, add = TRUE, ci.lty = 3)
@@ -120,7 +146,7 @@ Are the communities on each tree type adequately sampled?
            legend = c("All", "Resistant", "Susceptible"), 
            lty = c(1, 1, 3), lwd = c(5, 2, 2), col = c("lightgrey", "black", "black"))
 
-![](rln_files/figure-markdown_strict/specacum-1.png)
+![](scrl_report_files/figure-markdown_strict/specacum-1.png)
 
 Moth trees have different microenvironments
 ===========================================
@@ -149,7 +175,7 @@ less abundant and diverse (paired t-tests, in text)
     ##             conf.int2 estimate.mean.of.x null.value.mean            stderr
     ## a  -0.139723581424019             -1.544               0 0.686610632687508
     ## r  -0.779891322352267  -2.53333333333333               0 0.857332582541993
-    ## h -0.0717134452340906 -0.436984666523121               0  0.17859667871239
+    ## h -0.0717134452340905 -0.436984666523121               0  0.17859667871239
     ##   alternative            method                                 data.name
     ## a   two.sided One Sample t-test tapply(abun, l.dat[, "Tree.pairs"], diff)
     ## r   two.sided One Sample t-test tapply(rich, l.dat[, "Tree.pairs"], diff)
@@ -175,176 +201,84 @@ composition is different (PERMANOVA, in text and supplement)
 
 <table>
 <thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Df
-</th>
-<th style="text-align:right;">
-SumOfSqs
-</th>
-<th style="text-align:right;">
-R2
-</th>
-<th style="text-align:right;">
-F
-</th>
-<th style="text-align:right;">
-Pr(&gt;F)
-</th>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-Moth
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.8329281
-</td>
-<td style="text-align:right;">
-0.0389768
-</td>
-<td style="text-align:right;">
-2.352343
-</td>
-<td style="text-align:right;">
-0.023
-</td>
+<tr class="odd">
+<td>Moth</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.8329281</td>
+<td style="text-align: right;">0.0389768</td>
+<td style="text-align: right;">2.352343</td>
+<td style="text-align: right;">0.023</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Residual
-</td>
-<td style="text-align:right;">
-58
-</td>
-<td style="text-align:right;">
-20.5368939
-</td>
-<td style="text-align:right;">
-0.9610232
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">20.5368939</td>
+<td style="text-align: right;">0.9610232</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Total
-</td>
-<td style="text-align:right;">
-59
-</td>
-<td style="text-align:right;">
-21.3698219
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.3698219</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
 </tbody>
 </table>
+
     kable(ptab.moth.rel)
 
 <table>
 <thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Df
-</th>
-<th style="text-align:right;">
-SumOfSqs
-</th>
-<th style="text-align:right;">
-R2
-</th>
-<th style="text-align:right;">
-F
-</th>
-<th style="text-align:right;">
-Pr(&gt;F)
-</th>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-Moth
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.8791695
-</td>
-<td style="text-align:right;">
-0.0405034
-</td>
-<td style="text-align:right;">
-2.448363
-</td>
-<td style="text-align:right;">
-0.021
-</td>
+<tr class="odd">
+<td>Moth</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.8791695</td>
+<td style="text-align: right;">0.0405034</td>
+<td style="text-align: right;">2.448363</td>
+<td style="text-align: right;">0.021</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Residual
-</td>
-<td style="text-align:right;">
-58
-</td>
-<td style="text-align:right;">
-20.8269063
-</td>
-<td style="text-align:right;">
-0.9594966
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">20.8269063</td>
+<td style="text-align: right;">0.9594966</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Total
-</td>
-<td style="text-align:right;">
-59
-</td>
-<td style="text-align:right;">
-21.7060758
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.7060758</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
 </tbody>
 </table>
+
 three main species were reduced by moths (FDR paired t-tests, in text +
 supplement)
 
@@ -394,7 +328,8 @@ Create a multi-bar plot figure for the community.
           type = "h", lwd = 2
        )
     bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
-                      ylab = "Difference (S - R)")
+                      ylab = "Difference (S - R)", 
+                      axisnames = TRUE, names.arg = "")
     lines(x = as.vector(sapply(bp.out, rep, 2)),
           y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
           type = "h", lwd = 2
@@ -437,119 +372,61 @@ Ordination)
 
 <table>
 <thead>
-<tr>
-<th style="text-align:left;">
-</th>
-<th style="text-align:right;">
-Df
-</th>
-<th style="text-align:right;">
-SumOfSqs
-</th>
-<th style="text-align:right;">
-R2
-</th>
-<th style="text-align:right;">
-F
-</th>
-<th style="text-align:right;">
-Pr(&gt;F)
-</th>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-Light...average
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-0.4114619
-</td>
-<td style="text-align:right;">
-0.0192543
-</td>
-<td style="text-align:right;">
-1.218728
-</td>
-<td style="text-align:right;">
-0.243
-</td>
+<tr class="odd">
+<td>Light…average</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.4114619</td>
+<td style="text-align: right;">0.0192543</td>
+<td style="text-align: right;">1.218728</td>
+<td style="text-align: right;">0.243</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Litter..
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-1.0035484
-</td>
-<td style="text-align:right;">
-0.0469610
-</td>
-<td style="text-align:right;">
-2.972456
-</td>
-<td style="text-align:right;">
-0.007
-</td>
+<tr class="even">
+<td>Litter..</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.0035484</td>
+<td style="text-align: right;">0.0469610</td>
+<td style="text-align: right;">2.972456</td>
+<td style="text-align: right;">0.007</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Residual
-</td>
-<td style="text-align:right;">
-57
-</td>
-<td style="text-align:right;">
-19.2441042
-</td>
-<td style="text-align:right;">
-0.9005271
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="odd">
+<td>Residual</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">19.2441042</td>
+<td style="text-align: right;">0.9005271</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
-<tr>
-<td style="text-align:left;">
-Total
-</td>
-<td style="text-align:right;">
-59
-</td>
-<td style="text-align:right;">
-21.3698219
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
-</td>
+<tr class="even">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.3698219</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
 </tbody>
 </table>
+
     nmds.out <- nmds(vegdist(com.ds), 2, 2)
     ord <- nmds.min(nmds.out, dims = 2)
 
-    ## Minimum stress for given dimensionality:  0.2164016 
-    ## r^2 for minimum stress configuration:  0.6474944
+    ## Minimum stress for given dimensionality:  0.2169355 
+    ## r^2 for minimum stress configuration:  0.6416469
 
     ord.pch <- c("R", "S")[(l.dat[, "Moth"] + 1)]
     plot(X2~ X1, data = ord, pch = ord.pch)
 
-![](rln_files/figure-markdown_strict/ord-com-plot-1.png)
+![](scrl_report_files/figure-markdown_strict/ord-com-plot-1.png)
 
 litter not light was correlated with large rocks (dist cor, in text)
 
