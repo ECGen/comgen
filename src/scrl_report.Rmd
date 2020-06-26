@@ -132,7 +132,7 @@ legend("bottomright",
 
 ```
 
-```{R, specaccum-plot)
+```{R, specaccum-plot}
 
 pdf("../results/scrl_spp-accum.pdf", width = 5, height = 5)
 plot(spa.all,
