@@ -311,7 +311,6 @@ Create a multi-bar plot figure for the community.
     segments(bp.out[, 1], isp.mu + isp.se,
              bp.out[, 1], isp.mu - isp.se, 
              lwd = 1.5)
-
     dev.off()
 
     ## X11cairo 
@@ -344,7 +343,7 @@ Ordination)
 
     set.seed(123)
     ptab.env <- adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
-                       strata = l.dat[, "Tree.pairs"],  
+                       strata = l.dat[, "Tree.pairs"], 
                        by = "margin", nperm = 100000)
     kable(ptab.env)
 
@@ -395,6 +394,23 @@ Ordination)
 </tbody>
 </table>
 
+    pdf("../results/scrl_litterVlight.pdf", width = 9, height = 5)
+
+    par(mfrow = c(1,2))
+    plot(density(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)), 
+        main = "", xlab = "Litter Difference (S - R)")
+    abline(v = mean(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)),
+        lwd = 0.5)
+    plot(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff), 
+        tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff), 
+        xlab = "Litter Difference (S - R)", ylab = "Light Difference (S - R)",
+        pch = 19)
+
+    dev.off()
+
+    ## X11cairo 
+    ##        2
+
     nmds.out <- nmds(vegdist(com.ds), 2, 2)
     ord <- nmds.min(nmds.out, dims = 2)
 
@@ -406,7 +422,9 @@ Ordination)
 
 ![](scrl_report_files/figure-markdown_strict/ord-com-plot-1.png)
 
-litter not light was correlated with large rocks (dist cor, in text)
+Litter not light was correlated with large rocks (dist cor, in text).
+Thus, higher amounts of litter under trees was not related to the
+penetration of light under the tree canopy.
 
     cor.test(tapply(l.dat[, "Big.rocks.."], l.dat[, "Tree.pairs"], diff),
              tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff))
@@ -453,17 +471,17 @@ litter not light was correlated with large rocks (dist cor, in text)
     ##        cor 
     ## -0.1713898
 
-    cor.test(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff),
-             tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff))
+    cor.test(tapply(l.dat[, "Small.rocks.."], l.dat[, "Tree.pairs"], diff),
+             tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff))
 
     ## 
     ##  Pearson's product-moment correlation
     ## 
-    ## data:  tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff) and tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff)
-    ## t = -0.92053, df = 28, p-value = 0.3652
+    ## data:  tapply(l.dat[, "Small.rocks.."], l.dat[, "Tree.pairs"], diff) and tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)
+    ## t = -4.994, df = 28, p-value = 2.819e-05
     ## alternative hypothesis: true correlation is not equal to 0
     ## 95 percent confidence interval:
-    ##  -0.5007401  0.2013096
+    ##  -0.8391386 -0.4332285
     ## sample estimates:
     ##        cor 
-    ## -0.1713898
+    ## -0.6863699
