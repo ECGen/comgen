@@ -134,7 +134,7 @@ legend("bottomright",
 
 ```{R, specaccum-plot)
 
-pdf("../results/scrl_spp-accum.pdf, width = 5, height = 5)
+pdf("../results/scrl_spp-accum.pdf", width = 5, height = 5)
 plot(spa.all,
      ylim = c(0, 20),
      xlab = "Cumulative Trees Sampled",
