@@ -295,13 +295,13 @@ Create a multi-bar plot figure for the community.
 
     pdf(file = "../results/scrl_isp_ard.pdf", width = 10, height = 5)
     par(mfrow = c(1,2))
-    bp.out <- barplot(ard.mu, col = "black", ylim = c(-5, 0), 
+    bp.out <- barplot(ard.mu, col = "darkgrey", ylim = c(-5, 0), 
                       ylab = "Difference (S - R)")
     lines(x = as.vector(sapply(bp.out, rep, 2)),
           y = as.vector(rbind(ard.mu + ard.se, ard.mu - ard.se)),
           type = "h", lwd = 2
        )
-    bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
+    bp.out <- barplot(isp.mu, col = "darkgrey", ylim = c(-0.5, 0), 
                       ylab = "Difference (S - R)", 
                       axisnames = TRUE, 
                       names.arg = sapply(names(isp.mu), 
