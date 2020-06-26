@@ -38,38 +38,12 @@ Analysis Summary
 
 
     ## Libraries
-    my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "reshape2")
+    my.libs <- c("vegan", "ecodist", "knitr")
     if (any(!(my.libs %in% installed.packages()[, 1]))){
         sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
                install.packages)
     }else{}
-
-    ## Installing package into '/home/glomus/R/aarch64-unknown-linux-gnu-library/3.6'
-    ## (as 'lib' is unspecified)
-
-    ## also installing the dependencies 'cli', 'pillar', 'tibble', 'readr'
-
-    ## Warning in FUN(X[[i]], ...): installation of package 'cli' had non-zero exit
-    ## status
-
-    ## Warning in FUN(X[[i]], ...): installation of package 'pillar' had non-zero exit
-    ## status
-
-    ## Warning in FUN(X[[i]], ...): installation of package 'tibble' had non-zero exit
-    ## status
-
-    ## Warning in FUN(X[[i]], ...): installation of package 'readr' had non-zero exit
-    ## status
-
-    ## Warning in FUN(X[[i]], ...): installation of package 'kableExtra' had non-zero
-    ## exit status
-
     sapply(my.libs, require, character.only = TRUE)
-
-    ## Loading required package: kableExtra
-
-    ## Warning in library(package, lib.loc = lib.loc, character.only = TRUE,
-    ## logical.return = TRUE, : there is no package called 'kableExtra'
 
     # if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
     #    devtools::install_github("ecgen/comgenr")
@@ -329,7 +303,10 @@ Create a multi-bar plot figure for the community.
        )
     bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
                       ylab = "Difference (S - R)", 
-                      axisnames = TRUE, names.arg = "")
+                      axisnames = TRUE, 
+                      names.arg = sapply(names(isp.mu), 
+                          function(x) paste(substr(x, 1, 1), substr(x, 4, 4),
+                          collapse = "")))
     lines(x = as.vector(sapply(bp.out, rep, 2)),
           y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
           type = "h", lwd = 2

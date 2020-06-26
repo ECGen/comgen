@@ -44,7 +44,7 @@ se <- function(x){sd(x) / sqrt(length(x))}
 
 
 ## Libraries
-my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "reshape2")
+my.libs <- c("vegan", "ecodist", "knitr")
 if (any(!(my.libs %in% installed.packages()[, 1]))){
     sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
            install.packages)
@@ -226,7 +226,10 @@ lines(x = as.vector(sapply(bp.out, rep, 2)),
    )
 bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
                   ylab = "Difference (S - R)", 
-				  axisnames = TRUE, names.arg = "")
+				  axisnames = TRUE, 
+				  names.arg = sapply(names(isp.mu), 
+					  function(x) paste(substr(x, 1, 1), substr(x, 4, 4),
+					  collapse = "")))
 lines(x = as.vector(sapply(bp.out, rep, 2)),
       y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
       type = "h", lwd = 2
