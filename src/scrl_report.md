@@ -294,27 +294,28 @@ Create a multi-bar plot figure for the community.
     ard.se <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], se)
 
     pdf(file = "../results/scrl_isp_ard.pdf", width = 10, height = 5)
+
     par(mfrow = c(1,2))
     bp.out <- barplot(ard.mu, col = "darkgrey", ylim = c(-5, 0), 
-                      ylab = "Difference (S - R)")
-    lines(x = as.vector(sapply(bp.out, rep, 2)),
-          y = as.vector(rbind(ard.mu + ard.se, ard.mu - ard.se)),
-          type = "h", lwd = 2
-       )
+                      ylab = "Difference (S - R)", border = "NA")
+    segments(bp.out[, 1], ard.mu + ard.se,
+             bp.out[, 1], ard.mu - ard.se, 
+             lwd = 2)
     bp.out <- barplot(isp.mu, col = "darkgrey", ylim = c(-0.5, 0), 
-                      ylab = "Difference (S - R)", 
-                      axisnames = TRUE, 
-                      names.arg = sapply(names(isp.mu), 
-                          function(x) paste(c(substr(x, 1, 1), substr(x,
-                          4, 4)), collapse = "")))
-    lines(x = as.vector(sapply(bp.out, rep, 2)),
-          y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
-          type = "h", lwd = 2
-       )
+                      ylab = "Difference (S - R)", border = "NA",
+                axisnames = TRUE, 
+                names.arg = sapply(names(isp.mu), 
+                    function(x) 
+                                        paste(c(substr(x, 1, 1), 
+                                                substr(x, 4, 4)), collapse = "")))
+    segments(bp.out[, 1], isp.mu + isp.se,
+             bp.out[, 1], isp.mu - isp.se, 
+             lwd = 2)
+
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Create a plot of the two most indicative species
 
@@ -323,8 +324,8 @@ Create a plot of the two most indicative species
     legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Create plot with indicator taxa
 
@@ -332,8 +333,8 @@ Create plot with indicator taxa
     plot(melt(isp.dif)[-1], xlab = "Species", ylab = "Abundance Reduction")
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Litter covering rocks was the main driver (FIGURE = ORDINATION)
 ===============================================================
