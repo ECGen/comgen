@@ -293,7 +293,7 @@ Create a multi-bar plot figure for the community.
     ard.mu <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], mean)
     ard.se <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], se)
 
-    pdf(file = "../results/scrl_isp_ard.pdf", width = 10, height = 5)
+    pdf(file = "../results/scrl_isp_ard.pdf", width = 9, height = 5)
 
     par(mfrow = c(1,2))
     bp.out <- barplot(ard.mu, col = "darkgrey", ylim = c(-5, 0), 
