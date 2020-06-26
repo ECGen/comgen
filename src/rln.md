@@ -1,13 +1,12 @@
 Analysis Summary
 ================
 
--   Dead trees and non-lichen species were removed from lichen
-    community analyses.
--   Lichen communities were adequately sampled, based on species
+-   Dead trees were removed from lichen community analyses.
+-   Rock epiphyte communities were adequately sampled, based on species
     accumulation curves, with moth resistant trees accumulating slightly
     more lichen species.
--   Lichen communities (abundance, richness, diversity, composition)
-    were significantly, generally negatively, affected by
+-   Communities (abundance, richness, diversity, composition) were
+    significantly, generally negatively, affected by
     moth susceptibility.
 -   Several tree variables, including light availability, leaf litter
     abundance and rock abundance, were impacted by moth susceptibility.
@@ -35,13 +34,20 @@ Analysis Summary
         return(out)
     }
 
+    se <- function(x){sd(x) / sqrt(length(x))}
+
+
     ## Libraries
-    my.libs <- c("vegan", "ecodist", "knitr", "kableExtra")
+    my.libs <- c("vegan", "ecodist", "knitr", "kableExtra", "devtools", "reshape2")
     if (any(!(my.libs %in% installed.packages()[, 1]))){
         sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
                install.packages)
     }else{}
     sapply(my.libs, require, character.only = TRUE)
+
+    if (!(any(grepl("ComGenR", installed.packages()[, 1])))){
+       devtools::install_github("ecgen/comgenr")
+    }
 
 Load Data
 =========
@@ -86,7 +92,7 @@ Definition):
     spp.moss <- c("Synrur", "Cerpur.Bryarg")
 
     ## Create a community matrix
-    com <- l.dat[, colnames(l.dat) %in% spp.l]
+    com <- l.dat[, colnames(l.dat) %in% c(spp.l, spp.moss)]
     com.moss <- l.dat[, colnames(l.dat) %in% spp.moss]
 
     ## Add the tree labels to the rownames
@@ -137,13 +143,13 @@ less abundant and diverse (paired t-tests, in text)
     data.frame(tt.arh)
 
     ##         statistic.t parameter.df             p.value          conf.int1
-    ## a -2.35680534636893           29  0.0253991007560338  -2.89259563276878
-    ## r -2.83579994251995           29 0.00824742800912124  -3.95880113980294
-    ## h -2.43278934693583           29  0.0213834528180339 -0.783514237345595
+    ## a -2.24872719194069           29  0.0322967805096532  -2.94827641857598
+    ## r -2.95490149904486           29 0.00615219062629224   -4.2867753443144
+    ## h -2.44676815758056           29  0.0207112921139992 -0.802255887812151
     ##             conf.int2 estimate.mean.of.x null.value.mean            stderr
-    ## a  -0.204737700564557  -1.54866666666667               0 0.657104189386137
-    ## r  -0.641198860197055               -2.3               0 0.811058624239964
-    ## h -0.0678109108683952 -0.425662574106995               0 0.174968940341312
+    ## a  -0.139723581424019             -1.544               0 0.686610632687508
+    ## r  -0.779891322352267  -2.53333333333333               0 0.857332582541993
+    ## h -0.0717134452340906 -0.436984666523121               0  0.17859667871239
     ##   alternative            method                                 data.name
     ## a   two.sided One Sample t-test tapply(abun, l.dat[, "Tree.pairs"], diff)
     ## r   two.sided One Sample t-test tapply(rich, l.dat[, "Tree.pairs"], diff)
@@ -167,30 +173,178 @@ composition is different (PERMANOVA, in text and supplement)
 
     kable(ptab.moth)
 
-\begin{tabular}{l|r|r|r|r|r}
-\hline
-  & Df & SumOfSqs & R2 & F & Pr(>F)\\
-\hline
-Moth & 1 & 0.8281197 & 0.0389381 & 2.349914 & 0.023\\
-\hline
-Residual & 58 & 20.4394472 & 0.9610619 & NA & NA\\
-\hline
-Total & 59 & 21.2675669 & 1.0000000 & NA & NA\\
-\hline
-\end{tabular}
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Df
+</th>
+<th style="text-align:right;">
+SumOfSqs
+</th>
+<th style="text-align:right;">
+R2
+</th>
+<th style="text-align:right;">
+F
+</th>
+<th style="text-align:right;">
+Pr(&gt;F)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Moth
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.8329281
+</td>
+<td style="text-align:right;">
+0.0389768
+</td>
+<td style="text-align:right;">
+2.352343
+</td>
+<td style="text-align:right;">
+0.023
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+20.5368939
+</td>
+<td style="text-align:right;">
+0.9610232
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+21.3698219
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
     kable(ptab.moth.rel)
 
-\begin{tabular}{l|r|r|r|r|r}
-\hline
-  & Df & SumOfSqs & R2 & F & Pr(>F)\\
-\hline
-Moth & 1 & 0.8836864 & 0.0409591 & 2.477087 & 0.02\\
-\hline
-Residual & 58 & 20.6911630 & 0.9590409 & NA & NA\\
-\hline
-Total & 59 & 21.5748495 & 1.0000000 & NA & NA\\
-\hline
-\end{tabular}
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Df
+</th>
+<th style="text-align:right;">
+SumOfSqs
+</th>
+<th style="text-align:right;">
+R2
+</th>
+<th style="text-align:right;">
+F
+</th>
+<th style="text-align:right;">
+Pr(&gt;F)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Moth
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.8791695
+</td>
+<td style="text-align:right;">
+0.0405034
+</td>
+<td style="text-align:right;">
+2.448363
+</td>
+<td style="text-align:right;">
+0.021
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:right;">
+58
+</td>
+<td style="text-align:right;">
+20.8269063
+</td>
+<td style="text-align:right;">
+0.9594966
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+21.7060758
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
 three main species were reduced by moths (FDR paired t-tests, in text +
 supplement)
 
@@ -209,15 +363,65 @@ supplement)
     rownames(isp) <- names(ind.spp)
     isp[, "p.value"] <- p.adjust(isp[, "p.value"], method = "fdr")
     isp <- isp[order(isp[, "p.value"]), ]
-    head(isp[, 1:3])
 
-    ##        statistic.t parameter.df    p.value
-    ## Acacon   -3.377629           29 0.01390405
-    ## Acasup   -3.242091           29 0.01390405
-    ## Canros   -3.581884           29 0.01390405
-    ## Lobalp   -2.041361           29 0.17642430
-    ## Phydub   -1.922619           29 0.18031798
-    ## Calare   -1.607607           29 0.22424946
+Calculate the average abundances of the indicators
+
+    isp.names <- as.character(na.omit(rownames(isp[isp[, "p.value"] < 0.05, ])))
+    isp.com <- com[,colnames(com) %in% isp.names]
+    isp.dif <- apply(isp.com, 2, function(x,y) tapply(x, y, diff), y = l.dat[ ,"Tree.pairs"])
+
+Create a multi-bar plot figure for the community.
+
+    isp.dat <- melt(isp.dif)
+    colnames(isp.dat) <- c("Tree.pairs", "Species", "diff")
+    isp.mu <- tapply(isp.dat[, "diff"], isp.dat[, "Species"], mean)
+    isp.se <- tapply(isp.dat[, "diff"], isp.dat[, "Species"], se)
+    ard.dif <- cbind(tapply(abun, l.dat[, "Tree.pairs"], diff), 
+                     tapply(rich, l.dat[, "Tree.pairs"], diff), 
+                     tapply(shan, l.dat[, "Tree.pairs"], diff))
+    colnames(ard.dif) <- c("Abundance", "Richness", "Diversity")
+    ard.dat <- melt(ard.dif)
+    colnames(ard.dat) <- c("Tree.pairs", "Stat", "diff")
+    ard.mu <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], mean)
+    ard.se <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], se)
+
+    pdf(file = "../results/scrl_isp_ard.pdf", width = 10, height = 5)
+    par(mfrow = c(1,2))
+    bp.out <- barplot(ard.mu, col = "black", ylim = c(-5, 0), 
+                      ylab = "Difference (S - R)")
+    lines(x = as.vector(sapply(bp.out, rep, 2)),
+          y = as.vector(rbind(ard.mu + ard.se, ard.mu - ard.se)),
+          type = "h", lwd = 2
+       )
+    bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
+                      ylab = "Difference (S - R)")
+    lines(x = as.vector(sapply(bp.out, rep, 2)),
+          y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
+          type = "h", lwd = 2
+       )
+    dev.off()
+
+    ## png 
+    ##   2
+
+Create a plot of the two most indicative species
+
+    pdf(file = "../results/scrl_complot.pdf", width = 7, height = 7)
+    plot(com[, c("Acasup", "Canros")], pch = l.dat[, "Moth"] + 1, cex = 3, col = l.dat[, "Moth"] + 1)
+    legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
+    dev.off()
+
+    ## png 
+    ##   2
+
+Create plot with indicator taxa
+
+    pdf(file = "../results/scrl_pdif.pdf", width = 7, height = 7)
+    plot(melt(isp.dif)[-1], xlab = "Species", ylab = "Abundance Reduction")
+    dev.off()
+
+    ## png 
+    ##   2
 
 Litter covering rocks was the main driver (FIGURE = ORDINATION)
 ===============================================================
@@ -231,19 +435,111 @@ Ordination)
                        by = "margin", nperm = 100000)
     kable(ptab.env)
 
-\begin{tabular}{l|r|r|r|r|r}
-\hline
-  & Df & SumOfSqs & R2 & F & Pr(>F)\\
-\hline
-Light...average & 1 & 0.4114804 & 0.0193478 & 1.225652 & 0.240\\
-\hline
-Litter.. & 1 & 1.0095951 & 0.0474711 & 3.007221 & 0.007\\
-\hline
-Residual & 57 & 19.1362475 & 0.8997855 & NA & NA\\
-\hline
-Total & 59 & 21.2675669 & 1.0000000 & NA & NA\\
-\hline
-\end{tabular}
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Df
+</th>
+<th style="text-align:right;">
+SumOfSqs
+</th>
+<th style="text-align:right;">
+R2
+</th>
+<th style="text-align:right;">
+F
+</th>
+<th style="text-align:right;">
+Pr(&gt;F)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Light...average
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0.4114619
+</td>
+<td style="text-align:right;">
+0.0192543
+</td>
+<td style="text-align:right;">
+1.218728
+</td>
+<td style="text-align:right;">
+0.243
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Litter..
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.0035484
+</td>
+<td style="text-align:right;">
+0.0469610
+</td>
+<td style="text-align:right;">
+2.972456
+</td>
+<td style="text-align:right;">
+0.007
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residual
+</td>
+<td style="text-align:right;">
+57
+</td>
+<td style="text-align:right;">
+19.2441042
+</td>
+<td style="text-align:right;">
+0.9005271
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Total
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+21.3698219
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
     nmds.out <- nmds(vegdist(com.ds), 2, 2)
     ord <- nmds.min(nmds.out, dims = 2)
 

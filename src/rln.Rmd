@@ -7,12 +7,11 @@ output: md_document
 
 # Analysis Summary
 
-- Dead trees and non-lichen species were removed from lichen community
-  analyses. 
-- Lichen communities were adequately sampled, based on species
+- Dead trees were removed from lichen community analyses.
+- Rock epiphyte communities were adequately sampled, based on species
   accumulation curves, with moth resistant trees accumulating slightly
   more lichen species.
-- Lichen communities (abundance, richness, diversity, composition)
+- Communities (abundance, richness, diversity, composition)
 were significantly, generally negatively, affected by moth
 susceptibility.
 - Several tree variables, including light availability, leaf litter
@@ -84,7 +83,7 @@ The following are variable descriptions (Variable, Type, Range, Definition):
 ```{r results = "hide"}
 
 ## Data are in ../data/scrl
-l.dat <- read.csv("./data/scrl/spp_env_combined.csv")
+l.dat <- read.csv("../data/scrl/spp_env_combined.csv")
 
 ## Summary of data
 summary(l.dat)
@@ -217,7 +216,7 @@ colnames(ard.dat) <- c("Tree.pairs", "Stat", "diff")
 ard.mu <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], mean)
 ard.se <- tapply(ard.dat[, "diff"], ard.dat[, "Stat"], se)
 
-pdf(file = "./results/scrl_isp_ard.pdf", width = 10, height = 5)
+pdf(file = "../results/scrl_isp_ard.pdf", width = 10, height = 5)
 par(mfrow = c(1,2))
 bp.out <- barplot(ard.mu, col = "black", ylim = c(-5, 0), 
                   ylab = "Difference (S - R)")
@@ -239,7 +238,7 @@ Create a plot of the two most indicative species
 
 ```{r}
 
-pdf(file = "./results/scrl_complot.pdf", width = 7, height = 7)
+pdf(file = "../results/scrl_complot.pdf", width = 7, height = 7)
 plot(com[, c("Acasup", "Canros")], pch = l.dat[, "Moth"] + 1, cex = 3, col = l.dat[, "Moth"] + 1)
 legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
 dev.off()
@@ -250,7 +249,7 @@ Create plot with indicator taxa
 
 ```{r}
 
-pdf(file = "./results/scrl_pdif.pdf", width = 7, height = 7)
+pdf(file = "../results/scrl_pdif.pdf", width = 7, height = 7)
 plot(melt(isp.dif)[-1], xlab = "Species", ylab = "Abundance Reduction")
 dev.off()
 
