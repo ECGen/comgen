@@ -122,6 +122,19 @@ Are the communities on each tree type adequately sampled?
 
 ![](scrl_report_files/figure-markdown_strict/specacum-1.png)
 
+\`\`\`{R, specaccum-plot)
+
+pdf(“../results/scrl\_spp-accum.pdf, width = 5, height = 5)
+plot(spa.all, ylim = c(0, 20), xlab =”Cumulative Trees Sampled“, ylab
+=”Species Observed“, col =”grey“, ci.col = ‘lightgrey’, ci.type =”poly“,
+ci.lty = 0) plot(spa.res, ci.col =”black“, ci.type =”bar“, lty = 1, add
+= TRUE, ci.lty = 1) plot(spa.sus, ci.col =”black“, ci.type =”bar“, lty =
+3, add = TRUE, ci.lty = 3) legend(”bottomright“, legend =
+c(”All“,”Resistant“,”Susceptible“), lty = c(1, 1, 3), lwd = c(5, 2, 2),
+col = c(”lightgrey“,”black“,”black")) dev.off()
+
+\`\`\`
+
 Moth trees have different microenvironments
 ===========================================
 
