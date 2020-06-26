@@ -304,9 +304,9 @@ Create a multi-bar plot figure for the community.
     bp.out <- barplot(isp.mu, col = "black", ylim = c(-0.5, 0), 
                       ylab = "Difference (S - R)", 
                       axisnames = TRUE, 
-                      names.arg = sapply(names(isp.mu), 
-                          function(x) paste(substr(x, 1, 1), substr(x, 4, 4),
-                          collapse = "")))
+                      names.arg = paste(sapply(names(isp.mu), 
+                          function(x) c(substr(x, 1, 1), substr(x, 4, 4))),
+                          collapse = ""))
     lines(x = as.vector(sapply(bp.out, rep, 2)),
           y = as.vector(rbind(isp.mu + isp.se, isp.mu - isp.se)),
           type = "h", lwd = 2
