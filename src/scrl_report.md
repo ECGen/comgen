@@ -38,7 +38,7 @@ Analysis Summary
 
 
     ## Libraries
-    my.libs <- c("vegan", "ecodist", "knitr")
+    my.libs <- c("vegan", "ecodist", "knitr", "reshape2")
     if (any(!(my.libs %in% installed.packages()[, 1]))){
         sapply(my.libs[!(my.libs %in% installed.packages()[, 1])], 
                install.packages)
@@ -79,6 +79,9 @@ Definition):
     ## Data are in ../data/scrl
     l.dat <- read.csv("../data/scrl/spp_env_combined.csv")
 
+    ## Fix species names
+    colnames(l.dat)[colnames(l.dat) == "Acasup"] <- "Acaame"
+
     ## Summary of data
     summary(l.dat)
 
@@ -86,7 +89,7 @@ Definition):
     l.dat <- l.dat[l.dat[, "Live.Dead"] != 0, ]
 
     ## Lichen species list
-    spp.l <- c("Acacon", "Acasup", "Acaobp", "Sterile.sp", "Brown.cr",
+    spp.l <- c("Acacon", "Acaame", "Acaobp", "Sterile.sp", "Brown.cr",
     "Lobalp", "Canros", "Calare", "Phydub", "Rhichr", "Xanlin", "Xanpli",
     "Xanele", "GrBr.cr", "Gray.cr")
     spp.moss <- c("Synrur", "Cerpur.Bryarg")
@@ -135,10 +138,8 @@ Are the communities on each tree type adequately sampled?
            lty = c(1, 1, 3), lwd = c(5, 2, 2), col = c("lightgrey", "black", "black"))
     dev.off()
 
-    ## X11cairo 
-    ##        2
-
-![](scrl_report_files/figure-markdown_strict/specaccum-plot-1.png)
+    ## png 
+    ##   2
 
 Moth trees have different microenvironments
 ===========================================
@@ -331,18 +332,18 @@ Create a multi-bar plot figure for the community.
              lwd = 1.5)
     dev.off()
 
-    ## X11cairo 
-    ##        2
+    ## png 
+    ##   2
 
 Create a plot of the two most indicative species
 
     pdf(file = "../results/scrl_complot.pdf", width = 7, height = 7)
-    plot(com[, c("Acasup", "Canros")], pch = l.dat[, "Moth"] + 1, cex = 3, col = l.dat[, "Moth"] + 1)
+    plot(com[, c("Acaame", "Canros")], pch = l.dat[, "Moth"] + 1, cex = 3, col = l.dat[, "Moth"] + 1)
     legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
     dev.off()
 
-    ## X11cairo 
-    ##        2
+    ## png 
+    ##   2
 
 Create plot with indicator taxa
 
@@ -350,8 +351,8 @@ Create plot with indicator taxa
     plot(melt(isp.dif)[-1], xlab = "Species", ylab = "Abundance Reduction")
     dev.off()
 
-    ## X11cairo 
-    ##        2
+    ## png 
+    ##   2
 
 Litter covering rocks was the main driver (FIGURE = ORDINATION)
 ===============================================================
