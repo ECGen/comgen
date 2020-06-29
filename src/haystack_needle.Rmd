@@ -1,0 +1,130 @@
+---
+title: Finding the Genotype Needle in the Community Haystack: Can ordination inflate community level effects?
+
+---
+
+# What if two species with similar abundances cared about different genotypes?
+
+n  <- 25
+n.g  <- 4
+g <- factor(paste("g", sort(rep(1:n.g, n)), ""))
+s1  <- c(rpois(n, runif(n, 100, 300)), 
+         rpois(n, runif(n, 0, 30)), 
+         rpois(n * 2, runif(n * 2, 0, 300))) * 100
+s2  <- c(rpois(n * 2, runif(n * 2, 0, 300)),
+         rpois(n, runif(n, 100, 300)), 
+         rpois(n, runif(n, 0, 30)))
+com  <- cbind(s1, s2)
+d  <- vegdist(com)
+ord <- nmds(d, 2, 2)
+om  <- nmds.min(ord)
+summary(aov(om[, 1]~g))
+summary(aov(om[, 2]~g))
+
+par(mfrow = c(2, 2))
+plot(s1~g)
+plot(s2~g)
+plot(om[, 1]~g)
+plot(om[, 2]~g)
+
+
+# What if two species with wildly different abundances cared about different genotypes?
+
+n  <- 25
+n.g  <- 4
+g <- factor(paste("g", sort(rep(1:n.g, n)), ""))
+s1  <- c(rpois(n, runif(n, 100, 300)), 
+         rpois(n, runif(n, 0, 30)), 
+         rpois(n * 2, runif(n * 2, 0, 300))) * 10
+s2  <- c(rpois(n * 2, runif(n * 2, 0, 300)),
+         rpois(n, runif(n, 100, 300)), 
+         rpois(n, runif(n, 0, 30)))
+
+com  <- cbind(s1, s2)
+d  <- vegdist(com)
+set.seed(12345)
+ord <- nmds(d, 2, 2)
+om  <- nmds.min(ord)
+summary(aov(om[, 1]~g))
+summary(aov(om[, 2]~g))
+par(mfrow = c(2, 2))
+plot(s1~g)
+plot(s2~g)
+plot(om[, 1]~g)
+plot(om[, 2]~g)
+
+# Does it matter which order they're in? Nope. 
+
+com  <- cbind(s2, s1)
+d  <- vegdist(com)
+set.seed(12345)
+ord <- nmds(d, 2, 2)
+om  <- nmds.min(ord)
+summary(aov(om[, 1]~g))
+summary(aov(om[, 2]~g))
+par(mfrow = c(2, 2))
+plot(s1~g)
+plot(s2~g)
+plot(om[, 1]~g)
+plot(om[, 2]~g)
+
+# What if one low abundance species cares about genotype, but nothing else does?
+
+abund.scalar  <- 100
+n  <- 15
+n.g  <- 4
+g <- factor(paste("g", sort(rep(1:n.g, n)), ""))
+s1  <- c(rpois(n, runif(n, 10, 30)), 
+         rpois(n, runif(n, 0, 30)), 
+         rpois(n, runif(n, 50, 100)), 
+         rpois(n, runif(n, 30, 50)))
+s.all <- lapply(1:100, 
+                function(i, n) 
+                    rpois(n * n.g, runif(n * n.g, 0, 100 * abund.scalar)), 
+                n = n)
+com  <- cbind(s1, do.call(cbind, s.all))
+d  <- vegdist(com)
+ord <- nmds(d, 2, 2)
+om  <- nmds.min(ord)
+summary(aov(s1~g))
+summary(aov(om[, 1]~g))
+summary(aov(om[, 2]~g))
+
+par(mfrow = c(1, 3))
+plot(s1~g)
+plot(om[, 1]~g)
+plot(om[, 2]~g)
+
+# What if one high abundance species cares about genotype, but nothing else does?
+
+s1  <- c(rpois(n, runif(n, 10, 30)), 
+         rpois(n, runif(n, 0, 30)), 
+         rpois(n, runif(n, 50, 100)), 
+         rpois(n, runif(n, 30, 50))) 
+s1  <- s1 * abund.scalar
+s.all <- lapply(1:100, 
+                function(i, n) 
+                    rpois(n * n.g, runif(n * n.g, 0, 100)), 
+                n = n)
+com  <- cbind(s1, do.call(cbind, s.all))
+d  <- vegdist(com)
+ord <- nmds(d, 2, 2)
+om  <- nmds.min(ord)
+summary(aov(s1~g))
+summary(aov(om[, 1]~g))
+summary(aov(om[, 2]~g))
+
+par(mfrow = c(1, 3))
+plot(s1~g)
+plot(om[, 1]~g)
+plot(om[, 2]~g)
+
+
+Yes, a high abundance species will over-ride the rest of the community.
+
+# What's the path forward? 
+
+- Checking the stress in the ordination
+- Relativization
+- What does abundance tell us anyway?
+- Network approaches and the search for modules?
