@@ -670,9 +670,10 @@ large rocks.
     ##        cor 
     ## -0.9027609
 
-    pdf("../results/plot-litterVbigrocks.pdf", width = 5, height = 5)
+    pdf("../results/scrl_litterVbigrocks.pdf", width = 5, height = 5)
     plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
-         xlab = "Litter Cover", ylab = "Rock Cover (size >3cm)")
+         xlab = "Litter Cover", ylab = "Rock Cover (size >3 cm)",
+         pch = 19, cex = 1.5)
     abline(lm(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."]))
     dev.off()
 
