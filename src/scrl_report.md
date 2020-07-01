@@ -656,6 +656,20 @@ controlled for.
 Because light was significantly, negatively correlated with litter and
 large rocks.
 
+    cor.test(env.dif[, "Big.rocks.."], env.dif[, "Litter.."])
+
+    ## 
+    ##  Pearson's product-moment correlation
+    ## 
+    ## data:  env.dif[, "Big.rocks.."] and env.dif[, "Litter.."]
+    ## t = -11.106, df = 28, p-value = 9.054e-12
+    ## alternative hypothesis: true correlation is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.9530598 -0.8039735
+    ## sample estimates:
+    ##        cor 
+    ## -0.9027609
+
     pdf("../results/plot-litterVbigrocks.pdf", width = 5, height = 5)
     plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
          xlab = "Litter Cover", ylab = "Rock Cover (size >3cm)")
