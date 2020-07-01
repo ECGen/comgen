@@ -109,6 +109,16 @@ rownames(com) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 rownames(com.moss) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 rownames(l.dat) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 
+## Paired environmental differences
+total.rocks  <- apply(l.dat[, c("Big.rocks..", "Small.rocks..")], 1, sum)
+env <- l.dat[, c("Litter..", "Big.rocks..", "Small.rocks..", 
+                           "Shrubs..", "Grass..", "Branches..", 
+                           "Light...N", "Light...S", "Light...average")]
+env <- cbind(env, total.rocks)
+env.dif <- apply(env, 2, function(x, p) tapply(x, p, diff), p = l.dat[, "Tree.pairs"])
+
+heatmap(abs(round(cor(env.dif), 3)))
+
 ```
 
 
@@ -283,17 +293,65 @@ dev.off()
 
 # Litter covering rocks was the main driver (FIGURE = ORDINATION)
 
-light not litter predicted lichen composition (PERMANOVA, table 3, Ordination)
+Although light did significantly explain variation in the lichen
+community, this was not significant once the variation in litter was
+controlled for. 
+
 
 ```{R, cache = TRUE}
 
+
 set.seed(123)
-ptab.env <- adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
+ptab.env <- adonis2(com.ds ~ Litter.. +  Light...average, data = l.dat, 
                    strata = l.dat[, "Tree.pairs"], 
                    by = "margin", nperm = 100000)
 kable(ptab.env)
 
+set.seed(123)
+ptab.env <- adonis2(com.ds ~ Light...average + Litter.. , data = l.dat, 
+                   strata = l.dat[, "Tree.pairs"], 
+                   by = "margin", nperm = 100000)
+kable(ptab.env)
+
+set.seed(123)
+ptab.env <- adonis2(com.ds ~ total.rocks ,
+                   strata = l.dat[, "Tree.pairs"], 
+                   by = "term", nperm = 100000)
+
+kable(ptab.env)
+set.seed(123)
+ptab.env <- adonis2(com.ds ~ Big.rocks.. , data = l.dat, 
+                   strata = l.dat[, "Tree.pairs"], 
+                   by = "term", nperm = 100000)
+
+kable(ptab.env)
+set.seed(123)
+ptab.env <- adonis2(com.ds ~ Small.rocks.. , data = l.dat, 
+                   strata = l.dat[, "Tree.pairs"], 
+                   by = "term", nperm = 100000)
+kable(ptab.env)
+set.seed(123)
+ptab.env <- adonis2(com.ds ~ Litter.. , data = l.dat, 
+                   strata = l.dat[, "Tree.pairs"], 
+                   by = "term", nperm = 100000)
+kable(ptab.env)
+
+
 ```
+
+Because light was significantly, negatively correlated with litter and
+large rocks.
+
+```{R, corplot-bigrocks-litter, cache = TRUE}
+
+pdf("../results/plot-litterVbigrocks.pdf", width = 5, height = 5)
+plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
+     xlab = "Litter Cover", ylab = "Rock Cover (size >3cm)")
+abline(lm(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."]))
+dev.off()
+
+```
+
 
 ```{R, litter-plot, cache = TRUE}
 

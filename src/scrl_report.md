@@ -103,6 +103,18 @@ Definition):
     rownames(com.moss) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
     rownames(l.dat) <- paste(l.dat[, "Moth"], l.dat[, "Tree.pairs"], sep = "_")
 
+    ## Paired environmental differences
+    total.rocks  <- apply(l.dat[, c("Big.rocks..", "Small.rocks..")], 1, sum)
+    env <- l.dat[, c("Litter..", "Big.rocks..", "Small.rocks..", 
+                               "Shrubs..", "Grass..", "Branches..", 
+                               "Light...N", "Light...S", "Light...average")]
+    env <- cbind(env, total.rocks)
+    env.dif <- apply(env, 2, function(x, p) tapply(x, p, diff), p = l.dat[, "Tree.pairs"])
+
+    heatmap(abs(round(cor(env.dif), 3)))
+
+![](scrl_report_files/figure-markdown_strict/unnamed-chunk-2-1.png)
+
 Species accumulation
 ====================
 
@@ -138,8 +150,10 @@ Are the communities on each tree type adequately sampled?
            lty = c(1, 1, 3), lwd = c(5, 2, 2), col = c("lightgrey", "black", "black"))
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
+
+![](scrl_report_files/figure-markdown_strict/specaccum-plot-1.png)
 
 Moth trees have different microenvironments
 ===========================================
@@ -277,16 +291,6 @@ supplement)
 
     ind.spp <- lapply(com, function(x, p) t.test(tapply(x, p, diff)), p = l.dat[, "Tree.pairs"])
     isp <- apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric)
-
-    ## Warning in apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric): NAs
-    ## introduced by coercion
-
-    ## Warning in apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric): NAs
-    ## introduced by coercion
-
-    ## Warning in apply(do.call(rbind, lapply(ind.spp, unlist)), 2, as.numeric): NAs
-    ## introduced by coercion
-
     rownames(isp) <- names(ind.spp)
     isp[, "p.value"] <- p.adjust(isp[, "p.value"], method = "fdr")
     isp <- isp[order(isp[, "p.value"]), ]
@@ -332,8 +336,8 @@ Create a multi-bar plot figure for the community.
              lwd = 1.5)
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Create a plot of the two most indicative species
 
@@ -342,8 +346,8 @@ Create a plot of the two most indicative species
     legend("topleft", title = "Tree Type", legend = c("Resistant", "Susceptible"), pch = c(2, 1), col = c(2, 1))
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Create plot with indicator taxa
 
@@ -351,17 +355,71 @@ Create plot with indicator taxa
     plot(melt(isp.dif)[-1], xlab = "Species", ylab = "Abundance Reduction")
     dev.off()
 
-    ## png 
-    ##   2
+    ## X11cairo 
+    ##        2
 
 Litter covering rocks was the main driver (FIGURE = ORDINATION)
 ===============================================================
 
-light not litter predicted lichen composition (PERMANOVA, table 3,
-Ordination)
+Although light did significantly explain variation in the lichen
+community, this was not significant once the variation in litter was
+controlled for.
 
     set.seed(123)
-    ptab.env <- adonis2(com.ds ~  Light...average + Litter.., data = l.dat, 
+    ptab.env <- adonis2(com.ds ~ Litter.. +  Light...average, data = l.dat, 
+                       strata = l.dat[, "Tree.pairs"], 
+                       by = "margin", nperm = 100000)
+    kable(ptab.env)
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Litter..</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.0035484</td>
+<td style="text-align: right;">0.0469610</td>
+<td style="text-align: right;">2.972456</td>
+<td style="text-align: right;">0.007</td>
+</tr>
+<tr class="even">
+<td>Light…average</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.4114619</td>
+<td style="text-align: right;">0.0192543</td>
+<td style="text-align: right;">1.218728</td>
+<td style="text-align: right;">0.243</td>
+</tr>
+<tr class="odd">
+<td>Residual</td>
+<td style="text-align: right;">57</td>
+<td style="text-align: right;">19.2441042</td>
+<td style="text-align: right;">0.9005271</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.3698219</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+
+    set.seed(123)
+    ptab.env <- adonis2(com.ds ~ Light...average + Litter.. , data = l.dat, 
                        strata = l.dat[, "Tree.pairs"], 
                        by = "margin", nperm = 100000)
     kable(ptab.env)
@@ -412,6 +470,200 @@ Ordination)
 </tr>
 </tbody>
 </table>
+
+    set.seed(123)
+    ptab.env <- adonis2(com.ds ~ total.rocks ,
+                       strata = l.dat[, "Tree.pairs"], 
+                       by = "term", nperm = 100000)
+
+    kable(ptab.env)
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>total.rocks</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.664876</td>
+<td style="text-align: right;">0.0779078</td>
+<td style="text-align: right;">4.900435</td>
+<td style="text-align: right;">0.002</td>
+</tr>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">19.704946</td>
+<td style="text-align: right;">0.9220922</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.369822</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+
+    set.seed(123)
+    ptab.env <- adonis2(com.ds ~ Big.rocks.. , data = l.dat, 
+                       strata = l.dat[, "Tree.pairs"], 
+                       by = "term", nperm = 100000)
+
+    kable(ptab.env)
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Big.rocks..</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2.428473</td>
+<td style="text-align: right;">0.1136403</td>
+<td style="text-align: right;">7.436188</td>
+<td style="text-align: right;">0.001</td>
+</tr>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">18.941349</td>
+<td style="text-align: right;">0.8863597</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.369822</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+
+    set.seed(123)
+    ptab.env <- adonis2(com.ds ~ Small.rocks.. , data = l.dat, 
+                       strata = l.dat[, "Tree.pairs"], 
+                       by = "term", nperm = 100000)
+    kable(ptab.env)
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Small.rocks..</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.2204425</td>
+<td style="text-align: right;">0.0103156</td>
+<td style="text-align: right;">0.604541</td>
+<td style="text-align: right;">0.782</td>
+</tr>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">21.1493794</td>
+<td style="text-align: right;">0.9896844</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.3698219</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+
+    set.seed(123)
+    ptab.env <- adonis2(com.ds ~ Litter.. , data = l.dat, 
+                       strata = l.dat[, "Tree.pairs"], 
+                       by = "term", nperm = 100000)
+    kable(ptab.env)
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">SumOfSqs</th>
+<th style="text-align: right;">R2</th>
+<th style="text-align: right;">F</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Litter..</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.714256</td>
+<td style="text-align: right;">0.0802185</td>
+<td style="text-align: right;">5.058457</td>
+<td style="text-align: right;">0.002</td>
+</tr>
+<tr class="even">
+<td>Residual</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">19.655566</td>
+<td style="text-align: right;">0.9197815</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="odd">
+<td>Total</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">21.369822</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+
+Because light was significantly, negatively correlated with litter and
+large rocks.
+
+    pdf("../results/plot-litterVbigrocks.pdf", width = 5, height = 5)
+    plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
+         xlab = "Litter Cover", ylab = "Rock Cover (size >3cm)")
+    abline(lm(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."]))
+    dev.off()
+
+    ## X11cairo 
+    ##        2
 
     pdf("../results/scrl_litterVlight.pdf", width = 9, height = 5)
 
