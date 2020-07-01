@@ -676,7 +676,7 @@ large rocks.
     ## X11cairo 
     ##        2
 
-    pdf("../results/scrl_litterVlight.pdf", width = 15, height = 7)
+    pdf("../results/scrl_litter_effects.pdf", width = 15, height = 7)
     par(mfrow = c(1,3))
     plot(density(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)), 
         main = "", xlab = "Litter Difference (S - R)")
