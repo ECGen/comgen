@@ -671,27 +671,25 @@ large rocks.
     ## -0.9027609
 
     pdf("../results/scrl_litterVbigrocks.pdf", width = 5, height = 5)
-    plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
-         xlab = "Litter Cover", ylab = "Rock Cover (size >3 cm)",
-         pch = 19, cex = 1.5)
-    abline(lm(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."]))
     dev.off()
 
     ## X11cairo 
     ##        2
 
-    pdf("../results/scrl_litterVlight.pdf", width = 9, height = 5)
-
-    par(mfrow = c(1,2))
+    pdf("../results/scrl_litterVlight.pdf", width = 15, height = 7)
+    par(mfrow = c(1,3))
     plot(density(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)), 
         main = "", xlab = "Litter Difference (S - R)")
     abline(v = mean(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff)),
         lwd = 0.5)
+    plot(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."], 
+         xlab = "Litter Difference (S - R)", ylab = "Rock Cover (size >3 cm) Difference (S - R)",
+         pch = 19, cex = 1.5)
+    abline(lm(env.dif[, "Big.rocks.."] ~ env.dif[, "Litter.."]))
     plot(tapply(l.dat[, "Litter.."], l.dat[, "Tree.pairs"], diff), 
         tapply(l.dat[, "Light...average"], l.dat[, "Tree.pairs"], diff), 
         xlab = "Litter Difference (S - R)", ylab = "Light Difference (S - R)",
-        pch = 19)
-
+        pch = 19, cex = 1.5)
     dev.off()
 
     ## X11cairo 
