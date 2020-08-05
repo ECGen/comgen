@@ -1091,7 +1091,8 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     chp.coord <- ch.plot(ord[["nms"]], onc.dat[, "geno"],
                          cex = 2.5, lwd = 2.5, mu.pch = 15,
                          pt.col = "white",
-                         bar.col = grey(0.5)
+                         bar.col = grey(0.5),
+                         xlab = "Axis 1", ylab = "Axis 2"
                          )
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "A", bty = "n", text.font = 2)
