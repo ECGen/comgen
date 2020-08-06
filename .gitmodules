@@ -1,3 +1,6 @@
 [submodule "docs/lcn_manuscript"]
 	path = docs/lcn_manuscript
 	url = https://github.com/ECGen/lcn_manuscript
+[submodule "docs/lcn_manscript"]
+	path = docs/lcn_manscript
+	url = https://github.com/ecgen/lcn_manuscript
