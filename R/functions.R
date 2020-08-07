@@ -469,7 +469,7 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
                         ph.reml.pval["statistic"],
                         H2(ph.reml, g = onc.dat$geno), 
                         R2(ph.reml), ph.reml.pval$p.value)
-    ct.reml <- lme4::lmer(I(CT^(1 / 4)) ~ (1 | geno), 
+    ct.reml <- lme4::lmer(I(rank(CT)) ~ (1 | geno), 
                           data = onc.dat, REML = TRUE)
     ct.reml.pval <- RLRsim::exactRLRT(ct.reml, nsim = nsim, seed = rlrt.seed)
     ct.reml.result <- c("Condensed Tannins", 
@@ -761,23 +761,30 @@ run_SEM <- function(onc.dat, cn.d.onc, np = 100000){
 run_perm <- function(onc.dat, onc.com, cn.d.onc){
     com.perm <- vegan::adonis2((onc.com^(2)) ~ geno,
                                data = onc.dat, 
-                               by = "term",
+                               by = "margin",
                                mrank = TRUE,
                                perm = 100000)
     cn.perm <- vegan::adonis2(cn.d.onc^(2) ~ geno,
-                              by = "term", 
+                              by = "margin", 
                               data = onc.dat, 
                               mrank = TRUE,
                               permutations = 100000)
     cn.trait.perm <- vegan::adonis2(
-                                cn.d.onc^(2)~BR+CT+pH+CN,
-                                by = "term", 
-                              data = onc.dat, 
-                              mrank = TRUE,
-                              permutations = 100000)
+                                cn.d.onc^(2)~ BR + CT + pH + CN,
+                                by = "margin", 
+                                data = onc.dat, 
+                                mrank = TRUE,
+                                permutations = 100000)
+    cn.trait.geno  <- vegan::adonis2(
+                                 cn.d.onc^(2)~ geno + BR + CT + pH + CN,
+                                 by = "term", 
+                                 data = onc.dat, 
+                                 mrank = TRUE,
+                                 permutations = 100000)
     out <- list(com = com.perm, 
                 cn = cn.perm,
-                cn.trait = cn.trait.perm)
+                cn.trait = cn.trait.perm,
+                cn.trait.geno = cn.trait.geno)
     return(out)
 }
 
