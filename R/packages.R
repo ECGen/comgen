@@ -2,10 +2,10 @@
 cran.pkgs <- c("magrittr", "devtools", "beepr",
               "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "igraph",
-              "bipartite", "RColorBrewer", "enaR", "signnet", "gplots", "plyr"
+              "bipartite", "RColorBrewer", "signnet", "gplots", "plyr"
               )
 gh.pkgs <- c("ROpenSci/drake", "r-lib/styler",
-             "ECGen/ComGenR", "ECGen/conetto")
+             "ECGen/ComGenR", "ECGen/conetto", "SEELab/enaR")
 gh.pkgs.names <- do.call(rbind, 
                          strsplit(gh.pkgs, 
                                   split = "/"))[, 2]

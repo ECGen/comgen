@@ -18,7 +18,7 @@ speciescen_Rs  -0.4175     0.1701  -2.454 0.014659 *
 speciescen_Xg  -0.5009     0.1701  -2.944 0.003470 ** 
 speciescen_Xm  -0.6024     0.1701  -3.541 0.000458 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 0.7317 on 324 degrees of freedom
 Multiple R-squared:  0.1647,	Adjusted R-squared:  0.1441 
