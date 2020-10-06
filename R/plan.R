@@ -88,7 +88,7 @@ plan <- drake_plan(
         onc.dat, sig.alpha = 0.03, 
         plot.vectors = TRUE,
         vec.var = c("BR", "Cen"),
-        vec.lwd = 1.2, vec.cex = 1.25,
+        vec.lwd = 0.90, vec.cex = 0.85,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
