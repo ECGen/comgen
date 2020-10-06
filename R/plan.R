@@ -97,7 +97,8 @@ plan <- drake_plan(
     geno_sppcen.pdf = plot_geno_sppcen(onc.dat, spp.cen.pos.in, spp.cen.pos.out,
                                        file = "results/geno_sppcen.pdf"),
     ## bark roughness
-    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf"),
+    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf", 
+                             cex = 1.0, lwd = 0.75, lab.cex = 0.85),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),
