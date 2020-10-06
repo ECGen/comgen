@@ -1107,7 +1107,7 @@ plot_h2 <- function(ord, onc.dat, file = "./cn_trait_h2.pdf",
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "A", bty = "n", text.font = 2)
     if (plot.vectors){
-        if (vec.var != "vector variables"){
+        if (vec.var[[1]] != "vector variables"){
             ord[["vec"]][vec.var, "pval"] <- sig.alpha - (sig.alpha * 0.5)
             ord[["vec"]][!rownames(ord[["vec"]]) %in% vec.var, "pval"] <- 1 - sig.alpha 
         }
