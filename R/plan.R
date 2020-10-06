@@ -85,8 +85,8 @@ plan <- drake_plan(
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
     ## fig:h2_plot
     h2_plot.pdf = plot_h2(cn.ord, 
-        onc.dat, sig.alpha = 0.15, 
-        plot.vectors = FALSE,
+        onc.dat, sig.alpha = 0.03, 
+        plot.vectors = TRUE,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),

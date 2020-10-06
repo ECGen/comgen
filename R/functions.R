@@ -1090,8 +1090,11 @@ plot_mdc <- function(onc.dat, file = "./cn_metrics.pdf"){
     dev.off()
 }
 
-plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
-                    file = "./cn_trait_h2.pdf"){
+plot_h2 <- function(ord, onc.dat, file = "./cn_trait_h2.pdf",
+                    sig.alpha = 1, plot.vectors = FALSE, 
+                    vec.var = "vector variables", 
+                    vec.lwd = 1.20, vec.cex = 1.25
+                    ){
     ## Significant Genotype and Network Effects
     pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1))
@@ -1104,9 +1107,13 @@ plot_h2 <- function(ord, onc.dat, sig.alpha = 1, plot.vectors = FALSE,
     text(chp.coord, labels = rownames(chp.coord), cex = 0.55)
     legend("topleft", "A", bty = "n", text.font = 2)
     if (plot.vectors){
+        if (vec.var != "vector variables"){
+            ord[["vec"]][vec.var, "pval"] <- sig.alpha - (sig.alpha * 0.5)
+            ord[["vec"]][!rownames(ord[["vec"]]) %in% vec.var, "pval"] <- 1 - sig.alpha 
+        }
         plot(ord[["vec"]], pval = sig.alpha, 
              col = grey(0.01), 
-             lwd = 1.0, cex = 0.75)
+             lwd = vec.lwd, cex = vec.cex)
     }
     ## MDC Plot
     mdc.plot(onc.dat[, "geno"], onc.dat[, "L"],
