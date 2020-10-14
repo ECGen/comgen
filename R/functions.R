@@ -956,7 +956,6 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
-    cn.trait.perm <- as.data.frame(perm.results[["cn.trait"]])
     ## rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
     ##                        "C:N Ratio", "Condensed Tannins", 
     ##                        "Percent Cover", "Species Richness",
@@ -964,6 +963,13 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
     ##                        "Network Modularity", "Network Centrality", 
     ##                        "Residual", "Total")
     colnames(cn.perm) <- c("df", "SS", "R2", "F", "p-value")
+    cn.trait.perm <- as.data.frame(perm.results[["cn.trait"]])
+    rownames(cn.trait.perm) <- c("Bark Roughness", 
+                                 "Condensed Tannins", 
+                                 "pH", 
+                                 "Carbon:Nitrogen Ratio",
+                                 "Residual", 
+                                 "Total")
     ## Create the latex
     tab.h2 <- xtable::xtable(
        h2.tab,
