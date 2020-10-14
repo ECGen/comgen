@@ -954,6 +954,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                                         # Tree Traits
     ## Remove R2 from H2 table
     h2.tab <- h2.tab[, colnames(h2.tab) != "R2"]
+    ## Handle degrees of freedom rounding
+    colnames(h2.tab)[colnames(h2.tab) == "Df"] <- "df"
     ## Format lichen network permanova table
     cn.perm <- as.data.frame(perm.results[["cn"]])
     ## rownames(cn.perm) <- c("Genotype", "Bark Roughness", "pH", 
@@ -970,7 +972,29 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                                  "Carbon:Nitrogen Ratio",
                                  "Residual", 
                                  "Total")
+    colnames(cn.trait.perm)[colnames(cn.trait.perm) == "Df"] <- "df"
     ## Create the latex
+    h2.digits <- matrix(c(rep(0, nrow(h2.tab)), 
+                          rep(0, nrow(h2.tab)), 
+                          rep(0, nrow(h2.tab)), 
+                          rep(digits, nrow(h2.tab)), 
+                          rep(2, nrow(h2.tab)),
+                          rep(digits, nrow(h2.tab))), 
+                        nrow(h2.tab))
+    h2.net.digits <- matrix(c(rep(0, 11), 
+                          rep(0, 11), 
+                          rep(0, 11), 
+                          rep(digits, 11), 
+                          rep(2, 11),
+                          rep(digits, 11)), 
+                          11)
+    h2.trait.digits <- matrix(c(rep(0, 6), 
+                          rep(0, 6), 
+                          rep(0, 6), 
+                          rep(digits, 6), 
+                          rep(2, 6),
+                          rep(digits, 6)), 
+                          6)
     tab.h2 <- xtable::xtable(
        h2.tab,
        caption = "Genotypic effects on tree traits and bark lichen.",
@@ -978,7 +1002,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        type = "latex",
        include.rownames = FALSE,
        include.colnames = TRUE, 
-        digits = digits
+       digits = h2.digits
        )
     tab.h2.net <- xtable::xtable(
        h2.tab[c("cn.perm.h2",
@@ -997,7 +1021,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        type = "latex",
        include.rownames = FALSE,
        include.colnames = TRUE, 
-        digits = digits
+       digits = h2.net.digits
        )
     tab.h2.trait <- xtable::xtable(
        h2.tab[c("prb.reml.result",
@@ -1011,7 +1035,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        type = "latex",
        include.rownames = FALSE,
        include.colnames = TRUE, 
-        digits = digits
+       digits = h2.trait.digits
        )
      tab.cn.perm <- xtable::xtable(
         cn.perm,
@@ -1019,8 +1043,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         label = "tab:cn_perm",
         type = "latex", 
         include.rownames = TRUE,
-        include.colnames = TRUE, 
-        digits = digits
+        include.colnames = TRUE
         )
     tab.cn.trait.perm <- xtable::xtable(
         cn.trait.perm,
@@ -1028,8 +1051,7 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         label = "tab:cn_trait_perm",
         type = "latex", 
         include.rownames = TRUE,
-        include.colnames = TRUE, 
-        digits = digits
+        include.colnames = TRUE
         )
     tab.com.perm <- xtable::xtable(
         perm.results[["com"]],
