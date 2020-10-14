@@ -995,6 +995,13 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                           rep(2, 6),
                           rep(digits, 6)), 
                           6)
+    cn.trait.digits <- matrix(c(rep(0, 6), 
+                          rep(0, 6), 
+                          rep(2, 6), 
+                          rep(2, 6), 
+                          rep(digits, 6),
+                          rep(digits, 6)), 
+                          6)
     tab.h2 <- xtable::xtable(
        h2.tab,
        caption = "Genotypic effects on tree traits and bark lichen.",
@@ -1051,7 +1058,8 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
         label = "tab:cn_trait_perm",
         type = "latex", 
         include.rownames = TRUE,
-        include.colnames = TRUE
+        include.colnames = TRUE,
+        digits = cn.trait.digits
         )
     tab.com.perm <- xtable::xtable(
         perm.results[["com"]],
