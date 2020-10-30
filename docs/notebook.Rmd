@@ -1,6 +1,7 @@
 ---
 title: "Notebook: Community Genetics"
 output: pdf_document
+bibliography: "notebook.bib"
 
 ---
 
@@ -58,11 +59,23 @@ lines(range(g), range(g), col = "grey")
 
 ```
 
+- It would appear that for a regular graph, the scaling of the degree is
+super-linear, exponential as long as the graph is regular and the
+addition of genotypes results in the addition of a proportionate
+number of vertices (i.e. interactions). 
 - This could be expanded to explore different network structures, such
 as centralized, modular, nested, etc. 
+- The nested structure would be particularly interesting, as genotype
+  communities are likely subsets of the larger community [@Lau2016a].
 - This could be done via formulations of the degree distribution,
 	e.g. $P(k) = \frac{n_k}{n}$ for a regular network or
 	Erdos-Renyi/Random, Scale-Free, Small-World, etc.
 - Could also explore other metrics.
 
+![](img/Fig_foundation_species_networks.png)
 
+
+
+# References
+
+<div id="refs"></div>
