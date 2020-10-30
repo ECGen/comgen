@@ -102,6 +102,13 @@ The following is from Guimaraes 2020
 > higher the connectivity parameter, and consequently, the network >
 > shows a giant component.
 
+If increasing genotypic richness promotes module formation, then the
+fixation of a genotype in a population could lead to the formation of
+a giant component in which a single module associated with that
+genotype comes to dominate and the connectivity of the community is
+maximized. What would the functional consequences of this be for the
+ecosystem?
+
 # References
 
 <div id="refs"></div>
