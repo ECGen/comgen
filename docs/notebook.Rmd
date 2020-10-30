@@ -74,7 +74,33 @@ as centralized, modular, nested, etc.
 
 ![](img/Fig_foundation_species_networks.png)
 
+## Giant Components and Genotpic Richness
 
+The following is from Guimaraes 2020
+
+> THE EMERGENCE OF A GIANT COMPONENT 
+> 
+> In random networks, the critical > point separating the structural
+> phases (e.g., disconnected networks > and networks with a giant
+> component) is controlled by a connectivity > parameter. This result
+> applies to multiple forms of random > networks. In Erdös-Rényi
+> graphs, in which the probability of the > occurrence of an
+> interaction is constant and equal for all possible > interactions,
+> the giant component is expected to emerge if k > 1, > where k is the
+> average degree.  Erdös-Rényi graphs show binomial > degree
+> distributions, whereas ecological networks often show > distinct
+> forms of degree distributions. For random networks with > arbitrary
+> (fixed) degree distributions, the giant component is > expected to
+> emerge if c1 = k2 − 2k > 0, where k2 is the average of > the square
+> of the degrees of the nodes in the network. For random > networks
+> with fixed degree distribution showing bipartivity, the > emergence
+> of a giant component occurs if c2 = MI i=1 MJ j=1 ij(ij − > i − j)pi
+> pj > 0, where MI(MJ) is the largest degree recorded in set > I (J),
+> and pi(pj) is the relative frequency of nodes with a degree > equal
+> to i ( j ) (Newman et al. 2001). For the last two forms of > random
+> networks, the higher the variance in the degree distribution, > the
+> higher the connectivity parameter, and consequently, the network >
+> shows a giant component.
 
 # References
 
