@@ -1548,10 +1548,17 @@ centralization_signed <- function(x, mode = c("in", "out"), type = c("pos", "neg
 update_manuscript <- function(files, dir, file.tex = "main.tex", render = FALSE){
     files = paste0("results/", names(files))
     if (dir.exists(dir)){
+        tabs <- files[grep("\\.tex", files)]
+        figs <- files[!grepl("\\.tex", files)]
         file.copy(
             overwrite = TRUE, recursive = FALSE, copy.mode = TRUE,
-            from = files,
-            to = dir
+            from = tabs,
+            to = paste0(dir, "/figures")
+            )
+        file.copy(
+            overwrite = TRUE, recursive = FALSE, copy.mode = TRUE,
+            from = figs,
+            to = paste0(dir, "/tables")
             )
         if (render){
             texi2pdf(paste(dir, file.tex, sep = "/"), clean = TRUE)
