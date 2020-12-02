@@ -972,7 +972,11 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
                                  "Carbon:Nitrogen Ratio",
                                  "Residual", 
                                  "Total")
-    colnames(cn.trait.perm)[colnames(cn.trait.perm) == "Df"] <- "df"
+    colnames(cn.trait.perm) <- c("df",
+                                 "SS",
+                                 "R2",
+                                 "Pseudo-F",
+                                 "p-value")
     ## Create the latex
     h2.digits <- matrix(c(rep(0, nrow(h2.tab)), 
                           rep(0, nrow(h2.tab)), 
@@ -1011,19 +1015,26 @@ make_tables <- function(onc.dat, reml.results, perm.results, digits = 4){
        include.colnames = TRUE, 
        digits = h2.digits
        )
+    h2.net.tab <- h2.tab[c("cn.perm.h2",
+                           "link.reml.result", 
+                           "link.pos.reml.result",
+                           "link.neg.reml.result",
+                           "cen.reml.result",
+                           "cen.in.reml.result",
+                           "cen.inp.reml.result",
+                           "cen.inn.reml.result",
+                           "cen.out.reml.result",
+                           "cen.outp.reml.result",
+                           "cen.outn.reml.result"), ]
+    colnames(h2.net.tab) <- c("Response", 
+                              "df", 
+                              "RLRT",
+                              "H2", 
+                              "p-value")
+    h2.net.tab[, "df"] <- h2.net.tab[1, "df"]
     tab.h2.net <- xtable::xtable(
-       h2.tab[c("cn.perm.h2",
-                "link.reml.result", 
-                "link.pos.reml.result",
-                "link.neg.reml.result",
-                "cen.reml.result",
-                "cen.in.reml.result",
-                "cen.inp.reml.result",
-                "cen.inn.reml.result",
-                "cen.out.reml.result",
-                "cen.outp.reml.result",
-                "cen.outn.reml.result"), ],
-       caption = "Genotypic effects on the associated lichen network structure.",
+       h2.net.tab,
+       caption = "Genotypic effects on the associated lichen network structure. $RLRT$ is the statistic from the restricted likelihood ratio tests.",
        label = "tab:h2_net",
        type = "latex",
        include.rownames = FALSE,
