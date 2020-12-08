@@ -85,8 +85,10 @@ plan <- drake_plan(
     cn_onc.pdf = plot_nets(cn.onc, onc.dat, file = "results/cn_onc.pdf"),
     ## fig:h2_plot
     h2_plot.pdf = plot_h2(cn.ord, 
-        onc.dat, sig.alpha = 0.15, 
-        plot.vectors = FALSE,
+        onc.dat, sig.alpha = 0.03, 
+        plot.vectors = TRUE,
+        vec.var = c("BR", "Cen"),
+        vec.lwd = 0.90, vec.cex = 0.85,
         file = "results/h2_plot.pdf"),
     ## fig:spp_cen
     spp_cen.pdf = plot_sppcen(spp.cen, file = "results/spp_cen.pdf"),
@@ -95,7 +97,8 @@ plan <- drake_plan(
     geno_sppcen.pdf = plot_geno_sppcen(onc.dat, spp.cen.pos.in, spp.cen.pos.out,
                                        file = "results/geno_sppcen.pdf"),
     ## bark roughness
-    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf"),
+    br_net.pdf = plot_br_net(onc.dat, file = "results/br_net.pdf", 
+                             cex = 1.0, lwd = 0.75, lab.cex = 0.85),
     ## SUPPLEMENTARY
     xg_size.pdf = plot_xg_size(xgs.data, file = "results/xg_size.pdf"),
     spac_geno.pdf = plot_spag(spac.g, file = "results/spac_geno.pdf"),

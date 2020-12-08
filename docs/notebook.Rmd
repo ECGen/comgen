@@ -1,0 +1,114 @@
+---
+title: "Notebook: Community Genetics"
+output: pdf_document
+bibliography: "notebook.bib"
+
+---
+
+# Summary
+
+
+
+# Notebook
+
+## Fri 30 Oct 2020 02:28:22 PM EDT
+
+- Given a network of species ($n$) with uniform genotypic richness ($g$)
+  we would calculate the number of individuals ($m$) to be equal to
+  $ng$. 
+- If the graph is regular, the number of vertices ($v$), then the
+  degree of the graph $deg(G)$ can be calculated as $m(k - 1)$, where $k$ is
+  the degree of each node. 
+- Using these assumptions, we can calculate the scaling of the graph
+  degree in response to variation in the genotypic richness, assuming
+  each node is the maximum degree.
+  
+  
+```{r degG-by-g, eval = TRUE, cache = TRUE, fig.width = 7, fig.height = 7}
+
+n <-  10
+g  <- seq(1, 1000)
+dG <- n * g * (n * g - 1)
+plot(dG~g, type = "l", 
+     xlab = "Genotype Richness (g)", 
+     ylab = "Network Degree (deg G)")
+lines(range(g), range(dG), col = "grey")
+lines(range(g), range(g), col = "grey")
+
+```
+
+We can expand this to variation in the node degree mainting a regular
+graph. 
+
+```{R degG-g-k, eval = TRUE, cache = TRUE, fig.width = 7, fig.height = 7}
+
+min.v <- n * g * 1/10
+med.v <- n * g * 1/2
+max.v <- n * g
+dg.min <- n * g * (min.v - 1)
+dg.med <- n * g * (med.v - 1)
+dg.max <- n * g * (max.v - 1)
+
+plot(dg.max ~ g, type = "l", 
+     xlab = "Genotype Richness (g)", 
+     ylab = "Network Degree (deg G)")
+lines(g, dg.med, lty = 2)
+lines(g, dg.min, lty = 3)
+lines(range(g), range(dG), col = "grey")
+lines(range(g), range(g), col = "grey")
+
+```
+
+- It would appear that for a regular graph, the scaling of the degree is
+super-linear, exponential as long as the graph is regular and the
+addition of genotypes results in the addition of a proportionate
+number of vertices (i.e. interactions). 
+- This could be expanded to explore different network structures, such
+as centralized, modular, nested, etc. 
+- The nested structure would be particularly interesting, as genotype
+  communities are likely subsets of the larger community [@Lau2016a].
+- This could be done via formulations of the degree distribution,
+	e.g. $P(k) = \frac{n_k}{n}$ for a regular network or
+	Erdos-Renyi/Random, Scale-Free, Small-World, etc.
+- Could also explore other metrics.
+
+![](img/Fig_foundation_species_networks.png)
+
+## Giant Components and Genotpic Richness
+
+The following is from Guimaraes 2020
+
+> THE EMERGENCE OF A GIANT COMPONENT 
+> 
+> In random networks, the critical > point separating the structural
+> phases (e.g., disconnected networks > and networks with a giant
+> component) is controlled by a connectivity > parameter. This result
+> applies to multiple forms of random > networks. In Erdös-Rényi
+> graphs, in which the probability of the > occurrence of an
+> interaction is constant and equal for all possible > interactions,
+> the giant component is expected to emerge if k > 1, > where k is the
+> average degree.  Erdös-Rényi graphs show binomial > degree
+> distributions, whereas ecological networks often show > distinct
+> forms of degree distributions. For random networks with > arbitrary
+> (fixed) degree distributions, the giant component is > expected to
+> emerge if c1 = k2 − 2k > 0, where k2 is the average of > the square
+> of the degrees of the nodes in the network. For random > networks
+> with fixed degree distribution showing bipartivity, the > emergence
+> of a giant component occurs if c2 = MI i=1 MJ j=1 ij(ij − > i − j)pi
+> pj > 0, where MI(MJ) is the largest degree recorded in set > I (J),
+> and pi(pj) is the relative frequency of nodes with a degree > equal
+> to i ( j ) (Newman et al. 2001). For the last two forms of > random
+> networks, the higher the variance in the degree distribution, > the
+> higher the connectivity parameter, and consequently, the network >
+> shows a giant component.
+
+If increasing genotypic richness promotes module formation, then the
+fixation of a genotype in a population could lead to the formation of
+a giant component in which a single module associated with that
+genotype comes to dominate and the connectivity of the community is
+maximized. What would the functional consequences of this be for the
+ecosystem?
+
+# References
+
+<div id="refs"></div>
