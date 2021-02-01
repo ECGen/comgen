@@ -1,7 +1,8 @@
 plan <- drake_plan(
 ### Load data
     ## Lichen Quadrat Data from Ogden Nature Center
-    garden.data.in = read.csv("./data/lcn/LCO_data_ONC_PIT.csv"),
+    garden.data.raw = read.csv("./data/lcn/LCO_data_ONC_PIT.csv"),
+    garden.data.in = clean_garden_data(garden.data.raw),
     ## Roughness Data
     rough.in = read.csv("./data/lcn/ONC_raw_roughness.csv"),
     ## Chemistry Data

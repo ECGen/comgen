@@ -1,5 +1,14 @@
 ### Loading data objects
 ### Data notes:
+
+# Cleaning data
+clean_garden_data <- function(x = "raw garden data"){
+    colnames(x)[colnames(x) == "Chol"] <- "Ahol"
+    colnames(x)[colnames(x) == "Lsp"] <- "Mheg"
+    colnames(x)[colnames(x) == "Rsp"] <- "Rfre"
+    return(x)
+}
+
 # Loading data
 # separate onc
 
