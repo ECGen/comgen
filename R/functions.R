@@ -450,8 +450,8 @@ run_spp_centrality <- function(cn.onc, onc.dat, rescale = FALSE,
             )
         }else{cen.spp.reml[[i]] <- c("spp centrality", mean(cen.spp[, i]), rep(NA, 3))}
     }
-    spp <- c("X. galericulata", "C. subdeflexa", "L. spp.", "C. holocarpa", "X. montana", 
-             "P. melanchra", "P. adscendens", "P. undulata", "R. sp.")
+    spp <- c("X. galericulata", "C. subdeflexa", "M. hagenii", "A. holocarpa", "X. montana", 
+             "P. melanchra", "P. adscendens", "P. undulata", "R. freyi")
     cen.spp.table <- do.call(rbind, cen.spp.reml)[, -1]
     cen.spp.table <- apply(cen.spp.table, 2, as.numeric)
     cen.spp.table <- round(cen.spp.table, digits)
@@ -1304,14 +1304,14 @@ plot_br_net <- function(onc.dat, file = "./results/br_net.pdf",
 ## Supplementary Figures
 plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = "./results/geno_sppcen.pdf"){
     ylim.min <- 0
-    ylim.max <- max(cbind(spp.cen.pos.in[["cen.spp"]][, c("cen_Ch", "cen_Xm")], 
-                          spp.cen.pos.out[["cen.spp"]][, c("cen_Ch", "cen_Xm")]))
+    ylim.max <- max(cbind(spp.cen.pos.in[["cen.spp"]][, c("cen_Ah", "cen_Xm")], 
+                          spp.cen.pos.out[["cen.spp"]][, c("cen_Ah", "cen_Xm")]))
     pdf(file, width = 9, height = 4.5)
     par(mfrow = c(1, 2), mar = c(5.1, 4.1, 4.1, 2.1), cex.lab = 1.0, cex.axis = 1.0)
-    mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ch"],
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Ah"],
              ylim = c(ylim.min, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (In)",
-             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
+             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ah"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
              std = FALSE,
@@ -1320,7 +1320,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.in[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
-             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ch"], 
+             ord = order(tapply(spp.cen.pos.in[["cen.spp"]][, "cen_Ah"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
              std = FALSE,
@@ -1328,13 +1328,14 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
              xlas = 2
              )
     legend("topright", 
-           legend = c("C. holocarpa", "X. montana"), 
+           legend = c(expression(italic("A. holocarpa")), 
+                      expression(italic("X. montana"))), 
            pch = c(19, 1), bty = "none")
     legend("topleft", "A", bty = "n", text.font = 2)
-    mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ch"],
+    mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Ah"],
              ylim = c(ylim.min, ylim.max),
              xlab = "Tree Genotype", ylab = "Centraliity (Out)",
-             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
+             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ah"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE),
              std = FALSE, 
@@ -1343,7 +1344,7 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
              )
     mdc.plot(onc.dat[, "geno"], spp.cen.pos.out[["cen.spp"]][, "cen_Xm"],
              add = TRUE, pch = 1,
-             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ch"], 
+             ord = order(tapply(spp.cen.pos.out[["cen.spp"]][, "cen_Ah"], 
                  onc.dat[, "geno"], mean), 
                  decreasing = TRUE), 
              std = FALSE,
@@ -1351,7 +1352,8 @@ plot_geno_sppcen <- function(onc.dat, spp.cen.pos.in, spp.cen.pos.out, file = ".
              xlas = 2
              )
     legend("topright", 
-           legend = c("C. holocarpa", "X. montana"), 
+           legend = c(expression(italic("A. holocarpa")), 
+                      expression(italic("X. montana"))), 
            pch = c(19, 1), bty = "none")
     legend("topleft", "B", bty = "n", text.font = 2)
     dev.off()

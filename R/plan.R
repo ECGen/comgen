@@ -27,7 +27,7 @@ plan <- drake_plan(
     xgs.data = proc_size(xgal.size.in), 
 ### Modeling
     ## Lichen Network Models
-    cn.onc = proc_cn_onc(onc.q),
+    ocn.onc = proc_cn_onc(onc.q),
     ## Lichen Network Model Similarity
     cn.d.onc = proc_cn_d_onc(cn.onc, onc.dat, 
         method = "euclidean", rm.na = TRUE),
