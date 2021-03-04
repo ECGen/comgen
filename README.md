@@ -1,5 +1,7 @@
 # Lichen Network Heritability Study
 
+[![DOI](https://zenodo.org/badge/147694422.svg)](https://zenodo.org/badge/latestdoi/147694422)
+
 - This project uses Drake, a workflow system designed for R.
 - To access the project, run `make.R`, which will load the necessary
   libraries and execute modeling and analyses for the project.
