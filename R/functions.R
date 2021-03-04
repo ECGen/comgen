@@ -1111,7 +1111,7 @@ run_nms <- function(d, vec.data, dim = 2, seed = 12345){
 run_sppcen_aov <- function(spp.cen){
     spp.cen.dat <- melt(spp.cen[["cen.spp"]])
     colnames(spp.cen.dat) <- c("tree.id", "species", "centrality")
-    sppcen.aov <- lm(centrality ~ species, data = spp.cen.dat)
+  sppcen.aov <- lm(centrality ~ species, data = spp.cen.dat)
     sppcen.mct <- TukeyHSD(aov(centrality ~ species, data = spp.cen.dat))
     out <- list(aov = sppcen.aov, mct = sppcen.mct)
     return(out)
