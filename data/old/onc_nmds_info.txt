@@ -1,2 +1,0 @@
-"Minimum stress for given dimensionality:  0.113774 "
-"r^2 for minimum stress configuration:  0.9397553 "
