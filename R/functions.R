@@ -1591,7 +1591,8 @@ update_manuscript <- function(files, dir, file.tex = "main.tex", render = FALSE)
         print("Manuscript directory not present.")
         print("Setting up submodule:")
         system("git add submodule https://github.com/ECGen/lcn_manuscript docs/lcn_manuscript")
-        print("Re-run make.R")
+        print("Make sure that lcn_manuscript is installed in docs,")
+        print("then re-run make.R")
     }
 }
 
