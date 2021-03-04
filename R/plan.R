@@ -1,16 +1,16 @@
 plan <- drake_plan(
 ### Load data
     ## Lichen Quadrat Data from Ogden Nature Center
-    garden.data.raw = read.csv("./data/lcn/LCO_data_ONC_PIT.csv"),
+    garden.data.raw = read.csv("./data/LCO_data_ONC_PIT.csv"),
     garden.data.in = clean_garden_data(garden.data.raw),
     ## Roughness Data
-    rough.in = read.csv("./data/lcn/ONC_raw_roughness.csv"),
+    rough.in = read.csv("./data/ONC_raw_roughness.csv"),
     ## Chemistry Data
-    onc.nc.in = read.csv("./data/lcn/ONC_phytochem_NC.csv"), 
-    onc.tan.in = read.csv("./data/lcn/ONC_phytochem_tannin.csv"),
-    onc.ph.in = read.csv("./data/lcn/ONC_Bark_lichen_pH_data.csv"),
+    onc.nc.in = read.csv("./data/ONC_phytochem_NC.csv"), 
+    onc.tan.in = read.csv("./data/ONC_phytochem_tannin.csv"),
+    onc.ph.in = read.csv("./data/ONC_Bark_lichen_pH_data.csv"),
     ## X. galericulata size estimates
-    xgal.size.in = read.csv("./data/lcn/ONC_Xgal_SizeData_May2011.csv"),
+    xgal.size.in = read.csv("./data/ONC_Xgal_SizeData_May2011.csv"),
 ### Data wrangling
     ## Genotypes and Trees to Remove
     rm.geno = c("RL6", "T6", "999"),
