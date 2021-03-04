@@ -1,7 +1,4 @@
-Community Genetics Projects
-==========================
-
-# Lichen Network Study
+# Lichen Network Heritability Study
 
 - This project uses Drake, a workflow system designed for R.
 - To access the project, run `make.R`, which will load the necessary
