@@ -1,5 +1,4 @@
 ## Check for supporting packages
-options(pkgType = "both")     # try binary, then source if needed.
 cran.pkgs <- c("magrittr", "devtools", "beepr",
               "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "igraph",
