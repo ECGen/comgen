@@ -1,5 +1,5 @@
 ## Check for supporting packages
-cran.pkgs <- c("magrittr", "devtools", "beepr",
+cran.pkgs <- c("magrittr", "devtools", "beepr", "pak",
               "xtable", "reshape", "tools",
               "MuMIn", "lme4", "RLRsim", "vegan", "ecodist", "igraph",
               "bipartite", "RColorBrewer", "signnet", "gplots", "plyr"
@@ -22,7 +22,7 @@ if (any(!(cran.pkgs %in% installed.packages()[, 1]))){
 if (any(!(gh.pkgs.names %in% installed.packages()[, 1]))){
     sapply(gh.pkgs[which(!(gh.pkgs.names %in% 
                            installed.packages()[, 1]))], 
-           devtools::install_github,
+           pak::pak,
            dependencies = TRUE)
 }
 ## Load libraries

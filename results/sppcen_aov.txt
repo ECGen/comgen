@@ -8,15 +8,15 @@ Residuals:
 
 Coefficients:
               Estimate Std. Error t value Pr(>|t|)    
-(Intercept)     0.7006     0.1203   5.824 1.38e-08 ***
-speciescen_Cs   0.2731     0.1701   1.605 0.109437    
-speciescen_Mh  -0.1268     0.1701  -0.746 0.456443    
-speciescen_Pa  -0.7006     0.1701  -4.118 4.85e-05 ***
-speciescen_Pm  -0.5787     0.1701  -3.401 0.000754 ***
-speciescen_Pu  -0.6682     0.1701  -3.927 0.000105 ***
-speciescen_Rf  -0.4175     0.1701  -2.454 0.014659 *  
-speciescen_Xg  -0.5009     0.1701  -2.944 0.003470 ** 
-speciescen_Xm  -0.6024     0.1701  -3.541 0.000458 ***
+(Intercept)    0.19969    0.12030   1.660  0.09788 .  
+speciescen_Cs  0.77398    0.17012   4.549 7.61e-06 ***
+speciescen_Mh  0.37406    0.17012   2.199  0.02860 *  
+speciescen_Ah  0.50090    0.17012   2.944  0.00347 ** 
+speciescen_Xm -0.10146    0.17012  -0.596  0.55135    
+speciescen_Pm -0.07777    0.17012  -0.457  0.64787    
+speciescen_Pa -0.19969    0.17012  -1.174  0.24134    
+speciescen_Pu -0.16726    0.17012  -0.983  0.32626    
+speciescen_Rf  0.08344    0.17012   0.490  0.62414    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
