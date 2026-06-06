@@ -199,4 +199,10 @@ plan <- drake_plan(
         dir = "docs/lcn_manuscript", 
         file.tex = "main.tex",
         render = FALSE)
+### Generate Supporting Information
+    update.manuscript = update_manuscript(
+        files = tables_figures, 
+        dir = "docs/lcn_manuscript", 
+        file.tex = "supporting_information.tex",
+        render = FALSE)
 )
