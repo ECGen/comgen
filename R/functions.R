@@ -715,11 +715,60 @@ run_reml <- function(onc.dat, trait.results, rm.na = TRUE, raw.reml = FALSE, nsi
     return(out)
 }
 
+run_pc_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, rlrt.seed = 2623){
+    if (rm.na){onc.dat <- na.omit(onc.dat)}
+
+    link.pc.reml <- lme4::lmer(I(L) ~ PC + (1 | geno), 
+                            data = onc.dat, REML = TRUE)
+    link.pc.reml.pval <- RLRsim::exactRLRT(link.pc.reml, nsim = nsim, seed = rlrt.seed)
+    link.pc.reml.result <- c("Degree ~ PC", 
+                          Df = "",
+                          link.pc.reml.pval["statistic"],
+                          h2 = H2(link.pc.reml, g = onc.dat$geno), 
+                          r2 = R2(link.pc.reml), link.pc.reml.pval$p.value)
+    cen.pc.reml <- lme4::lmer(I(Cen) ~ PC + (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cen.pc.reml.pval <- RLRsim::exactRLRT(cen.pc.reml, nsim = nsim, seed = rlrt.seed)
+    cen.pc.reml.result <- c("Centralization ~ PC", 
+                         Df = "",
+                         cen.pc.reml.pval["statistic"],
+                         H2(cen.pc.reml, g = onc.dat$geno), 
+                         R2(cen.pc.reml), cen.pc.reml.pval$p.value)
+    linkr4.pc.reml <- lme4::lmer(I(L^(1 / 4)) ~ PC + (1 | geno), 
+                            data = onc.dat, REML = TRUE)
+    linkr4.pc.reml.pval <- RLRsim::exactRLRT(linkr4.pc.reml, nsim = nsim, seed = rlrt.seed)
+    linkr4.pc.reml.result <- c("Degree ~ PC", 
+                          Df = "",
+                          linkr4.pc.reml.pval["statistic"],
+                          H2(linkr4.pc.reml, g = onc.dat$geno), 
+                          R2(linkr4.pc.reml), linkr4.pc.reml.pval$p.value)
+
+    cenr4.pc.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ PC + (1 | geno), 
+                           data = onc.dat, REML = TRUE)
+    cenr4.pc.reml.pval <- RLRsim::exactRLRT(cenr4.pc.reml, nsim = nsim, seed = rlrt.seed)
+    cenr4.pc.reml.result <- c("Centralization ~ PC", 
+                         Df = "",
+                         cenr4.pc.reml.pval["statistic"],
+                         H2(cenr4.pc.reml, g = onc.dat$geno), 
+                         R2(cenr4.pc.reml), cenr4.pc.reml.pval$p.value)
+    if (raw.reml){
+        out <- list(link.pc.reml,
+                    cen.pc.reml,
+                    linkr4.pc.reml,
+                    cenr4.pc.reml)
+    }else{
+        out <- rbind(link.pc.reml.result,
+                     cen.pc.reml.result,
+                     linkr4.pc.reml.result,
+                     cenr4.pc.reml.result)
+        colnames(out) <- c("response", "Df", "statistic", "H2", "R2", "p-value")
+    }
+    return(out)
+}
+
 std <- function(x){
     (x - mean(x)) / sqrt(length(x))
 }
-
-
 
 run_trait_path <- function(onc.dat){
     out <- list()
