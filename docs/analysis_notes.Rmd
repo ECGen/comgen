@@ -1,0 +1,73 @@
+# Analysis Notes
+
+Make sure to run make.R first and load the necessary objects.
+
+```{r}
+
+loadd(onc.dat)
+loadd(cn.d.onc)
+
+```
+
+## Is the network similarity driven by abundance of lichen?
+
+In a PerMANOVA with sequential partitioning of variance, we find that
+genotype has a significant effect on network similarity (R2 = 0.54, p
+= 0.030). When moved to the end of the model, the genotypic effect is
+no longer significant (p = 0.11), and Bark Roughness (R2 = 0.26, p <
+0.01) and Percent Cover (R2 = 0.10, p = 0.03) are both
+significant. These results collectively support the hypothesis that
+genetically based variation in bark roughness increases the cover of
+lichens and leads to more similar lichen networks. Given that
+Condensed Tannins, although genetically based (R2 = 0.32, p = 0.03),
+do not significantly predict network similarity suggests that the
+effect of Bark Roughness is structural rather than biochemically
+mediated (e.g., through increased leaching of phytochemicals that
+could impact lichen establishment and growth).
+
+```{r}
+
+
+    cn.geno.trait.pc  <- vegan::adonis2(
+                                    cn.d.onc^(2)~ geno + CT + pH + CN + BR + PC,
+                                    by = "term", 
+                                    data = onc.dat, 
+                                    mrank = TRUE,
+                                    permutations = 100000)
+    cn.trait.pc.geno  <- vegan::adonis2(
+                                    cn.d.onc^(2)~ CT + pH + CN + BR + PC + geno,
+                                    by = "term", 
+                                    data = onc.dat, 
+                                    mrank = TRUE,
+                                    permutations = 100000)
+
+```
+
+# How does bark roughness affect the structure of the lichen networks? Is
+it driven by lichen abudance (Percent Cover)?
+
+Both Network Size (R2 = 0.87, p < 0.01) and Network Centralization (R2
+= 0.05, p < 0.01) significantly explained the similarity of lichen
+networks. These effects remained significant, even after variance
+explained by Percent Cover was accounted for in the model. This
+supports the conlcusion that the genetically based patterns in network
+similarity are related to both the abundance of lichen and to other
+factors that determine the structure of the networks. 
+
+```{r}
+
+    cn.l.cen.pc  <- vegan::adonis2(
+                                     cn.d.onc~ L + Cen + PC,
+                                     by = "term", 
+                                     data = onc.dat, 
+                                     mrank = TRUE,
+                                     permutations = 100000)
+
+    cn.pc.l.cen  <- vegan::adonis2(
+                                     cn.d.onc~ PC + L + Cen,
+                                     by = "term", 
+                                     data = onc.dat, 
+                                     mrank = TRUE,
+                                     permutations = 100000)
+
+```

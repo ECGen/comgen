@@ -721,7 +721,7 @@ run_pc_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, 
     link.pc.reml <- lme4::lmer(I(L) ~ PC + (1 | geno), 
                             data = onc.dat, REML = TRUE)
     link.pc.reml.pval <- RLRsim::exactRLRT(link.pc.reml, nsim = nsim, seed = rlrt.seed)
-    link.pc.reml.result <- c("Degree ~ PC", 
+    link.pc.reml.result <- c("Degree", 
                           Df = "",
                           link.pc.reml.pval["statistic"],
                           h2 = H2(link.pc.reml, g = onc.dat$geno), 
@@ -729,7 +729,7 @@ run_pc_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, 
     cen.pc.reml <- lme4::lmer(I(Cen) ~ PC + (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cen.pc.reml.pval <- RLRsim::exactRLRT(cen.pc.reml, nsim = nsim, seed = rlrt.seed)
-    cen.pc.reml.result <- c("Centralization ~ PC", 
+    cen.pc.reml.result <- c("Centralization", 
                          Df = "",
                          cen.pc.reml.pval["statistic"],
                          H2(cen.pc.reml, g = onc.dat$geno), 
@@ -737,7 +737,7 @@ run_pc_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, 
     linkr4.pc.reml <- lme4::lmer(I(L^(1 / 4)) ~ PC + (1 | geno), 
                             data = onc.dat, REML = TRUE)
     linkr4.pc.reml.pval <- RLRsim::exactRLRT(linkr4.pc.reml, nsim = nsim, seed = rlrt.seed)
-    linkr4.pc.reml.result <- c("Degree ~ PC", 
+    linkr4.pc.reml.result <- c("Degree^(1/4)", 
                           Df = "",
                           linkr4.pc.reml.pval["statistic"],
                           H2(linkr4.pc.reml, g = onc.dat$geno), 
@@ -746,7 +746,7 @@ run_pc_reml <- function(onc.dat, rm.na = TRUE, raw.reml = FALSE, nsim = 100000, 
     cenr4.pc.reml <- lme4::lmer(I(Cen^(1 / 4)) ~ PC + (1 | geno), 
                            data = onc.dat, REML = TRUE)
     cenr4.pc.reml.pval <- RLRsim::exactRLRT(cenr4.pc.reml, nsim = nsim, seed = rlrt.seed)
-    cenr4.pc.reml.result <- c("Centralization ~ PC", 
+    cenr4.pc.reml.result <- c("Centralization^(1/4)", 
                          Df = "",
                          cenr4.pc.reml.pval["statistic"],
                          H2(cenr4.pc.reml, g = onc.dat$geno), 
