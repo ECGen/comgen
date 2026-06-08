@@ -53,9 +53,18 @@ it driven by lichen abudance (Percent Cover)?
 Examination of the variaince in lichen network similarity explained by
 species richness and the network metrics of size and centrality,
 supported the hypothesis that network structure is both a function of
-increasing numbers of species (i.e., nodes in the network) and
-other structural differences. In analyzing two PerMANOVAs with these
-factors, we found that 
+increasing numbers of species (i.e., nodes in the network) and other
+structural differences. In analyzing two PerMANOVAs with these
+factors, we found that network size (R2 = 0.77, p-value < 0.001) and
+centrality (R2 = 0.04, p-value < 0.001) both explained vaiation in
+network similarity regardless of whether species richness was the
+first or last factor entered into the model. Additionally, although
+variation in network similarity explained by centrality was low, it
+was significant even after partitioning the variance explained by
+network size. Based on this, we can conclude that network similarity
+is both of function of the number of lichen species in the community
+ determining network size and other aspects of network strcutre, such
+ as centralization. 
 
 ```{r}
 
