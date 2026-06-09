@@ -15,7 +15,7 @@ show_code <- TRUE
 make_pdf <- TRUE
 eval_output <- as.logical(1 - make_pdf)
 eval_tables <- make_pdf
-knitr::opts_chunk$set(echo = show_code, xtable.comment = FALSE)  # global default
+knitr::opts_chunk$set(echo = show_code)  # global default
 digits <- c(0, 0, 2, 2, 2, 3)
 
 ```
@@ -52,7 +52,7 @@ between genotypically explained variance in bark roughness and lichen
 community species richness that affects the similarity of lichen
 network structure.
 
-```{r permanova-geno, results = "hide", cache=TRUE}
+```{r permanova-geno, results = "hide", cache = TRUE}
 
 cn.geno.trait.pc.sr <- vegan::adonis2(
                                cn.d.onc~ geno + CT + pH + CN + BR + PC + SR,
@@ -85,13 +85,13 @@ as.data.frame(cn.trait.pc.sr.geno)
 
 ```{r table-cn-geno-trait-pc-sr, results = "asis", eval = eval_tables,echo = FALSE}
 
-xtable(as.data.frame(cn.geno.trait.pc.sr), digits = digits)
+xtable(as.data.frame(cn.geno.trait.pc.sr), digits = digits, xtable.comment = FALSE)
 
 ```
 
 ```{r table-cn-trait-pc-sr-geno, results = "asis", eval = eval_tables,echo=FALSE}
 
-xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits)
+xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits, xtable.comment = FALSE)
 
 ```
 
@@ -114,7 +114,7 @@ this, we can conclude that network similarity is both of function of
 the number of lichen species in the community determining network size
 and other aspects of network strcutre, such as centralization.
 
-```{r permanova-nm-sr, results = "hide", cache=TRUE}
+```{r permanova-nm-sr, results = "hide", cache = TRUE}
 
 cn.l.cen.sr  <- vegan::adonis2(
                            cn.d.onc~ L + Cen + SR,
@@ -146,12 +146,12 @@ as.data.frame(cn.sr.l.cen)
 
 ```{r table-cn-l-cen-sr, results = "asis", eval = eval_tables, echo = FALSE}
 
-xtable(as.data.frame(cn.l.cen.sr), digits = digits)
+xtable(as.data.frame(cn.l.cen.sr), digits = digits, xtable.comment = FALSE)
 
 ```
 
 ```{r table-cn-sr-l-cen, results = "asis", eval = eval_tables, echo = FALSE}
 
-xtable(as.data.frame(cn.sr.l.cen), digits = digits)
+xtable(as.data.frame(cn.sr.l.cen), digits = digits, xtable.comment = FALSE)
 
 ```
