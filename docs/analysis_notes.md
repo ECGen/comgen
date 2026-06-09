@@ -11,21 +11,22 @@
 
 We found support for the hypothesis that genotypically based variation
 in lichen network structure is potentially driven by variation in bark
-roughness. In an initital PerMANOVA with sequential partitioning of
-variance explained, genotype has a strong, statistically significant
-effect (R2 = 0.37, p-value = 0.040) when including tree traits and
-lichen community indices in the model. In this ordering, condensed
-tannins (R2 = 0.09, p-value = 0.486) and species richness (R2 = 0.11,
-p-value = 0.017) are both significant, although with low explanatory
-power. After moving genotype to the final predictor in the model,
-genotype is no longer significant and has low explanatory power, while
-both bark roughness (R2 = 0.14, p-value = 0.006) and species richness
-(R2 = 0.20, 0.002) are now significant and have increased in the
-variance in network similarity explained. Taken together, these results
-suggest that there is potentially a causal relationship between
-genotypically explained variance in bark roughness and lichen community
-species richness that affects the similarity of lichen network
-structure.
+roughness, not just as a function of increasing abundance or richness
+of lichen species. In an initital PerMANOVA with sequential
+partitioning of variance explained, genotype has a strong,
+statistically significant effect (R2 = 0.37, p-value = 0.040) when
+including tree traits and lichen community indices in the model. In
+this ordering, condensed tannins (R2 = 0.09, p-value = 0.486) and
+species richness (R2 = 0.11, p-value = 0.017) are both significant,
+although with low explanatory power. After moving genotype to the
+final predictor in the model, genotype is no longer significant and
+has low explanatory power, while both bark roughness (R2 = 0.14,
+p-value = 0.006) and species richness (R2 = 0.20, 0.002) are now
+significant and have increased in the variance in network similarity
+explained. Taken together, these results suggest that there is
+potentially a causal relationship between genotypically explained
+variance in bark roughness and lichen community species richness that
+affects the similarity of lichen network structure.
 
     cn.geno.trait.pc.sr <- vegan::adonis2(
                                    cn.d.onc~ geno + CT + pH + CN + BR + PC + SR,

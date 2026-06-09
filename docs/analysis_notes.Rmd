@@ -37,16 +37,15 @@ loadd(cn.d.onc)
 
 We found support for the hypothesis that genotypically based variation
 in lichen network structure is potentially driven by variation in bark
-roughness. In an initital PerMANOVA with sequential partitioning of
+roughness, not purely as a function of increasing lichen abundance or
+richness. In an initital PerMANOVA with sequential partitioning of
 variance explained, genotype has a strong, statistically significant
-effect (R2 = 0.37, p-value = 0.040) when including tree traits and
-lichen community indices in the model. In this ordering, condensed
-tannins (R2 = 0.09, p-value = 0.486) and species richness (R2 = 0.11,
-p-value = 0.017) are both significant, although with low explanatory
-power. After moving genotype to the final predictor in the model,
-genotype is no longer significant and has low explanatory power, while
-both bark roughness (R2 = 0.14, p-value = 0.006) and species richness
-(R2 = 0.20, 0.002) are now significant and have increased in the
+effect when including tree traits and lichen community indices in the
+model. In this ordering, condensed tannins and species richness are
+both significant, although with low explanatory power. After moving
+genotype to the final predictor in the model, genotype is no longer
+significant and has low explanatory power, while both bark roughness
+and species richness are now significant and have increased in the
 variance in network similarity explained. Taken together, these
 results suggest that there is potentially a causal relationship
 between genotypically explained variance in bark roughness and lichen
@@ -99,22 +98,21 @@ xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits)
 
 # How does species richness relate to network structure?
 
-
-Examination of the variaince in lichen network similarity explained by
-species richness and the network metrics of size and centrality,
-supported the hypothesis that network structure is both a function of
-increasing numbers of species (i.e., nodes in the network) and other
-structural differences. In analyzing two PerMANOVAs with these
-factors, we found that network size (R2 = 0.77, p-value < 0.001) and
-centrality (R2 = 0.04, p-value < 0.001) both explained vaiation in
-network similarity regardless of whether species richness was the
-first or last factor entered into the model. Additionally, although
-variation in network similarity explained by centrality was low, it
-was significant even after partitioning the variance explained by
-network size. Based on this, we can conclude that network similarity
-is both of function of the number of lichen species in the community
- determining network size and other aspects of network strcutre, such
- as centralization. 
+Following the above results showing the effects of bark roughness and
+species richness on network structure, an examination of the variaince
+in lichen network similarity explained by species richness and the
+network metrics of size and centrality, supported the hypothesis that
+network structure is both a function of increasing numbers of species
+(i.e., nodes in the network) and other structural differences. In
+analyzing two PerMANOVAs with these factors, we found that network
+size and centrality both explained vaiation in network similarity
+regardless of whether species richness was the first or last factor
+entered into the model. Additionally, although variation in network
+similarity explained by centrality was low, it was significant even
+after partitioning the variance explained by network size. Based on
+this, we can conclude that network similarity is both of function of
+the number of lichen species in the community determining network size
+and other aspects of network strcutre, such as centralization.
 
 ```{r permanova-nm-sr, results = "hide"}
 
