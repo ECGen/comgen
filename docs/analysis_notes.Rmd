@@ -95,6 +95,7 @@ xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits, xtable.comment = FAL
 
 ```
 
+\newpage
 
 # How does species richness relate to network structure?
 
