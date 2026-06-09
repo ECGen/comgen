@@ -22,6 +22,7 @@ loadd(cn.d.onc)
 
 ```
 
+
 ## Is the network similarity driven by abundance of lichen?
 
 We found support for the hypothesis that genotypically based variation
@@ -86,8 +87,8 @@ xtable(as.data.frame(cn.trait.pc.sr.geno))
 ```
 
 
-# How does bark roughness affect the structure of the lichen networks?
-Is it driven by lichen abudance (Percent Cover)?
+# How does species richness relate to network structure?
+
 
 Examination of the variaince in lichen network similarity explained by
 species richness and the network metrics of size and centrality,
