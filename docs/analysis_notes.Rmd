@@ -1,5 +1,14 @@
 # Analysis Notes
 
+* BR = bark roughness
+* CT = bark condensed tannins
+* CN = bark carbon-nitrogen ratio
+* PC = percent cover (percent occupied cells in the sampling grid)
+* SR = lichen species richness
+* L = size of lichen network (number of nodes)
+* Cen = centrality of the lichen network
+
+
 ```{r setup, include=FALSE}
 
 show_code <- TRUE
@@ -7,6 +16,7 @@ make_pdf <- TRUE
 eval_output <- as.logical(1 - make_pdf)
 eval_tables <- make_pdf
 knitr::opts_chunk$set(echo = show_code)  # global default
+digits <- c(0, 0, 2, 2, 2, 3)
 
 ```
 
@@ -76,13 +86,13 @@ as.data.frame(cn.trait.pc.sr.geno)
 
 ```{r table-cn-geno-trait-pc-sr, results = "asis", eval = eval_tables}
 
-xtable(as.data.frame(cn.geno.trait.pc.sr))
+xtable(as.data.frame(cn.geno.trait.pc.sr), digits = digits)
 
 ```
 
 ```{r table-cn-trait-pc-sr-geno, results = "asis", eval = eval_tables}
 
-xtable(as.data.frame(cn.trait.pc.sr.geno))
+xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits)
 
 ```
 
@@ -138,12 +148,12 @@ as.data.frame(cn.sr.l.cen)
 
 ```{r table-cn-l-cen-sr, results = "asis", eval = eval_tables}
 
-xtable(as.data.frame(cn.l.cen.sr))
+xtable(as.data.frame(cn.l.cen.sr), digits = digits)
 
 ```
 
 ```{r table-cn-sr-l-cen, results = "asis", eval = eval_tables}
 
-xtable(as.data.frame(cn.sr.l.cen))
+xtable(as.data.frame(cn.sr.l.cen), digits = digits)
 
 ```
