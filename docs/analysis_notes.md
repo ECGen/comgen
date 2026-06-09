@@ -1,8 +1,9 @@
 # Analysis Notes
 
-Make sure to run make.R first and load the necessary objects.
+    ## Make sure to run make.R first and load the necessary objects.
 
-    library(drake)
+    library(pacman)
+    p_load(drake, xtable, rmarkdown)
     loadd(onc.dat)
     loadd(cn.d.onc)
 
@@ -40,9 +41,39 @@ structure.
                                        mrank = TRUE,
                                        permutations = 100000)
 
-# How does bark roughness affect the structure of the lichen networks? Is
+    as.data.frame(cn.geno.trait.pc.sr)
 
-it driven by lichen abudance (Percent Cover)?
+    ##          Df  SumOfSqs         R2         F     Pr(>F)
+    ## geno      9 257.29223 0.37103551 2.3523174 0.04005960
+    ## CT        1  60.19753 0.08680955 4.9532522 0.04815952
+    ## pH        1   7.81880 0.01127532 0.6433567 0.44353556
+    ## CN        1  13.75107 0.01983011 1.1314832 0.29715703
+    ## BR        1  14.71778 0.02122420 1.2110281 0.28096719
+    ## PC        1  11.12976 0.01604998 0.9157931 0.35529645
+    ## SR        1  73.32073 0.10573423 6.0330728 0.01687983
+    ## Residual 21 255.21579 0.36804111        NA         NA
+    ## Total    36 693.44369 1.00000000        NA         NA
+
+    as.data.frame(cn.trait.pc.sr.geno)
+
+    ##          Df   SumOfSqs         R2          F      Pr(>F)
+    ## CT        1  42.567493 0.06138565  3.5025943 0.071539285
+    ## pH        1   9.995145 0.01441378  0.8224336 0.375456245
+    ## CN        1  19.523186 0.02815396  1.6064324 0.211677883
+    ## BR        1  99.979525 0.14417829  8.2266464 0.005749943
+    ## PC        1  29.877598 0.04308583  2.4584277 0.121878781
+    ## SR        1 140.147628 0.20210383 11.5318108 0.001699983
+    ## geno      9  96.137330 0.13863754  0.8789442 0.564134359
+    ## Residual 21 255.215787 0.36804111         NA          NA
+    ## Total    36 693.443693 1.00000000         NA          NA
+
+    xtable(as.data.frame(cn.geno.trait.pc.sr))
+
+    xtable(as.data.frame(cn.trait.pc.sr.geno))
+
+# How does bark roughness affect the structure of the lichen networks?
+
+Is it driven by lichen abudance (Percent Cover)?
 
 Examination of the variaince in lichen network similarity explained by
 species richness and the network metrics of size and centrality,
@@ -73,3 +104,25 @@ centralization.
                                data = onc.dat, 
                                mrank = TRUE,
                                permutations = 100000)
+
+    as.data.frame(cn.l.cen.sr)
+
+    ##          Df   SumOfSqs          R2          F      Pr(>F)
+    ## L         1 601.441361 0.867325448 376.372605 9.99990e-06
+    ## Cen       1  36.581838 0.052753869  22.892343 2.99997e-05
+    ## SR        1   2.686674 0.003874394   1.681279 1.95918e-01
+    ## Residual 33  52.733819 0.076046289         NA          NA
+    ## Total    36 693.443693 1.000000000         NA          NA
+
+    as.data.frame(cn.sr.l.cen)
+
+    ##          Df  SumOfSqs         R2         F       Pr(>F)
+    ## SR        1  77.83169 0.11223938  48.70586 0.0000099999
+    ## L         1 536.35579 0.77346696 335.64307 0.0000099999
+    ## Cen       1  26.52240 0.03824737  16.59730 0.0001299987
+    ## Residual 33  52.73382 0.07604629        NA           NA
+    ## Total    36 693.44369 1.00000000        NA           NA
+
+    xtable(as.data.frame(cn.l.cen.sr))
+
+    xtable(as.data.frame(cn.sr.l.cen))

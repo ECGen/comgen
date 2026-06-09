@@ -1,9 +1,22 @@
 # Analysis Notes
 
-Make sure to run make.R first and load the necessary objects.
+```{r setup, include=FALSE}
 
-```{r}
-library(drake)
+show_code <- TRUE
+make_pdf <- TRUE
+eval_output <- as.logical(1 - make_pdf)
+eval_tables <- make_pdf
+knitr::opts_chunk$set(echo = show_code)  # global default
+
+```
+
+
+```{r deps, eval = TRUE}
+
+## Make sure to run make.R first and load the necessary objects.
+
+library(pacman)
+p_load(drake, xtable, rmarkdown)
 loadd(onc.dat)
 loadd(cn.d.onc)
 
@@ -29,7 +42,7 @@ between genotypically explained variance in bark roughness and lichen
 community species richness that affects the similarity of lichen
 network structure.
 
-```{r}
+```{r permanova-geno, results = "hide"}
 
 cn.geno.trait.pc.sr <- vegan::adonis2(
                                cn.d.onc~ geno + CT + pH + CN + BR + PC + SR,
@@ -47,8 +60,34 @@ cn.trait.pc.sr.geno  <- vegan::adonis2(
 
 ```
 
-# How does bark roughness affect the structure of the lichen networks? Is
-it driven by lichen abudance (Percent Cover)?
+```{r output-cn-geno-trait-pc-sr, eval = eval_output}
+
+as.data.frame(cn.geno.trait.pc.sr)
+
+```
+
+```{r output-cn-trait-pc-sr-geno, eval = eval_output}
+
+as.data.frame(cn.trait.pc.sr.geno)
+
+```
+
+
+```{r table-cn-geno-trait-pc-sr, results = "asis", eval = eval_tables}
+
+xtable(as.data.frame(cn.geno.trait.pc.sr))
+
+```
+
+```{r table-cn-trait-pc-sr-geno, results = "asis", eval = eval_tables}
+
+xtable(as.data.frame(cn.trait.pc.sr.geno))
+
+```
+
+
+# How does bark roughness affect the structure of the lichen networks?
+Is it driven by lichen abudance (Percent Cover)?
 
 Examination of the variaince in lichen network similarity explained by
 species richness and the network metrics of size and centrality,
@@ -66,7 +105,7 @@ is both of function of the number of lichen species in the community
  determining network size and other aspects of network strcutre, such
  as centralization. 
 
-```{r}
+```{r permanova-nm-sr, results = "hide"}
 
 cn.l.cen.sr  <- vegan::adonis2(
                            cn.d.onc~ L + Cen + SR,
@@ -81,5 +120,29 @@ cn.sr.l.cen  <- vegan::adonis2(
                            data = onc.dat, 
                            mrank = TRUE,
                            permutations = 100000)
+
+```
+
+```{r output-cn-l-cen-sr, eval = eval_output}
+
+as.data.frame(cn.l.cen.sr)
+
+```
+
+```{r output-cn-sr-l-cen, eval = eval_output}
+
+as.data.frame(cn.sr.l.cen)
+
+```
+
+```{r table-cn-l-cen-sr, results = "asis", eval = eval_tables}
+
+xtable(as.data.frame(cn.l.cen.sr))
+
+```
+
+```{r table-cn-sr-l-cen, results = "asis", eval = eval_tables}
+
+xtable(as.data.frame(cn.sr.l.cen))
 
 ```
