@@ -12,9 +12,10 @@
 ```{r setup, include=FALSE}
 
 show_code <- TRUE
-make_pdf <- TRUE
-eval_output <- as.logical(1 - make_pdf)
-eval_tables <- make_pdf
+make_doc <- TRUE
+make_pdf <- FALSE
+eval_output <- (as.logical(1 - make_pdf) & as.logical(1 - make_doc))
+eval_tables <- (as.logical(1 - make_pdf) | as.logical(1 - make_doc))
 knitr::opts_chunk$set(echo = show_code)  # global default
 digits <- c(0, 0, 2, 2, 2, 3)
 
@@ -26,7 +27,7 @@ digits <- c(0, 0, 2, 2, 2, 3)
 ## Make sure to run make.R first and load the necessary objects.
 
 library(pacman)
-p_load(drake, xtable, rmarkdown)
+p_load(drake, xtable, rmarkdown, flextable, knitr)
 loadd(onc.dat)
 loadd(cn.d.onc)
 
@@ -85,13 +86,34 @@ as.data.frame(cn.trait.pc.sr.geno)
 
 ```{r table-cn-geno-trait-pc-sr, results = "asis", eval = eval_tables,echo = FALSE}
 
-xtable(as.data.frame(cn.geno.trait.pc.sr), digits = digits, xtable.comment = FALSE)
+tab <- as.data.frame(cn.geno.trait.pc.sr)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits")[-1], align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
 
 ```
 
 ```{r table-cn-trait-pc-sr-geno, results = "asis", eval = eval_tables,echo=FALSE}
 
-xtable(as.data.frame(cn.trait.pc.sr.geno), digits = digits, xtable.comment = FALSE)
+tab <- as.data.frame(cn.trait.pc.sr.geno)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits"), align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
+
 
 ```
 
@@ -131,6 +153,23 @@ cn.sr.l.cen  <- vegan::adonis2(
                            mrank = TRUE,
                            permutations = 100000)
 
+
+cn.geno.sr.l.cen  <- vegan::adonis2(
+                                cn.d.onc~ geno + SR + L + Cen,
+                                by = "term", 
+                                data = onc.dat, 
+                                mrank = TRUE,
+                                permutations = 100000)
+
+cn.sr.l.cen.geno  <- vegan::adonis2(
+                           cn.d.onc~ SR + L + Cen + geno,
+                           by = "term", 
+                           data = onc.dat, 
+                           mrank = TRUE,
+                           permutations = 100000)
+
+
+
 ```
 
 ```{r output-cn-l-cen-sr, eval = eval_output, echo = FALSE}
@@ -145,14 +184,86 @@ as.data.frame(cn.sr.l.cen)
 
 ```
 
+```{r output-geno-cn-sr-l-cen, eval = eval_output, echo = FALSE}
+
+as.data.frame(cn.geno.sr.l.cen.geno)
+
+```
+
+```{r output-cn-sr-l-cen-geno, eval = eval_output, echo = FALSE}
+
+as.data.frame(cn.sr.l.cen.geno)
+
+```
+
+
 ```{r table-cn-l-cen-sr, results = "asis", eval = eval_tables, echo = FALSE}
 
-xtable(as.data.frame(cn.l.cen.sr), digits = digits, xtable.comment = FALSE)
+tab <- as.data.frame(cn.l.cen.sr)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits")[-1], align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
+
 
 ```
 
 ```{r table-cn-sr-l-cen, results = "asis", eval = eval_tables, echo = FALSE}
 
-xtable(as.data.frame(cn.sr.l.cen), digits = digits, xtable.comment = FALSE)
+tab <- as.data.frame(cn.sr.l.cen)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits")[-1], align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
+
 
 ```
+
+```{r table-geno-cn-sr-l-cen, results = "asis", eval = eval_tables, echo = FALSE}
+
+tab <- as.data.frame(cn.geno.sr.l.cen)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits")[-1], align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
+
+
+```
+
+
+```{r table-cn-sr-l-cen-geno, results = "asis", eval = eval_tables, echo = FALSE}
+
+tab <- as.data.frame(cn.sr.l.cen.geno)
+tab[, 4] <- round(tab[, 4], 2)
+tab[, 5] <- round(tab[, 5], 6)
+tab[is.na(tab)] <- ""
+xtab <- xtable(tab, digits = digits, xtable.comment = FALSE)
+
+if (make_doc){
+    kable(tab, digits = attr(xtab, "digits")[-1], align = attr(xtab, "align")[-1])
+}else{
+    print(xtab, type = "html", include.rownames = FALSE)
+}
+
+
+```
+
+

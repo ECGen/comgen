@@ -1,0 +1,644 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\section{Analysis Notes}\label{analysis-notes}
+
+\begin{itemize}
+\tightlist
+\item
+  BR = bark roughness
+\item
+  CT = bark condensed tannins
+\item
+  CN = bark carbon-nitrogen ratio
+\item
+  PC = percent cover (percent occupied cells in the sampling grid)
+\item
+  SR = lichen species richness
+\item
+  L = size of lichen network (number of nodes)
+\item
+  Cen = centrality of the lichen network
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Make sure to run make.R first and load the necessary objects.}
+
+\FunctionTok{library}\NormalTok{(pacman)}
+\FunctionTok{p\_load}\NormalTok{(drake, xtable, rmarkdown, flextable, knitr)}
+\FunctionTok{loadd}\NormalTok{(onc.dat)}
+\FunctionTok{loadd}\NormalTok{(cn.d.onc)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Is the network similarity driven by abundance of
+lichen?}\label{is-the-network-similarity-driven-by-abundance-of-lichen}
+
+We found support for the hypothesis that genotypically based variation
+in lichen network structure is potentially driven by variation in bark
+roughness, not purely as a function of increasing lichen abundance or
+richness. In an initital PerMANOVA with sequential partitioning of
+variance explained, genotype has a strong, statistically significant
+effect when including tree traits and lichen community indices in the
+model. In this ordering, condensed tannins and species richness are both
+significant, although with low explanatory power. After moving genotype
+to the final predictor in the model, genotype is no longer significant
+and has low explanatory power, while both bark roughness and species
+richness are now significant and have increased in the variance in
+network similarity explained. Taken together, these results suggest that
+there is potentially a causal relationship between genotypically
+explained variance in bark roughness and lichen community species
+richness that affects the similarity of lichen network structure.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cn.geno.trait.pc.sr }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                               cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ geno }\SpecialCharTok{+}\NormalTok{ CT }\SpecialCharTok{+}\NormalTok{ pH }\SpecialCharTok{+}\NormalTok{ CN }\SpecialCharTok{+}\NormalTok{ BR }\SpecialCharTok{+}\NormalTok{ PC }\SpecialCharTok{+}\NormalTok{ SR,}
+                               \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                               \AttributeTok{data =}\NormalTok{ onc.dat, }
+                               \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                               \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+
+\NormalTok{cn.trait.pc.sr.geno  }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                                   cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ CT }\SpecialCharTok{+}\NormalTok{ pH }\SpecialCharTok{+}\NormalTok{ CN }\SpecialCharTok{+}\NormalTok{ BR }\SpecialCharTok{+}\NormalTok{ PC }\SpecialCharTok{+}\NormalTok{ SR }\SpecialCharTok{+}\NormalTok{ geno,}
+                                   \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                                   \AttributeTok{data =}\NormalTok{ onc.dat, }
+                                   \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                                   \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+9
+
+257.29
+
+0.37
+
+2.35
+
+0.04023
+
+1
+
+60.20
+
+0.09
+
+4.95
+
+0.04811
+
+1
+
+7.82
+
+0.01
+
+0.64
+
+0.444586
+
+1
+
+13.75
+
+0.02
+
+1.13
+
+0.297517
+
+1
+
+14.72
+
+0.02
+
+1.21
+
+0.280637
+
+1
+
+11.13
+
+0.02
+
+0.92
+
+0.352996
+
+1
+
+73.32
+
+0.11
+
+6.03
+
+0.01695
+
+21
+
+255.22
+
+0.37
+
+36
+
+693.44
+
+1.00
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+1
+
+42.57
+
+0.06
+
+3.5
+
+0.070909
+
+1
+
+10.00
+
+0.01
+
+0.82
+
+0.378716
+
+1
+
+19.52
+
+0.03
+
+1.61
+
+0.208418
+
+1
+
+99.98
+
+0.14
+
+8.23
+
+0.00579
+
+1
+
+29.88
+
+0.04
+
+2.46
+
+0.120689
+
+1
+
+140.15
+
+0.20
+
+11.53
+
+0.00173
+
+9
+
+96.14
+
+0.14
+
+0.88
+
+0.563294
+
+21
+
+255.22
+
+0.37
+
+36
+
+693.44
+
+1.00
+
+\newpage
+
+\section{How does species richness relate to network
+structure?}\label{how-does-species-richness-relate-to-network-structure}
+
+Following the above results showing the effects of bark roughness and
+species richness on network structure, an examination of the variaince
+in lichen network similarity explained by species richness and the
+network metrics of size and centrality, supported the hypothesis that
+network structure is both a function of increasing numbers of species
+(i.e., nodes in the network) and other structural differences. In
+analyzing two PerMANOVAs with these factors, we found that network size
+and centrality both explained vaiation in network similarity regardless
+of whether species richness was the first or last factor entered into
+the model. Additionally, although variation in network similarity
+explained by centrality was low, it was significant even after
+partitioning the variance explained by network size. Based on this, we
+can conclude that network similarity is both of function of the number
+of lichen species in the community determining network size and other
+aspects of network strcutre, such as centralization.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cn.l.cen.sr  }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                           cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ L }\SpecialCharTok{+}\NormalTok{ Cen }\SpecialCharTok{+}\NormalTok{ SR,}
+                           \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                           \AttributeTok{data =}\NormalTok{ onc.dat, }
+                           \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                           \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+
+\NormalTok{cn.sr.l.cen  }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                           cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ SR }\SpecialCharTok{+}\NormalTok{ L }\SpecialCharTok{+}\NormalTok{ Cen,}
+                           \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                           \AttributeTok{data =}\NormalTok{ onc.dat, }
+                           \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                           \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+
+
+\NormalTok{cn.geno.sr.l.cen  }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                                cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ geno }\SpecialCharTok{+}\NormalTok{ SR }\SpecialCharTok{+}\NormalTok{ L }\SpecialCharTok{+}\NormalTok{ Cen,}
+                                \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                                \AttributeTok{data =}\NormalTok{ onc.dat, }
+                                \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                                \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+
+\NormalTok{cn.sr.l.cen.geno  }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis2}\NormalTok{(}
+\NormalTok{                           cn.d.onc}\SpecialCharTok{\textasciitilde{}}\NormalTok{ SR }\SpecialCharTok{+}\NormalTok{ L }\SpecialCharTok{+}\NormalTok{ Cen }\SpecialCharTok{+}\NormalTok{ geno,}
+                           \AttributeTok{by =} \StringTok{"term"}\NormalTok{, }
+                           \AttributeTok{data =}\NormalTok{ onc.dat, }
+                           \AttributeTok{mrank =} \ConstantTok{TRUE}\NormalTok{,}
+                           \AttributeTok{permutations =} \DecValTok{100000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+1
+
+601.44
+
+0.87
+
+376.37
+
+1e-05
+
+1
+
+36.58
+
+0.05
+
+22.89
+
+3e-05
+
+1
+
+2.69
+
+0.00
+
+1.68
+
+0.195228
+
+33
+
+52.73
+
+0.08
+
+36
+
+693.44
+
+1.00
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+1
+
+77.83
+
+0.11
+
+48.71
+
+1e-05
+
+1
+
+536.36
+
+0.77
+
+335.64
+
+1e-05
+
+1
+
+26.52
+
+0.04
+
+16.6
+
+0.00012
+
+33
+
+52.73
+
+0.08
+
+36
+
+693.44
+
+1.00
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+9
+
+257.29
+
+0.37
+
+16.95
+
+1e-05
+
+1
+
+46.66
+
+0.07
+
+27.66
+
+2e-05
+
+1
+
+331.43
+
+0.48
+
+196.49
+
+1e-05
+
+1
+
+17.57
+
+0.03
+
+10.42
+
+0.00224
+
+24
+
+40.48
+
+0.06
+
+36
+
+693.44
+
+1.00
+
+Df
+
+SumOfSqs
+
+R2
+
+F
+
+Pr(\textgreater F)
+
+1
+
+77.83
+
+0.11
+
+46.14
+
+1e-05
+
+1
+
+536.36
+
+0.77
+
+317.97
+
+1e-05
+
+1
+
+26.52
+
+0.04
+
+15.72
+
+0.00029
+
+9
+
+12.25
+
+0.02
+
+0.81
+
+0.625554
+
+24
+
+40.48
+
+0.06
+
+36
+
+693.44
+
+1.00
+
+\end{document}
