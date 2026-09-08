@@ -1271,15 +1271,15 @@ plot_h2 <- function(ord, onc.dat, file = "./cn_trait_h2.pdf",
 }
 
 ## 
-plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
+plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf", curve_amt = 0.02){
     pdf(file)
     cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
     cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
     par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
     set.seed(123)
     net.col <- sign(meanNet(cn.onc))
-    net.col[net.col == -1] <- 2
-    net.col[net.col == 1] <- 1
+    net.col[net.col == -1] <- "red"
+    net.col[net.col == 1] <- "black"
     net.elwd <- (abs(meanNet(cn.onc)) * 10)^2
     coord <- gplot(abs(meanNet(cn.onc)),
                    gmode = "digraph",
@@ -1290,17 +1290,18 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
                    vertex.cex = 0.5,
                    arrowhead.cex = 0.5,
                    label.cex = 1,
+                   usecurve = TRUE,
+                   edge.curve = curve_amt,
                    main = "All Genotypes"
                    )
-    cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in%
-                            c("996", "WC5", "1008")]
+    cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "WC5", "1008")]
     cn.mu.plot <- cn.mu.plot[order(unlist(lapply(
         cn.mu.plot, function(x) sum(abs(sign(x)))
-        )))]
+    )))]
     for (i in 1:length(cn.mu.plot)) {
         net.col <- sign(cn.mu.plot[[i]])
-        net.col[net.col == -1] <- 2
-        net.col[net.col == 1] <- 1
+        net.col[net.col == -1] <- "red"
+        net.col[net.col == 1] <- "black"
         net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
         set.seed(123)
         gplot(abs(cn.mu.plot[[i]]),
@@ -1313,11 +1314,63 @@ plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
               vertex.cex = 0.5,
               arrowhead.cex = 0.5,
               label.cex = 1,
+              usecurve = TRUE,
+              edge.curve = curve_amt,
               main = names(cn.mu.plot)[i]
-              )
+        )
     }
     dev.off()
 }
+
+
+
+## plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf"){
+##     pdf(file)
+##     cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
+##     cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
+##     par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
+##     set.seed(123)
+##     net.col <- sign(meanNet(cn.onc))
+##     net.col[net.col == -1] <- "red"
+##     net.col[net.col == 1] <- "black"
+##     net.elwd <- (abs(meanNet(cn.onc)) * 10)^2
+##     coord <- gplot(abs(meanNet(cn.onc)),
+##                    gmode = "digraph",
+##                    displaylabels = TRUE,
+##                    edge.lwd = net.elwd,
+##                    edge.col = net.col,
+##                    vertex.col = "black",
+##                    vertex.cex = 0.5,
+##                    arrowhead.cex = 0.5,
+##                    label.cex = 1,
+##                    main = "All Genotypes"
+##                    )
+##     cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in%
+##                             c("996", "WC5", "1008")]
+##     cn.mu.plot <- cn.mu.plot[order(unlist(lapply(
+##         cn.mu.plot, function(x) sum(abs(sign(x)))
+##         )))]
+##     for (i in 1:length(cn.mu.plot)) {
+##         net.col <- sign(cn.mu.plot[[i]])
+##         net.col[net.col == -1] <- "red"
+##         net.col[net.col == 1] <- "black"
+##         net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
+##         set.seed(123)
+##         gplot(abs(cn.mu.plot[[i]]),
+##               gmode = "digraph",
+##               displaylabels = TRUE,
+##               coord = coord,
+##               edge.lwd = net.elwd,
+##               edge.col = net.col,
+##               vertex.col = "black",
+##               vertex.cex = 0.5,
+##               arrowhead.cex = 0.5,
+##               label.cex = 1,
+##               main = names(cn.mu.plot)[i]
+##               )
+##     }
+##     dev.off()
+## }
 
 plot_br_net <- function(onc.dat, file = "./results/br_net.pdf", 
                         cex = 2.5, lwd = 1.5, lab.cex = 1.5, 
