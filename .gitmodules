@@ -7,3 +7,5 @@
 [submodule "docs/docs"]
 	path = docs/docs
 	url = git@github.com:ecgen/lcn_manuscript.git
+[submodule "docs/lcn_manuscript/"]
+	branch = main
