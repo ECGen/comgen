@@ -193,17 +193,17 @@ plan <- drake_plan(
         sppcen_aov.txt = sppcen_aov.txt,
         spac_geno.pdf = spac_geno.pdf,
         xg_size.pdf = xg_size.pdf
-    ),
+    )
 ### Generate the manuscript
-    update.manuscript = update_manuscript(
-        files = tables_figures, 
-        dir = "docs/lcn_manuscript", 
-        file.tex = "main.tex",
-        render = FALSE),
+    ## update.manuscript = update_manuscript(
+    ##     files = tables_figures, 
+    ##     dir = "docs/lcn_manuscript", 
+    ##     file.tex = "main.tex",
+    ##     render = FALSE),
 ### Generate Supporting Information
-    update.support = update_manuscript(
-        files = tables_figures, 
-        dir = "docs/lcn_manuscript", 
-        file.tex = "supporting_information.tex",
-        render = FALSE)
+    ## update.support = update_manuscript(
+    ##     files = tables_figures, 
+    ##     dir = "docs/lcn_manuscript", 
+    ##     file.tex = "supporting_information.tex",
+    ##     render = FALSE)
 )
