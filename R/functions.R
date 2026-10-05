@@ -1271,56 +1271,129 @@ plot_h2 <- function(ord, onc.dat, file = "./cn_trait_h2.pdf",
 }
 
 ## 
-plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf", curve_amt = 0.02){
-    pdf(file)
-    cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
-    cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
-    par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
-    set.seed(123)
-    net.col <- sign(meanNet(cn.onc))
-    net.col[net.col == -1] <- "red"
-    net.col[net.col == 1] <- "black"
-    net.elwd <- (abs(meanNet(cn.onc)) * 10)^2
-    coord <- gplot(abs(meanNet(cn.onc)),
-                   gmode = "digraph",
-                   displaylabels = TRUE,
-                   edge.lwd = net.elwd,
-                   edge.col = net.col,
-                   vertex.col = "black",
-                   vertex.cex = 0.5,
-                   arrowhead.cex = 0.5,
-                   label.cex = 1,
-                   usecurve = TRUE,
-                   edge.curve = curve_amt,
-                   main = "All Genotypes"
-                   )
-    cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "WC5", "1008")]
-    cn.mu.plot <- cn.mu.plot[order(unlist(lapply(
-        cn.mu.plot, function(x) sum(abs(sign(x)))
-    )))]
-    for (i in 1:length(cn.mu.plot)) {
-        net.col <- sign(cn.mu.plot[[i]])
-        net.col[net.col == -1] <- "red"
-        net.col[net.col == 1] <- "black"
-        net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
-        set.seed(123)
-        gplot(abs(cn.mu.plot[[i]]),
-              gmode = "digraph",
-              displaylabels = TRUE,
-              coord = coord,
-              edge.lwd = net.elwd,
-              edge.col = net.col,
-              vertex.col = "black",
-              vertex.cex = 0.5,
-              arrowhead.cex = 0.5,
-              label.cex = 1,
-              usecurve = TRUE,
-              edge.curve = curve_amt,
-              main = names(cn.mu.plot)[i]
-        )
+plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf",
+                      edge_curve = 0.1, parallel_space = 0.2) {
+
+  # helper: build edge.curve matrix (same dim as adjacency)
+  make_curve_mat <- function(A, edge_curve, parallel_space) {
+    Apos <- (A > 0) & !is.na(A)
+    C <- matrix(0, nrow(A), ncol(A))
+    C[Apos] <- edge_curve
+    # add extra separation for reciprocal pairs
+    for (i in seq_len(nrow(A)-1)) {
+      for (j in (i+1):ncol(A)) {
+        if (Apos[i,j] && Apos[j,i]) {
+          C[i,j] <- C[i,j] + parallel_space/2
+          C[j,i] <- C[j,i] + parallel_space/2
+        }
+      }
     }
-    dev.off()
+    C
+  }
+
+  pdf(file)
+  on.exit(dev.off(), add = TRUE)
+
+  cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
+  cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
+
+  par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
+  set.seed(123)
+
+  A_all <- abs(meanNet(cn.onc))
+  net.col <- sign(meanNet(cn.onc)); net.col[net.col == -1] <- "red"; net.col[net.col == 1] <- "black"
+  net.elwd <- (A_all * 10)^2
+  curve_all <- make_curve_mat(A_all, edge_curve, parallel_space)
+
+  coord <- gplot(A_all,
+                 gmode = "digraph",
+                 displaylabels = TRUE,
+                 edge.lwd = net.elwd,
+                 edge.col = net.col,
+                 vertex.col = "black",
+                 vertex.cex = 0.5,
+                 arrowhead.cex = 0.5,
+                 label.cex = 1,
+                 usecurve = TRUE,
+                 edge.curve = curve_all,
+                 main = "All Genotypes")
+
+  cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "WC5", "1008")]
+  cn.mu.plot <- cn.mu.plot[order(unlist(lapply(cn.mu.plot, function(x) sum(abs(sign(x))))))]
+
+  for (i in seq_along(cn.mu.plot)) {
+    A <- abs(cn.mu.plot[[i]])
+    net.col <- sign(cn.mu.plot[[i]]); net.col[net.col == -1] <- "red"; net.col[net.col == 1] <- "black"
+    net.elwd <- (A * 10)^2
+    curve_mat <- make_curve_mat(A, edge_curve, parallel_space)
+
+    set.seed(123)
+    gplot(A,
+          gmode = "digraph",
+          displaylabels = TRUE,
+          coord = coord,
+          edge.lwd = net.elwd,
+          edge.col = net.col,
+          vertex.col = "black",
+          vertex.cex = 0.5,
+          arrowhead.cex = 0.5,
+          label.cex = 1,
+          usecurve = TRUE,
+          edge.curve = curve_mat,
+          main = names(cn.mu.plot)[i])
+  }
 }
+
+## plot_nets <- function(cn.onc, onc.dat, file = "./cn_onc.pdf", curve_amt = 0.02){
+##     pdf(file)
+##     cn.onc <- cn.onc[match(onc.dat[, "tree.id"], names(cn.onc))]
+##     cn.mu.onc <- tapply(cn.onc, onc.dat[, "geno"], meanNet)
+##     par(mfrow = c(2, 2), mar = c(0, 0.1, 1.0, 0.1))
+##     set.seed(123)
+##     net.col <- sign(meanNet(cn.onc))
+##     net.col[net.col == -1] <- "red"
+##     net.col[net.col == 1] <- "black"
+##     net.elwd <- (abs(meanNet(cn.onc)) * 10)^2
+##     coord <- gplot(abs(meanNet(cn.onc)),
+##                    gmode = "digraph",
+##                    displaylabels = TRUE,
+##                    edge.lwd = net.elwd,
+##                    edge.col = net.col,
+##                    vertex.col = "black",
+##                    vertex.cex = 0.5,
+##                    arrowhead.cex = 0.5,
+##                    label.cex = 1,
+##                    usecurve = TRUE,
+##                    edge.curve = curve_amt,
+##                    main = "All Genotypes"
+##                    )
+##     cn.mu.plot <- cn.mu.onc[names(cn.mu.onc) %in% c("996", "WC5", "1008")]
+##     cn.mu.plot <- cn.mu.plot[order(unlist(lapply(
+##         cn.mu.plot, function(x) sum(abs(sign(x)))
+##     )))]
+##     for (i in 1:length(cn.mu.plot)) {
+##         net.col <- sign(cn.mu.plot[[i]])
+##         net.col[net.col == -1] <- "red"
+##         net.col[net.col == 1] <- "black"
+##         net.elwd <- (abs(cn.mu.plot[[i]]) * 10)^2
+##         set.seed(123)
+##         gplot(abs(cn.mu.plot[[i]]),
+##               gmode = "digraph",
+##               displaylabels = TRUE,
+##               coord = coord,
+##               edge.lwd = net.elwd,
+##               edge.col = net.col,
+##               vertex.col = "black",
+##               vertex.cex = 0.5,
+##               arrowhead.cex = 0.5,
+##               label.cex = 1,
+##               usecurve = TRUE,
+##               edge.curve = curve_amt,
+##               main = names(cn.mu.plot)[i]
+##         )
+##     }
+##     dev.off()
+## }
 
 
 

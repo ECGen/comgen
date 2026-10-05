@@ -8,7 +8,7 @@ d308bdd7faa3ff9b,import,check_shapiro
 1366bfb342e49a47,target,check.fligner
 518028e891c50c87,target,check.shapiro
 8a4cc67826d23cec,import,clean_garden_data
-b212b59951fe696a,target,cn_onc.pdf
+c85d88fc56f4e042,target,cn_onc.pdf
 f7b65736a16dfc71,target,cn_perm.tex
 463dfc5ceb0e5a39,target,cn_trait_perm.tex
 e7fe0c220fb197a5,target,cn.d.onc
@@ -56,7 +56,7 @@ da17f39630c53244,target,perm.results
 76ee1ec0a34d8bc3,import,plot_br_net
 97ae0188003aeba5,import,plot_geno_sppcen
 7d80e3fc710ccf8c,import,plot_h2
-90074bfac3319b8b,import,plot_nets
+5a08d43d28d1b428,import,plot_nets
 17ada1e28c42604d,import,plot_spag
 bc1254f0b245e507,import,plot_sppcen
 1957da860e21f254,import,plot_xg_size
@@ -101,7 +101,7 @@ f7ef9077c0f6e724,target,spp.cen.pos.in
 c85d88fc56f4e042,target,sppcen_aov.txt
 e2f7d5c8a796215e,target,sppcen_xtab
 f0bf436ec5fa13ff,target,sppcen.tex
-47936203a963e2ef,target,tables_figures
+201c6b9122d5d596,target,tables_figures
 06d5becf73e964fc,target,trait_path_xtab
 a2f78a000bf8555c,target,trait_path.tex
 73bc872ee5ea4397,target,trait.results
